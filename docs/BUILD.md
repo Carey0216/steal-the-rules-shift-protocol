@@ -36,7 +36,7 @@ On the hosted page, verify first launch in a fresh browser profile. Complete the
 
 ## Publish a tagged release
 
-Commit the project with the new version in `project.godot`, push the commit, then build both targets. Run `./tools/release.ps1 -Tag v1.2.0 -Commit HEAD -BuildDir builds -Notes 'Release notes' -Latest` with the appropriate version and description. The script verifies the tag matches the project version and adds both ZIPs to the public GitHub release.
+Set the version in `project.godot` and add `docs/releases/vX.Y.Z.md`. Write complete notes in this order: English, 中文（简体）, 中文（繁體）, 日本語, 한국어. Separate the five sections with `---`. Commit and push the release, then build both targets. Run `./tools/release.ps1 -Tag vX.Y.Z -Commit HEAD -BuildDir builds -Latest`. The script checks the version and the language order, then publishes the tag and both ZIPs.
 
 ## Record the guide again
 

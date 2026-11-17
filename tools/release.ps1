@@ -2,7 +2,6 @@ param(
     [Parameter(Mandatory)][ValidatePattern('^v\d+\.\d+\.\d+$')][string] $Tag,
     [Parameter(Mandatory)][string] $Commit,
     [Parameter(Mandatory)][string] $BuildDir,
-    [Parameter(Mandatory)][string] $Notes,
     [switch] $Latest
 )
 
@@ -23,6 +22,12 @@ $sha = (Invoke-RepoGit rev-parse --verify "$Commit^{commit}").Trim()
 $settings = (Invoke-RepoGit show "${sha}:project.godot") -join "`n"
 $projectVersion = 'config/version="' + $Tag.Substring(1) + '"'
 if (-not ($settings -split "`r?`n").Contains($projectVersion)) { throw 'Tag must match the version in project.godot.' }
+$notesPath = Join-Path (Split-Path $PSScriptRoot -Parent) "docs/releases/$Tag.md"
+$notes = (Get-Content -LiteralPath $notesPath -Raw -Encoding UTF8).TrimEnd()
+$expectedLanguages = 'English|中文（简体）|中文（繁體）|日本語|한국어'
+$sections = $notes -split '(?m)^[ \t]*---[ \t]*\r?$'
+$actualLanguages = ($sections | ForEach-Object { [regex]::Match($_.Trim(), '\A## ([^\r\n]+)').Groups[1].Value }) -join '|'
+if ($actualLanguages -cne $expectedLanguages) { throw 'Release notes must contain all five language sections in order, separated by horizontal rules.' }
 $builds = @('shift-protocol-windows-x64.zip', 'shift-protocol-web.zip')
 $files = @($builds | ForEach-Object { Get-Item -LiteralPath (Join-Path $BuildDir $_) })
 
@@ -51,7 +56,7 @@ try {
     if ($null -eq $_.Exception.Response -or [int]$_.Exception.Response.StatusCode -ne 404) { throw }
 }
 if (-not $release) {
-    $body = @{tag_name=$Tag; target_commitish=$sha; name="SHIFT PROTOCOL $Tag"; body=$Notes; draft=$true} | ConvertTo-Json -Compress
+    $body = @{tag_name=$Tag; target_commitish=$sha; name="SHIFT PROTOCOL $Tag"; body=$notes; draft=$true} | ConvertTo-Json -Compress
     $release = Invoke-RestMethod "$api/releases" -Method Post -Headers $headers -ContentType 'application/json' -Body $body
 }
 
@@ -66,13 +71,16 @@ foreach ($file in $files) {
     if ($asset.state -ne 'uploaded' -or $asset.size -ne $file.Length -or ($asset.digest -and $asset.digest -ne $digest)) {
         throw "Release asset does not match the build: $($file.Name)"
     }
-    Write-Output $asset.browser_download_url
 }
 
 if ($release.draft) {
-    $body = @{draft=$false; make_latest=$Latest.IsPresent.ToString().ToLowerInvariant()} | ConvertTo-Json -Compress
+    $body = @{body=$notes; draft=$false; make_latest=$Latest.IsPresent.ToString().ToLowerInvariant()} | ConvertTo-Json -Compress
+    $release = Invoke-RestMethod "$api/releases/$($release.id)" -Method Patch -Headers $headers -ContentType 'application/json' -Body $body
+} elseif ($release.body -cne $notes) {
+    $body = @{body=$notes} | ConvertTo-Json -Compress
     $release = Invoke-RestMethod "$api/releases/$($release.id)" -Method Patch -Headers $headers -ContentType 'application/json' -Body $body
 }
 $public = Invoke-RestMethod "$api/releases/tags/$Tag" -Headers @{'User-Agent'='Shift-Protocol'}
-if ($public.draft -or ($public.assets | Where-Object state -eq 'uploaded').Count -lt 2) { throw 'Public release verification failed.' }
+if ($public.draft -or ($public.assets | Where-Object state -eq 'uploaded').Count -lt 2 -or $public.body -cne $notes) { throw 'Public release verification failed.' }
+Write-Output ($public.assets | Select-Object -ExpandProperty browser_download_url)
 Write-Output $public.html_url
