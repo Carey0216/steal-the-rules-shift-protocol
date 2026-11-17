@@ -1,0 +1,10 @@
+.godot/
+.import/
+builds/
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+docs/*.png.import

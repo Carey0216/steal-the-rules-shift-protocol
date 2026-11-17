@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.gd text eol=lf
+*.tscn text eol=lf
+*.ttf binary
+*.png binary
+*.wav binary
+assets/OFL-*.txt whitespace=-blank-at-eol
