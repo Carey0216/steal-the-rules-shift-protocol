@@ -219,6 +219,9 @@ func set_language(index: int) -> void:
 	queue_redraw()
 
 func _display_is_fullscreen() -> bool:
+	if OS.has_feature("web"):
+		var browser = Engine.get_singleton("JavaScriptBridge")
+		return browser.get_interface("document").fullscreenElement != null
 	return get_window().mode in [Window.MODE_FULLSCREEN, Window.MODE_EXCLUSIVE_FULLSCREEN]
 
 func set_fullscreen(enabled: bool) -> void:

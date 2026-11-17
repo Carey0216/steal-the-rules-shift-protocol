@@ -36,6 +36,9 @@ var demo_progress: ProgressBar
 var demo_toggle: Button
 var preview: TextureRect
 var previous_mode := ""
+var display_picker: OptionButton
+var web_document
+var fullscreen_listener
 
 func _ready() -> void:
 	layer = 4
@@ -51,8 +54,21 @@ func _ready() -> void:
 	elif not game.guide_seen:
 		page = "guide"
 		onboarding = true
+	if OS.has_feature("web"):
+		var browser = Engine.get_singleton("JavaScriptBridge")
+		web_document = browser.get_interface("document")
+		fullscreen_listener = browser.create_callback(_sync_web_display)
+		web_document.addEventListener("fullscreenchange", fullscreen_listener)
 	_draw_page()
 	previous_mode = game.mode
+
+func _exit_tree() -> void:
+	if web_document != null:
+		web_document.removeEventListener("fullscreenchange", fullscreen_listener)
+
+func _sync_web_display(_args: Array) -> void:
+	if page == "settings" and is_instance_valid(display_picker):
+		display_picker.select(int(game._display_is_fullscreen()))
 
 func sync_mode() -> void:
 	if game.mode == previous_mode:
@@ -167,6 +183,7 @@ func _modal(title: String, at: Rect2) -> Panel:
 
 func _draw_page() -> void:
 	set_process(false)
+	display_picker = null
 	demo_sheets.clear()
 	for child in ui.get_children():
 		ui.remove_child(child)
@@ -225,7 +242,9 @@ func _settings() -> void:
 			"Language":
 				selected_language = _option(panel, Locale.NAMES, Locale.current(), row, _change_language)
 			"Display mode":
-				_option(panel, ["Windowed", "Fullscreen"], int(fills_screen), row, _change_display)
+				display_picker = _option(panel, ["Windowed", "Fullscreen"], int(fills_screen), row, _change_display)
+				if is_web:
+					display_picker.disabled = not web_document.fullscreenEnabled
 			"Window size":
 				var choice := _option(panel, ["1152 × 648", "1280 × 720", "1600 × 900"], game.window_size_index, row, _change_window_size)
 				choice.disabled = is_web or fills_screen
@@ -247,7 +266,8 @@ func _change_language(index: int) -> void:
 
 func _change_display(index: int) -> void:
 	game.set_fullscreen(index == 1)
-	_draw_page.call_deferred()
+	if not OS.has_feature("web"):
+		_draw_page.call_deferred()
 
 func _change_window_size(index: int) -> void:
 	game.window_size_index = index
