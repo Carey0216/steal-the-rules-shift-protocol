@@ -3,6 +3,7 @@ extends SceneTree
 ## The pilot below sends standard combat inputs through the fixed-step simulation.
 
 const GAME = preload("res://main.tscn")
+const Locale = preload("res://src/locale.gd")
 const DT := 1.0 / 120.0
 var failed := 0
 var g: Node2D
@@ -24,10 +25,31 @@ func _check(ok: bool, message: String) -> void:
 func _run() -> void:
 	capture = "--capture" in OS.get_cmdline_user_args() and DisplayServer.get_name() != "headless"
 	g = GAME.instantiate()
+	g.save_path = ""
 	root.add_child(g)
 	g.set_physics_process(false)
 	g.audio_rig.set_mute(true)
-	g.save_path = ""
+	_check(g.title_menu.page == "language", "A fresh profile must request a language.")
+	for index in Locale.CODES.size():
+		g.set_language(index)
+		_check(Locale.current() == index, "Locale must be selectable: " + Locale.CODES[index])
+		if index > 0:
+			_check(Locale.text("Settings") != "Settings" and Locale.text("THE WARDEN") != "THE WARDEN", "Menus and encounters must be localized.")
+		for character in Locale.NAMES[index]:
+			_check(Locale.face(index).has_char(character.unicode_at(0)), "Missing glyph for native language name.")
+	g.set_language(0)
+	g.title_menu.pending_locale = 0
+	g.title_menu._confirm_language()
+	_check(g.title_menu.page == "guide", "Language confirmation must open the guide.")
+	if capture:
+		g.title_menu._choose_demo(3)
+		await process_frame
+		g.title_menu.set_process(false)
+		g.title_menu.demo_time = 2.2
+		g.title_menu._show_frame()
+		await _shot("guide")
+	g.title_menu.back()
+	_check(g.guide_seen and g.title_menu.page.is_empty(), "Finishing the guide must unlock the title screen.")
 	g.assist = false
 	if capture:
 		await _shot("title")

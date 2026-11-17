@@ -13,7 +13,7 @@ On Windows, use the Godot console executable for command output. To build and pa
 ./tools/build.ps1 -Godot 'C:/path/to/Godot_v4.7.2-stable_win64_console.exe'
 ```
 
-The script makes the Web and Windows exports from the committed presets, includes accompanying notices, and writes two ZIPs under `builds/`. Alternatively, export **Web** to `builds/web/index.html` and **Windows** to `builds/windows/ShiftProtocol.exe` from Project → Export after creating the output folders. Use the packaging script for distribution.
+The script tests and packages the Web and Windows exports in a staging folder. After both ZIPs are ready, it replaces the previous exports and ZIPs under `builds/`. Alternatively, export **Web** to `builds/web/index.html` and **Windows** to `builds/windows/ShiftProtocol.exe` from Project → Export after creating the output folders. Use the packaging script for distribution.
 
 Serve the Web build over HTTP, rather than double-clicking the HTML:
 
@@ -32,4 +32,8 @@ Open `http://127.0.0.1:8060/` in a desktop browser with WebGL 2. The Web preset 
 
 ## Before submitting
 
-On the hosted page, verify the first transfer with both Shift and Q, finish all three sectors on at least one target, retry from sector two, toggle audio and reduced motion, and check the final stats screen. Test with the canvas embedded at its intended dimensions. The automated run checks the rules and all three encounters; it does not replace a first-time player trying the tutorial.
+On the hosted page, verify first launch in a fresh browser profile, then select a language and replay the movement, strike, dodge, steal and rule demos. Check that the language persists after reloading. Verify the first transfer with both Shift and Q, finish all three sectors on at least one target, and check the final stats screen.
+
+## Record the guide again
+
+The demos are four-second recordings of the playable arena. The capture script operates the game via its normal keyboard inputs and checks each result. Run the graphical Godot binary with `--path . --windowed --resolution 1152x648 --script tools/record_demos.gd`, then run `python tools/pack_demos.py` with Pillow installed. The packer uses the frames in `builds/recordings/` to replace the WebP sheets in `assets/demos/`.

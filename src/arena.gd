@@ -3,6 +3,8 @@ extends Node2D
 
 const Art = preload("res://src/arena_art.gd")
 const AudioRig = preload("res://src/sound.gd")
+const Locale = preload("res://src/locale.gd")
+const Menu = preload("res://src/title_menu.gd")
 const SAVE = "user://shift_protocol.cfg"
 const SIZE = Vector2(1152, 648)
 const LEFT = 68.0
@@ -21,6 +23,7 @@ const ENCOUNTERS = [
 
 var art: RefCounted
 var audio_rig: Node
+var title_menu: CanvasLayer
 var config := ConfigFile.new()
 var save_path := SAVE
 var mode := "title"
@@ -83,11 +86,18 @@ var checkpoint := {"rule": Rule.EMPTY, "hp": MAX_HP, "time": 0.0, "steals": 0, "
 var reduced_motion := false
 var muted := false
 var assist := false
+var language_index := -1
+var guide_seen := false
+var fullscreen := false
+var text_size_index := 0
+var window_size_index := 0
+var record_demo := false
 var last_device := "keyboard"
 var just: Dictionary = {}
 var combat_rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
+	Locale.install()
 	Engine.physics_ticks_per_second = 120
 	_bind(&"left", [KEY_A, KEY_LEFT], [JOY_BUTTON_DPAD_LEFT])
 	_bind(&"right", [KEY_D, KEY_RIGHT], [JOY_BUTTON_DPAD_RIGHT])
@@ -104,16 +114,36 @@ func _ready() -> void:
 	_bind(&"assist_mode", [KEY_H], [])
 	_bind(&"quit_run", [KEY_T], [])
 	_bind(&"full", [KEY_F11], [])
-	config.load(SAVE)
+	if not save_path.is_empty():
+		config.load(save_path)
 	muted = config.get_value("settings", "mute", false)
 	reduced_motion = config.get_value("settings", "reduced_motion", false)
 	assist = config.get_value("settings", "assist", false)
+	language_index = Locale.CODES.find(config.get_value("settings", "language", ""))
+	guide_seen = config.get_value("settings", "guide_seen", false)
+	text_size_index = clampi(int(config.get_value("settings", "text_size", 0)), 0, Menu.SCALES.size() - 1)
+	window_size_index = clampi(int(config.get_value("settings", "window_size", 0)), 0, Menu.SIZES.size() - 1)
+	var locale := TranslationServer.standardize_locale(OS.get_locale())
+	var initial := language_index
+	if initial < 0:
+		initial = Locale.CODES.find(locale)
+		if initial < 0:
+			if locale.begins_with("zh"):
+				initial = 2 if locale.begins_with("zh_Hant") or locale.contains("_HK") or locale.contains("_MO") else 1
+			else:
+				initial = clampi(Locale.CODES.find(locale.get_slice("_", 0)), 0, Locale.CODES.size() - 1)
+	TranslationServer.set_locale(Locale.CODES[initial])
+	if DisplayServer.get_name() != "headless" and not OS.has_feature("editor") and not OS.has_feature("web"):
+		_apply_display(config.get_value("settings", "fullscreen", true))
 	best_time = config.get_value("records", "clear_time", 0.0)
 	combat_rng.randomize()
 	art = Art.new()
 	audio_rig = AudioRig.new()
 	add_child(audio_rig)
 	audio_rig.set_mute(muted)
+	title_menu = Menu.new()
+	title_menu.game = self
+	add_child(title_menu)
 
 func _bind(action: StringName, keys: Array, buttons: Array) -> void:
 	if InputMap.has_action(action):
@@ -132,6 +162,17 @@ func _bind(action: StringName, keys: Array, buttons: Array) -> void:
 		InputMap.action_add_event(action, event)
 
 func _input(event: InputEvent) -> void:
+	if title_menu != null and not record_demo:
+		if event.is_action_pressed(&"full"):
+			set_fullscreen(not _display_is_fullscreen())
+			if title_menu.page == "settings":
+				title_menu._draw_page.call_deferred()
+			get_viewport().set_input_as_handled()
+			return
+		if mode == "title" and not title_menu.page.is_empty():
+			return
+		if mode == "title" and event.is_action_pressed(&"confirm") and get_viewport().gui_get_focus_owner() != null:
+			return
 	if event is InputEventJoypadButton and event.pressed:
 		last_device = "pad"
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -139,14 +180,19 @@ func _input(event: InputEvent) -> void:
 		if event.keycode == KEY_SHIFT or event.physical_keycode == KEY_SHIFT:
 			just[&"steal"] = true
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if (mode == "title" and Rect2(59, 456, 293, 49).has_point(event.position)) or (mode in ["brief", "clear", "paused", "lost", "win"] and Rect2(278, 437, 346, 34).has_point(event.position)):
+		if mode in ["brief", "clear", "paused", "lost", "win"] and Rect2(278, 437, 346, 34).has_point(event.position):
 			just[&"confirm"] = true
-	for action in [&"confirm", &"pause", &"jump", &"dodge", &"rule", &"steal", &"retry", &"mute_game", &"motion", &"assist_mode", &"quit_run", &"full"]:
+	for action in [&"confirm", &"pause", &"jump", &"dodge", &"rule", &"steal", &"retry", &"mute_game", &"motion", &"assist_mode", &"quit_run"]:
 		if event.is_action_pressed(action):
 			just[action] = true
 
+func _unhandled_input(event: InputEvent) -> void:
+	if mode == "title" and title_menu != null and not title_menu.page.is_empty() and event.is_action_pressed("ui_cancel"):
+		title_menu.back()
+		get_viewport().set_input_as_handled()
+
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and mode in ["fight", "brief", "clear"]:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and not record_demo and mode in ["fight", "brief", "clear"]:
 		resume_mode = mode
 		mode = "paused"
 		just.clear()
@@ -155,9 +201,43 @@ func _save() -> void:
 	config.set_value("settings", "mute", muted)
 	config.set_value("settings", "reduced_motion", reduced_motion)
 	config.set_value("settings", "assist", assist)
+	if language_index >= 0:
+		config.set_value("settings", "language", Locale.CODES[language_index])
+	config.set_value("settings", "guide_seen", guide_seen)
+	config.set_value("settings", "text_size", text_size_index)
+	config.set_value("settings", "window_size", window_size_index)
+	if not OS.has_feature("web"):
+		config.set_value("settings", "fullscreen", fullscreen)
 	config.set_value("records", "clear_time", best_time)
 	if not save_path.is_empty():
 		config.save(save_path)
+
+func set_language(index: int) -> void:
+	language_index = index
+	TranslationServer.set_locale(Locale.CODES[index])
+	_save()
+	queue_redraw()
+
+func _display_is_fullscreen() -> bool:
+	return get_window().mode in [Window.MODE_FULLSCREEN, Window.MODE_EXCLUSIVE_FULLSCREEN]
+
+func set_fullscreen(enabled: bool) -> void:
+	_apply_display(enabled)
+	_save()
+
+func _apply_display(enabled: bool) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var window := get_window()
+	window.mode = Window.MODE_FULLSCREEN if enabled else Window.MODE_WINDOWED
+	fullscreen = enabled
+	if not enabled and not OS.has_feature("web"):
+		var screen := DisplayServer.screen_get_usable_rect(window.current_screen)
+		var available := (screen.size - Vector2i(48, 80)).max(Vector2i(640, 360))
+		var chosen: Vector2i = Menu.SIZES[window_size_index]
+		var fit := minf(1.0, minf(float(available.x) / chosen.x, float(available.y) / chosen.y))
+		window.size = Vector2i(Vector2(chosen) * fit)
+		window.position = screen.position + (screen.size - window.size) / 2
 
 func _physics_process(dt: float) -> void:
 	var pressed := just
@@ -170,9 +250,6 @@ func _physics_process(dt: float) -> void:
 	if pressed.has("motion"):
 		reduced_motion = not reduced_motion
 		_save()
-	if pressed.has("full") and not OS.has_feature("web"):
-		var current := DisplayServer.window_get_mode()
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if current == DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
 	if pressed.has("assist_mode") and mode == "title":
 		assist = not assist
 		_save()
@@ -223,6 +300,8 @@ func _physics_process(dt: float) -> void:
 	if mode != "paused":
 		_tick_fx(dt)
 	audio_rig.set_stage(stage if mode != "title" else -1, mode == "fight")
+	if title_menu != null and not record_demo:
+		title_menu.sync_mode()
 	queue_redraw()
 
 func _new_run() -> void:
@@ -402,17 +481,17 @@ func _try_shift() -> void:
 	_burst(core_pos(), wire_color, 43, 340.0)
 	_burst(wire_to, wire_color, 31, 260.0)
 	rings.append({"at": wire_from, "t": 0.55, "c": wire_color, "r": 214.0})
-	var consequence := "Boss stripped  /  reserve rule warming up"
+	var consequence := Locale.text("Boss stripped  /  reserve rule warming up")
 	if boss_rule != Rule.EMPTY:
-		consequence = "Boss inherited %s  /  its next attack changes" % RULE_NAMES[boss_rule]
+		consequence = Locale.text("Boss inherited %s  /  its next attack changes") % Locale.text(RULE_NAMES[boss_rule])
 	if player_rule == Rule.LIFT:
-		consequence = "Boss loses flight  /  " + ("lower deck breached" if stage == 1 and not floor_broken else "heavy impact")
+		consequence = Locale.text("Boss loses flight  /  lower deck breached" if stage == 1 and not floor_broken else "Boss loses flight  /  heavy impact")
 		if stage == 1:
 			floor_broken = true
 		grounded = false
 		v.y = -260.0
 	_set_state("reboot", 0.62)
-	_report("%s TRANSFERRED" % RULE_NAMES[player_rule], consequence, 1.75)
+	_report(Locale.text("%s TRANSFERRED") % Locale.text(RULE_NAMES[player_rule]), consequence, 1.75)
 	audio_rig.fire("steal")
 	_damage_boss(4)
 

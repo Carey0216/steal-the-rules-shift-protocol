@@ -1,5 +1,8 @@
 extends RefCounted
 
+const Locale = preload("res://src/locale.gd")
+const Menu = preload("res://src/title_menu.gd")
+
 const INK := Color("#0b131b")
 const PAPER := Color("#f5e9cd")
 const TEXT := Color("#ecede5")
@@ -10,19 +13,8 @@ const LINE := Color("#364853")
 const W := 1152.0
 const H := 648.0
 var g: Node2D
-var headline: Font
-var mono: Font
 var accent: Color
 var sec := 0
-
-func _init() -> void:
-	headline = _font("res://assets/BarlowCondensed-ExtraBold.ttf")
-	mono = _font("res://assets/SpaceMono-Regular.ttf")
-
-func _font(path: String) -> Font:
-	if ResourceLoader.exists(path):
-		return load(path)
-	return ThemeDB.fallback_font
 
 func paint(game: Node2D) -> void:
 	g = game
@@ -43,7 +35,8 @@ func paint(game: Node2D) -> void:
 	_player(g.p, g.facing, 1.0)
 	_world_fx(true)
 	g.draw_set_transform(Vector2.ZERO)
-	_hud()
+	if not g.record_demo:
+		_hud()
 	if g.mode in ["brief", "clear", "paused", "lost", "win"]:
 		_overlay()
 
@@ -62,9 +55,17 @@ func _shape(pos: Vector2, face: float, scale: float, coords: Array, color: Color
 		pts.append(pos + Vector2(coords[2 * i] * face, coords[2 * i + 1]) * scale)
 	g.draw_colored_polygon(pts, color)
 
-func _text(message: String, x: float, y: float, size: int, color: Color, big := false, align := HORIZONTAL_ALIGNMENT_LEFT) -> void:
-	var font := headline if big else mono
+func _text(message: String, x: float, y: float, size: int, color: Color, big := false, align := HORIZONTAL_ALIGNMENT_LEFT, max_width := 0.0, max_size := 256) -> void:
+	var index := Locale.current()
+	var font := Locale.face(0 if size >= 100 else index, big)
+	message = Locale.text(message)
+	if not g.record_demo and size < 100:
+		size = roundi(size * Menu.SCALES[g.text_size_index])
+	size = mini(size, max_size)
 	var width := font.get_string_size(message, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+	if max_width > 0 and width > max_width:
+		size = maxi(10, floori(size * max_width / width))
+		width = font.get_string_size(message, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
 	if align == HORIZONTAL_ALIGNMENT_RIGHT:
 		x -= width
 	elif align == HORIZONTAL_ALIGNMENT_CENTER:
@@ -126,8 +127,9 @@ func _background(floor: float, age: float) -> void:
 		_rect(x, y, 1 + i % 3, 1, _soft(accent, 0.10 + (i % 5) * 0.035))
 	for i in 115:
 		_rect(0, 4 + i * 5.0, W, 1, _soft(INK, 0.14))
-	_text("SUBLEVEL  /  " + str(sec + 1).pad_zeros(2), 59, 176, 12, _soft(DIM, 0.52))
-	_text("AUTHORIZED MACHINES ONLY", 1093, 176, 12, _soft(DIM, 0.52), false, HORIZONTAL_ALIGNMENT_RIGHT)
+	if not g.record_demo:
+		_text(Locale.text("SUBLEVEL") + "  /  " + str(sec + 1).pad_zeros(2), 59, 176, 12, _soft(DIM, 0.52))
+		_text("AUTHORIZED MACHINES ONLY", 1093, 176, 12, _soft(DIM, 0.52), false, HORIZONTAL_ALIGNMENT_RIGHT)
 
 func _floor(y: float) -> void:
 	_rect(-25, y, W + 50, 190, Color("#101921"))
@@ -310,11 +312,11 @@ func _hud() -> void:
 	_rect(0, 0, W, 136, INK)
 	_rect(0, 135, W, 1, LINE)
 	_rect(0, 0, W, 3, accent)
-	_text("SHIFT PROTOCOL", 42, 32, 27, PAPER, true)
-	_text("SECTOR " + g.ENCOUNTERS[sec].sector, 42, 55, 12, DIM)
+	_text("SHIFT PROTOCOL", 42, 35, 27, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 270, 30)
+	_text(Locale.text("SECTOR") + " " + Locale.text(g.ENCOUNTERS[sec].sector), 42, 55, 12, DIM)
 	_text(g.timecode(g.run_time), 1110, 34, 19, TEXT, false, HORIZONTAL_ALIGNMENT_RIGHT)
 	_text("RUN CLOCK", 1110, 55, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(g.ENCOUNTERS[sec].name, 576, 38, 32, PAPER, true, HORIZONTAL_ALIGNMENT_CENTER)
+	_text(g.ENCOUNTERS[sec].name, 576, 41, 32, PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 480, 34)
 	_rect(326, 51, 500, 8, LINE)
 	var fraction: float = float(g.boss_hp) / g.ENCOUNTERS[sec].hp
 	if fraction > 0:
@@ -327,26 +329,28 @@ func _hud() -> void:
 		_rect(42 + i * 22, 100, 17, 13, GREEN if i < g.hp else LINE)
 	var slot_color: Color = g.RULE_COLORS[g.player_rule]
 	_text("YOUR RULE", 315, 91, 12, DIM)
-	_text(g.RULE_NAMES[g.player_rule], 313, 119, 28, slot_color, true)
+	_text(g.RULE_NAMES[g.player_rule], 313, 123, 26, slot_color, true, HORIZONTAL_ALIGNMENT_LEFT, 130, 28)
 	var charge_label := "Y" if g.last_device == "pad" else "E"
 	if g.player_rule != g.Rule.EMPTY:
-		_text("[" + charge_label + "] READY" if g.charge else "RECHARGING", 430, 113, 12, slot_color if g.charge else DIM)
+		_text(Locale.text("[%s] READY") % charge_label if g.charge else "RECHARGING", 450, 113, 12, slot_color if g.charge else DIM)
 	_text("SHIFT LINK", 692, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
 	var link := "IN RANGE" if g.can_shift() else ("APPROACH" if g.state == "exposed" and g.boss_rule != g.Rule.EMPTY else "WAIT")
 	_text(link, 692, 115, 18, GREEN if g.can_shift() else DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
 	_text("BOSS RULE", 1110, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(g.RULE_NAMES[g.boss_rule], 1110, 119, 28, g.RULE_COLORS[g.boss_rule], true, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(g.RULE_NAMES[g.boss_rule], 1110, 123, 26, g.RULE_COLORS[g.boss_rule], true, HORIZONTAL_ALIGNMENT_RIGHT, 264, 28)
 	_rect(0, 568, W, 80, INK)
 	_line(Vector2(0, 568), Vector2(W, 568), LINE)
-	var sub := _instruction()
+	var sub := Locale.text(_instruction())
+	if g.last_device == "pad":
+		sub = sub.replace(" / E", " / Y")
 	_text(sub, 42, 596, 16, TEXT)
 	var inputs := "STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE" if g.last_device == "pad" else "A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE"
-	_text(inputs, 42, 627, 12, DIM)
-	_text("M AUDIO  /  V MOTION  /  ESC PAUSE", 1110, 627, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(inputs, 42, 627, 12, DIM, false, HORIZONTAL_ALIGNMENT_LEFT, 751)
+	_text("M AUDIO  /  V MOTION  /  ESC PAUSE", 1110, 627, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT, 300)
 	if g.state == "windup":
 		_text(g.move_name, 576, 176, 25, RED, true, HORIZONTAL_ALIGNMENT_CENTER)
 	elif g.notice_time > 0.0:
-		_text(g.notice, 576, 179, 35, g.wire_color if g.notice.ends_with("TRANSFERRED") else PAPER, true, HORIZONTAL_ALIGNMENT_CENTER)
+		_text(g.notice, 576, 179, 35, g.wire_color if g.wire_time > 0.0 else PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 990, 38)
 		_text(g.notice_sub, 576, 201, 13, TEXT, false, HORIZONTAL_ALIGNMENT_CENTER)
 	if g.hit_flash > 0.0 and not g.reduced_motion:
 		_rect(4, 139, W - 8, 424, _soft(RED, g.hit_flash * 0.9), false, 4.0)
@@ -389,46 +393,46 @@ func _overlay() -> void:
 	var enter := "START / A" if g.last_device == "pad" else "ENTER"
 	match g.mode:
 		"brief":
-			kicker = "INTRUSION  /  " + g.ENCOUNTERS[sec].sector
+			kicker = Locale.text("INTRUSION") + "  /  " + Locale.text(g.ENCOUNTERS[sec].sector)
 			title = g.ENCOUNTERS[sec].name
 			lines.append(g.ENCOUNTERS[sec].call)
 			if sec == 0:
 				lines.append("Get close when the core opens. Press SHIFT or Q.")
 				lines.append("One slot. Each swap hands your old rule to the boss.")
 			else:
-				lines.append("Carried: " + g.RULE_NAMES[g.player_rule] + "   /   Hull " + str(g.hp) + " of 7")
+				lines.append(Locale.text("Carried: %s   /   Hull %s of 7") % [Locale.text(g.RULE_NAMES[g.player_rule]), g.hp])
 				lines.append("Reboots restore this sector's starting loadout.")
-			cta = enter + "   ENGAGE"
+			cta = "ENGAGE"
 		"clear":
-			kicker = "SECTOR " + str(sec + 1).pad_zeros(2) + " / 03"
+			kicker = Locale.text("SECTOR") + " " + str(sec + 1).pad_zeros(2) + " / 03"
 			title = "GATE UNLOCKED"
-			lines.append("Carry " + g.RULE_NAMES[g.player_rule] + " into the next sector.")
+			lines.append(Locale.text("Carry %s into the next sector.") % Locale.text(g.RULE_NAMES[g.player_rule]))
 			lines.append("Repair up to three hull points on entry.")
-			cta = enter + "   DESCEND"
+			cta = "DESCEND"
 		"paused":
-			kicker = "LOCAL TERMINAL  /  STANDBY"
+			kicker = "SHIFT PROTOCOL"
 			title = "LINK PAUSED"
-			lines.append("M  Audio: " + ("OFF" if g.muted else "ON") + "    V  Reduced motion: " + ("ON" if g.reduced_motion else "OFF"))
+			lines.append("M  " + Locale.text("Audio") + " / " + Locale.text("Off" if g.muted else "On") + "      V  " + Locale.text("Reduced motion") + " / " + Locale.text("On" if g.reduced_motion else "Off"))
 			lines.append("R  Reboot sector   /   T  Return to title")
-			cta = enter + "   RESUME"
+			cta = "RESUME"
 		"lost":
-			kicker = "SECTOR " + str(sec + 1).pad_zeros(2) + "  /  LINK LOST"
+			kicker = Locale.text("SECTOR") + " " + str(sec + 1).pad_zeros(2) + "  /  " + Locale.text("LINK LOST")
 			title = "HULL BREACHED"
 			lines.append("Reboot from this sector with your entry loadout.")
 			lines.append("Dodge through danger. Strike when the core opens.")
-			cta = enter + "   REBOOT"
+			cta = "REBOOT"
 		"win":
-			kicker = "ROOT ACCESS GRANTED   //   03 / 03"
+			kicker = Locale.text("ROOT ACCESS GRANTED") + "   /   03 / 03"
 			title = "RULES REWRITTEN"
-			lines.append("%s    /    %s transfers    /    %s hits" % [g.timecode(g.run_time), g.steals, g.hits_taken])
-			lines.append("Assist run complete." if g.assist else "Personal best: " + g.timecode(g.best_time))
-			cta = enter + "   BACK TO TITLE"
+			lines.append(Locale.text("%s    /    %s transfers    /    %s hits") % [g.timecode(g.run_time), g.steals, g.hits_taken])
+			lines.append("Assist run complete." if g.assist else Locale.text("Personal best: %s") % g.timecode(g.best_time))
+			cta = "BACK TO TITLE"
 	_text(kicker, x + 34, y + 41, 14, accent)
-	_text(title, x + 32, y + 113, 63, PAPER, true)
+	_text(title, x + 32, y + 113, 63, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 604, 62)
 	for i in lines.size():
-		_text(lines[i], x + 35, y + 153 + i * 26, 15, TEXT)
+		_text(lines[i], x + 35, y + 153 + i * 26, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
 	_rect(x + 34, y + 239, 346, 34, GREEN)
-	_text(cta, x + 47, y + 261, 14, INK)
+	_text(enter + "   " + Locale.text(cta), x + 47, y + 261, 14, INK, false, HORIZONTAL_ALIGNMENT_LEFT, 319)
 	_columns(x + w - 106, 72, y + 243, 22, _soft(accent, 0.42))
 
 func _title() -> void:
@@ -442,18 +446,13 @@ func _title() -> void:
 	_rect(0, 0, W, 5, RED)
 	_line(Vector2(57, 83), Vector2(1095, 83), LINE)
 	_text("GAME OFF 2026", 58, 60, 14, PAPER)
-	_text("INTRUSION MANUAL  /  VOL. 01", 1095, 60, 14, PAPER, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text("01    /    ROOT ACCESS PROHIBITED", 59, 136, 13, RED)
 	_text("STEAL THE", 53, 250, 113, PAPER, true)
 	_text("RULES", 53, 347, 113, PAPER, true)
 	_text("S H I F T   P R O T O C O L", 61, 390, 19, GREEN)
-	_text("One slot. Three machines. Their rules are yours.", 60, 428, 15, TEXT)
-	_rect(59, 456, 293, 49, GREEN)
-	_text(("START / A" if g.last_device == "pad" else "ENTER") + "  /  INFILTRATE", 75, 486, 16, INK)
-	_text("H  ASSIST: " + ("ON" if g.assist else "OFF") + "    M  AUDIO: " + ("OFF" if g.muted else "ON") + "    V  LOW MOTION: " + ("ON" if g.reduced_motion else "OFF"), 59, 542, 12, DIM)
+	_text("One slot. Three machines. Their rules are yours.", 60, 428, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 541)
 	_rect(0, 568, W, 80, INK)
 	_line(Vector2(0, 568), Vector2(W, 568), LINE)
-	_text("DON'T FIGHT THE RULES. TAKE THEM.", 58, 610, 16, PAPER)
+	_text(("%s  /  " % Locale.NAMES[Locale.current()]) + "v" + str(ProjectSettings.get_setting("application/config/version")), 58, 610, 14, PAPER)
 	if g.best_time > 0.0:
-		_text("PB  " + g.timecode(g.best_time), 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
+		_text(Locale.text("Personal best: %s") % g.timecode(g.best_time), 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
 	_columns(902, 190, 596, 19, _soft(RED, 0.72))
