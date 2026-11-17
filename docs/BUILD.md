@@ -13,7 +13,7 @@ On Windows, use the Godot console executable for command output. To build and pa
 ./tools/build.ps1 -Godot 'C:/path/to/Godot_v4.7.2-stable_win64_console.exe'
 ```
 
-The script tests and packages the Web and Windows exports in a staging folder. After both ZIPs are ready, it replaces the previous exports and ZIPs under `builds/`. Alternatively, export **Web** to `builds/web/index.html` and **Windows** to `builds/windows/ShiftProtocol.exe` from Project → Export after creating the output folders. Use the packaging script for distribution.
+The script tests and packages both platforms in a staging folder. It exports the game into the Windows `runtime` directory and uses the Windows .NET Framework C# compiler to make the `ShiftProtocol.exe` launcher. After both ZIPs are ready, it replaces the previous exports and ZIPs under `builds/`. The launcher temporarily disables the five-Shift shortcut only while the game is the active Windows window and Sticky Keys is off. It restores the shortcut on focus loss and exit.
 
 Serve the Web build over HTTP, rather than double-clicking the HTML:
 
@@ -32,7 +32,11 @@ Open `http://127.0.0.1:8060/` in a desktop browser with WebGL 2. The Web preset 
 
 ## Before submitting
 
-On the hosted page, verify first launch in a fresh browser profile, then select a language and replay the movement, strike, dodge, steal and rule demos. Check that the language persists after reloading. Verify the first transfer with both Shift and Q, finish all three sectors on at least one target, and check the final stats screen.
+On the hosted page, verify first launch in a fresh browser profile. Complete the five guide steps and try a practice arena. Clear a sector, reload, and check the map retains the clear and unlocks only the next sector. Replay a cleared sector and verify that it leaves the campaign frontier intact. Check the Windows fullscreen startup and the save-and-quit button.
+
+## Publish a tagged release
+
+Commit the project with the new version in `project.godot`, push the commit, then build both targets. Run `./tools/release.ps1 -Tag v1.2.0 -Commit HEAD -BuildDir builds -Notes 'Release notes' -Latest` with the appropriate version and description. The script verifies the tag matches the project version and adds both ZIPs to the public GitHub release.
 
 ## Record the guide again
 

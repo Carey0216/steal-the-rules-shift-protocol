@@ -1,7 +1,7 @@
 <p align="center"><img src="../../assets/icon.svg" width="112" height="112" alt="SHIFT PROTOCOL 標誌"></p>
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
-![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](../../LICENSE)
+![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](../../LICENSE)
 
 [English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · **中文（繁體）** · [日本語](../../docs/readme/ja.md) · [한국어](../../docs/readme/ko.md)
 
@@ -12,11 +12,12 @@
 | 功能 | 遊戲中的表現 |
 | --- | --- |
 | SHIFT 交換 | 躲過攻擊，靠近開啟的核心並按 **Shift**。你取得 Boss 的能力，並把原有規則交給它。 |
-| 三場 Boss 戰 | 迎戰監守者、懸陣機和執行者。在第二場奪走 LIFT 可以砸穿地板。 |
-| 實戰錄影教學 | 首次啟動時選擇語言，觀看移動、跳躍、揮刀、閃避、偷取及使用能力的實戰錄影。點選標題畫面的 **？** 可重看。 |
+| 六個關卡 | 第二關坍塌後可走上下兩層。後續有通電柱、熔爐噴口、鎖定舊位置的鏡像攻擊，以及會強化你交出的規則的執行者。 |
+| 關卡地圖與存檔 | 每過一關都會儲存、點亮地圖並開放下一關。大廳可重玩已通關的關卡，查看用時、受擊和重試次數。Esc 暫停，齒輪選單可儲存並離開。 |
+| 逐步引導與實練 | 首次啟動依序看完五段實戰錄影。大廳的 **？** 可重看，每課都能進入實戰場地親手練習。 |
 | 設定 | 可變更語言、顯示模式、視窗大小及文字大小，也可切換音效、減少動態效果和輔助模式。Windows 首次啟動預設為全螢幕，之後會記住你的選擇。網頁版在頁面內啟動，可在設定切換全螢幕。 |
 
-![操作指南中的實戰錄影](../guide.png)
+![點亮了兩個關卡的地圖](../map.png)
 
 ## 操作方式
 
@@ -38,9 +39,9 @@
 
 ## 執行與建置
 
-在 Windows 上解壓縮整個檔案，執行與 `ShiftProtocol.pck` 同一資料夾的 `ShiftProtocol.exe`。使用桌面瀏覽器時，先點選遊戲畫面讓它取得焦點。從原始碼執行時，使用標準版 Godot 4.7.2 開啟 `project.godot` 再按 F5。建置說明包含匯出範本、測試及 Web、Windows 壓縮檔的製作步驟。
+在 Windows 上解壓縮整個檔案，按兩下 `ShiftProtocol.exe`，並保留旁邊的 `runtime` 資料夾。使用桌面瀏覽器時，先點選遊戲畫面讓它取得焦點。從原始碼執行時，使用標準版 Godot 4.7.2 開啟 `project.godot` 再按 F5。建置說明包含匯出範本、測試及 Web、Windows 壓縮檔的製作步驟。
 
-[建置說明（英文）](../BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
+[下載帶標籤的版本](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [建置說明（英文）](../BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
 
 ## 製作與授權
 

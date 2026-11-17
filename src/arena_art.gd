@@ -37,8 +37,8 @@ func paint(game: Node2D) -> void:
 	g.draw_set_transform(Vector2.ZERO)
 	if not g.record_demo:
 		_hud()
-	if g.mode in ["brief", "clear", "paused", "lost", "win"]:
-		_overlay()
+	if g.mode == "brief":
+		_briefing()
 
 func _rect(x: float, y: float, w: float, h: float, color: Color, solid := true, thickness := 1.0) -> void:
 	g.draw_rect(Rect2(x, y, w, h), color, solid, -1.0 if solid else thickness)
@@ -115,12 +115,19 @@ func _background(floor: float, age: float) -> void:
 			var x := 146.0 + i * 127.0
 			_line(Vector2(x, 133), Vector2(x + 42, 390), _soft(accent, 0.21), 2.0)
 			_line(Vector2(x + 42, 390), Vector2(x + 90, 456), _soft(accent, 0.10), 2.0)
-	elif sec == 2:
+	elif sec >= 2:
 		for i in 6:
 			var x := 55.0 + i * 218.0
 			_rect(x, 152, 92, 10, _soft(accent, 0.20))
 			_rect(x + 8, 164, 3, 256, _soft(accent, 0.13))
 			_rect(x + 84, 164, 3, 256, _soft(accent, 0.13))
+			if sec == 2:
+				_line(Vector2(x + 46, 171), Vector2(x + 46, 438), _soft(accent, 0.27), 3)
+			elif sec == 3:
+				for rib in 12:
+					_rect(x + 13, 411 - rib * 13, 67, 4, _soft(accent, 0.12 + rib * 0.009))
+			elif sec == 4:
+				_poly([Vector2(x, 200), Vector2(x + 89, 225), Vector2(x + 89, 386), Vector2(x, 423)], _soft(accent, 0.13))
 	for i in 72:
 		var x := fposmod(i * 337.1 + (age * (5.0 + i % 4) if not g.reduced_motion else 0.0), W)
 		var y := 146.0 + fposmod(i * 69.7 - (age * (9 + i % 3) if not g.reduced_motion else 0.0), 365.0)
@@ -144,9 +151,15 @@ func _floor(y: float) -> void:
 	_columns(58, 91, y + 4, 8, _soft(accent, 0.75))
 	_columns(1000, 91, y + 4, 8, _soft(accent, 0.75))
 	if g.floor_broken and g.mode != "title":
-		for x in [279, 584, 867]:
-			_poly([Vector2(x - 30, y - 2), Vector2(x + 33, y - 2), Vector2(x + 10, y + 14), Vector2(x + 17, y + 28), Vector2(x - 14, y + 16)], INK)
-			_line(Vector2(x - 14, y + 16), Vector2(x + 17, y + 28), accent, 2.0)
+		var top: float = g.BASE
+		var left: float = g.DECK_LEFT
+		var right: float = g.DECK_RIGHT
+		_poly([Vector2(0, top), Vector2(left, top), Vector2(left - 18, top + 22), Vector2(left - 52, top + 32), Vector2(0, top + 32)], Color("#23333d"))
+		_poly([Vector2(right, top), Vector2(W, top), Vector2(W, top + 32), Vector2(right + 46, top + 32), Vector2(right + 17, top + 23)], Color("#23333d"))
+		_line(Vector2(0, top), Vector2(left, top), accent, 3.0)
+		_line(Vector2(right, top), Vector2(W, top), accent, 3.0)
+		_columns(left - 97, 95, top + 5, 12, _soft(accent, 0.6))
+		_columns(right + 13, 95, top + 5, 12, _soft(accent, 0.6))
 
 func _boss(base: Vector2, face: float, scale: float, rule: int, poster: bool) -> void:
 	var pos := base
@@ -205,6 +218,19 @@ func _boss(base: Vector2, face: float, scale: float, rule: int, poster: bool) ->
 			_shape(pos, face, scale, [-24,-89,25,-89,17,-80,-17,-80], color)
 			for x in [-74, 74]:
 				_line(pos + Vector2(x, -61) * scale, pos + Vector2(x * 0.87, -33) * scale, color, 3.0 * scale)
+			match sec:
+				2:
+					for side in [-1.0, 1.0]:
+						_shape(pos, side, scale, [42,-98,71,-125,102,-125,112,-111,110,-67,82,-62], shell)
+						_line(pos + Vector2(82 * side, -112) * scale, pos + Vector2(91 * side, -74) * scale, color, 5.0 * scale)
+				3:
+					_shape(pos, face, scale, [-110,-36,-77,-65,81,-65,106,-39,98,-10,-109,-11], shell)
+					for vent in 10:
+						var x := -81.0 + vent * 17.0
+						_line(pos + Vector2(x, -48) * scale, pos + Vector2(x - 5, -25) * scale, color.darkened(0.2), 3.0 * scale)
+				4:
+					g.draw_arc(core, 79 * scale, -PI * 0.9, PI * 0.1, 32, color, 2.5 * scale, true)
+					g.draw_arc(core, 79 * scale, PI * 0.1, PI * 1.1, 32, _soft(color, 0.32), 2.0 * scale, true)
 	# Every rig uses the same socket. Open cores physically expand and display a range ring.
 	var exposed: bool = g.state == "exposed" and not poster
 	var dead: bool = g.state == "dead" and not poster
@@ -253,6 +279,8 @@ func _player(at: Vector2, face: float, scale: float) -> void:
 	if g.guard > 0.0:
 		g.draw_arc(at + Vector2(0, -25), 38, -PI, PI, 38, color, 3, true)
 		g.draw_circle(at + Vector2(0, -25), 38, _soft(color, 0.18), true, -1, true)
+	if g.dodge_protection > 0.0:
+		g.draw_arc(at + Vector2(0, -25), 28, 0.08, TAU - 0.08, 28, _soft(PAPER, 0.85), 1.5, true)
 	if g.swing > 0:
 		var hand := at + Vector2(9 * face, -24) * scale
 		var end := hand + Vector2(face * (62 + g.swing * 85), -14 - g.swing * 60) * scale
@@ -262,6 +290,15 @@ func _player(at: Vector2, face: float, scale: float) -> void:
 		g.draw_arc(hand, 66 * scale, angle - 0.63, angle + 0.49, 32, _soft(color, g.swing * 3.5), 2.0, true)
 
 func _warnings() -> void:
+	for hazard in g.environmental_zones():
+		var area: Rect2 = hazard.box
+		var tint: Color = hazard.color
+		g.draw_rect(area, _soft(tint, 0.28 if hazard.live else 0.09))
+		g.draw_rect(area, _soft(tint, 0.94 if hazard.live else 0.67), false, 2)
+		_columns(area.position.x, area.size.x, area.end.y - 10, 10, _soft(tint, 0.86))
+		if hazard.live:
+			for i in range(0, int(area.size.x), 19):
+				_line(area.position + Vector2(i, 1), area.position + Vector2(i + 10, area.size.y - 1), _soft(tint, 0.36), 2)
 	var progress: float = 1.0 - g.state_time / maxf(g.state_total, 0.1)
 	for box in g.zones:
 		g.draw_rect(box, _soft(RED, 0.08 + progress * 0.23))
@@ -327,6 +364,9 @@ func _hud() -> void:
 	_text("HULL", 42, 91, 12, DIM)
 	for i in g.MAX_HP:
 		_rect(42 + i * 22, 100, 17, 13, GREEN if i < g.hp else LINE)
+	_rect(42, 120, 149, 3, LINE)
+	_rect(42, 120, 149 * clampf(1.0 - g.dash_cd / g.DODGE_COOLDOWN, 0.0, 1.0), 3, PAPER)
+	_text("Dodge", 207, 124, 10, DIM)
 	var slot_color: Color = g.RULE_COLORS[g.player_rule]
 	_text("YOUR RULE", 315, 91, 12, DIM)
 	_text(g.RULE_NAMES[g.player_rule], 313, 123, 26, slot_color, true, HORIZONTAL_ALIGNMENT_LEFT, 130, 28)
@@ -347,15 +387,35 @@ func _hud() -> void:
 	var inputs := "STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE" if g.last_device == "pad" else "A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE"
 	_text(inputs, 42, 627, 12, DIM, false, HORIZONTAL_ALIGNMENT_LEFT, 751)
 	_text("M AUDIO  /  V MOTION  /  ESC PAUSE", 1110, 627, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT, 300)
-	if g.state == "windup":
-		_text(g.move_name, 576, 176, 25, RED, true, HORIZONTAL_ALIGNMENT_CENTER)
+	if g.practice >= 0:
+		_text("Practice", 576, 175, 22, GREEN, true, HORIZONTAL_ALIGNMENT_CENTER)
+	elif g.state == "windup":
+		var move_label: String = g.move_name
+		if g.rail_return:
+			move_label = "RETURN SWEEP"
+		elif g.overclock_attack:
+			move_label = Locale.text("OVERCLOCK") + " / " + Locale.text(move_label)
+		_text(move_label, 576, 176, 25, RED, true, HORIZONTAL_ALIGNMENT_CENTER, 655)
 	elif g.notice_time > 0.0:
 		_text(g.notice, 576, 179, 35, g.wire_color if g.wire_time > 0.0 else PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 990, 38)
 		_text(g.notice_sub, 576, 201, 13, TEXT, false, HORIZONTAL_ALIGNMENT_CENTER)
+	elif g.state == "exposed" and g.boss_rule != g.Rule.EMPTY:
+		var near_core := Locale.text("You gain %s   /   Boss gains %s") % [Locale.text(g.RULE_NAMES[g.boss_rule]), Locale.text(g.RULE_NAMES[g.player_rule])]
+		_rect(288, 141, 576, 44, _soft(INK, 0.91))
+		var ready := GREEN if g.can_shift() else DIM
+		_rect(288, 182, 576, 2, ready)
+		_text(near_core, 576, 170, 16, ready, false, HORIZONTAL_ALIGNMENT_CENTER, 552)
 	if g.hit_flash > 0.0 and not g.reduced_motion:
 		_rect(4, 139, W - 8, 424, _soft(RED, g.hit_flash * 0.9), false, 4.0)
 
 func _instruction() -> String:
+	if g.practice >= 0:
+		if g.notice_time > 0.0:
+			return g.notice_sub
+		return [
+			"Run and jump to the right.", "Face the core and strike.", "Dodge as the charge reaches you.",
+			"Approach the open core and press Shift.", "Face the core and press E to use RUSH.",
+		][g.practice]
 	if g.mode == "clear":
 		return "Sector clear. Your rule carries into the next fight."
 	if g.state == "exposed":
@@ -376,83 +436,49 @@ func _instruction() -> String:
 		g.Rule.AEGIS: return "AEGIS / E: catch a hit near the boss to reflect 8 damage."
 		_: return "Read the warning. Survive the attack. Take the open core."
 
-func _overlay() -> void:
+func _briefing() -> void:
 	_rect(0, 136, W, 432, _soft(INK, 0.70))
 	var x := 244.0
 	var y := 198.0
-	var w := 664.0
-	var h := 296.0
-	_rect(x + 6, y + 8, w, h, _soft(Color.BLACK, 0.60))
-	_rect(x, y, w, h, INK)
-	_rect(x, y, w, h, LINE, false)
-	_rect(x, y, 4, h, accent)
-	var kicker := ""
-	var title := ""
-	var lines: Array[String] = []
-	var cta := ""
+	var encounter: Dictionary = g.ENCOUNTERS[sec]
+	_rect(x, y, 664, 296, INK)
+	_rect(x, y, 664, 296, LINE, false)
+	_rect(x, y, 4, 296, accent)
+	_text(Locale.text("INTRUSION") + "  /  " + Locale.text(encounter.sector), x + 34, y + 41, 14, accent)
+	_text(encounter.name, x + 32, y + 113, 63, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 604, 62)
+	_text(encounter.call, x + 35, y + 153, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
+	if sec == 0:
+		_text("Get close when the core opens. Press SHIFT or Q.", x + 35, y + 179, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
+	else:
+		var loadout := Locale.text("Carried: %s   /   Hull %s of 7") % [Locale.text(g.RULE_NAMES[g.player_rule]), g.hp]
+		_text(loadout, x + 35, y + 179, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
 	var enter := "START / A" if g.last_device == "pad" else "ENTER"
-	match g.mode:
-		"brief":
-			kicker = Locale.text("INTRUSION") + "  /  " + Locale.text(g.ENCOUNTERS[sec].sector)
-			title = g.ENCOUNTERS[sec].name
-			lines.append(g.ENCOUNTERS[sec].call)
-			if sec == 0:
-				lines.append("Get close when the core opens. Press SHIFT or Q.")
-				lines.append("One slot. Each swap hands your old rule to the boss.")
-			else:
-				lines.append(Locale.text("Carried: %s   /   Hull %s of 7") % [Locale.text(g.RULE_NAMES[g.player_rule]), g.hp])
-				lines.append("Reboots restore this sector's starting loadout.")
-			cta = "ENGAGE"
-		"clear":
-			kicker = Locale.text("SECTOR") + " " + str(sec + 1).pad_zeros(2) + " / 03"
-			title = "GATE UNLOCKED"
-			lines.append(Locale.text("Carry %s into the next sector.") % Locale.text(g.RULE_NAMES[g.player_rule]))
-			lines.append("Repair up to three hull points on entry.")
-			cta = "DESCEND"
-		"paused":
-			kicker = "SHIFT PROTOCOL"
-			title = "LINK PAUSED"
-			lines.append("M  " + Locale.text("Audio") + " / " + Locale.text("Off" if g.muted else "On") + "      V  " + Locale.text("Reduced motion") + " / " + Locale.text("On" if g.reduced_motion else "Off"))
-			lines.append("R  Reboot sector   /   T  Return to title")
-			cta = "RESUME"
-		"lost":
-			kicker = Locale.text("SECTOR") + " " + str(sec + 1).pad_zeros(2) + "  /  " + Locale.text("LINK LOST")
-			title = "HULL BREACHED"
-			lines.append("Reboot from this sector with your entry loadout.")
-			lines.append("Dodge through danger. Strike when the core opens.")
-			cta = "REBOOT"
-		"win":
-			kicker = Locale.text("ROOT ACCESS GRANTED") + "   /   03 / 03"
-			title = "RULES REWRITTEN"
-			lines.append(Locale.text("%s    /    %s transfers    /    %s hits") % [g.timecode(g.run_time), g.steals, g.hits_taken])
-			lines.append("Assist run complete." if g.assist else Locale.text("Personal best: %s") % g.timecode(g.best_time))
-			cta = "BACK TO TITLE"
-	_text(kicker, x + 34, y + 41, 14, accent)
-	_text(title, x + 32, y + 113, 63, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 604, 62)
-	for i in lines.size():
-		_text(lines[i], x + 35, y + 153 + i * 26, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
 	_rect(x + 34, y + 239, 346, 34, GREEN)
-	_text(enter + "   " + Locale.text(cta), x + 47, y + 261, 14, INK, false, HORIZONTAL_ALIGNMENT_LEFT, 319)
-	_columns(x + w - 106, 72, y + 243, 22, _soft(accent, 0.42))
+	_text(enter + "   " + Locale.text("ENGAGE"), x + 47, y + 261, 14, INK, false, HORIZONTAL_ALIGNMENT_LEFT, 319)
 
 func _title() -> void:
-	_background(510, g.clock)
-	_floor(510)
-	_boss(Vector2(877, 505), -1, 2.32, g.Rule.RUSH, true)
-	_player(Vector2(633, 507), 1, 1.25)
-	_rect(0, 0, 646, H, _soft(INK, 0.90))
-	for i in 26:
-		_rect(646 + 4 * i, 0, 4, H, _soft(INK, 0.83 * (1.0 - i / 26.0)))
-	_rect(0, 0, W, 5, RED)
-	_line(Vector2(57, 83), Vector2(1095, 83), LINE)
-	_text("GAME OFF 2026", 58, 60, 14, PAPER)
-	_text("STEAL THE", 53, 250, 113, PAPER, true)
-	_text("RULES", 53, 347, 113, PAPER, true)
-	_text("S H I F T   P R O T O C O L", 61, 390, 19, GREEN)
-	_text("One slot. Three machines. Their rules are yours.", 60, 428, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 541)
+	_background(527, g.clock)
+	_floor(527)
+	_boss(Vector2(878, 524), -1, 2.29, g.Rule.RUSH, true)
+	_player(Vector2(639, 524), 1, 1.31)
+	_rect(0, 0, W, 86, INK)
+	_rect(0, 0, W, 3, RED)
+	_line(Vector2(57, 85), Vector2(1095, 85), LINE)
+	_text("Lobby", 58, 60, 23, PAPER, true)
+	_poly([Vector2(0, 86), Vector2(579, 86), Vector2(615, 126), Vector2(615, 568), Vector2(0, 568)], INK)
+	_poly([Vector2(59, 120), Vector2(520, 120), Vector2(546, 146), Vector2(546, 387), Vector2(59, 387)], PAPER)
+	_poly([Vector2(520, 120), Vector2(546, 146), Vector2(520, 146)], Color("#c7ae8c"))
+	_rect(59, 120, 4, 267, RED)
+	_text("STEAL THE", 82, 222, 100, INK, true)
+	_text("RULES", 81, 314, 113, INK, true)
+	_line(Vector2(83, 332), Vector2(520, 332), Color("#b6a38b"))
+	_text("S H I F T   P R O T O C O L", 85, 363, 15, INK)
+	_text("Take a rule. Change the fight.", 60, 429, 16, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 490)
+	_line(Vector2(640, 116), Vector2(1093, 116), _soft(accent, 0.40))
+	_line(Vector2(1093, 116), Vector2(1093, 184), _soft(accent, 0.40))
+	_line(Vector2(629, 503), Vector2(691, 503), _soft(accent, 0.45), 2)
 	_rect(0, 568, W, 80, INK)
 	_line(Vector2(0, 568), Vector2(W, 568), LINE)
 	_text(("%s  /  " % Locale.NAMES[Locale.current()]) + "v" + str(ProjectSettings.get_setting("application/config/version")), 58, 610, 14, PAPER)
-	if g.best_time > 0.0:
-		_text(Locale.text("Personal best: %s") % g.timecode(g.best_time), 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_columns(902, 190, 596, 19, _soft(RED, 0.72))
+	_text(Locale.text("%d of %d sectors cleared") % [g.campaign.records.size(), g.ENCOUNTERS.size()], 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	_columns(962, 132, 596, 19, _soft(RED, 0.58))

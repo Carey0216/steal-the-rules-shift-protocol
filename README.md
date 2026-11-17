@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/icon.svg" width="112" height="112" alt="SHIFT PROTOCOL logo"></p>
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
-![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](LICENSE)
+![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](LICENSE)
 
 **English** · [中文（简体）](docs/readme/zh-CN.md) · [中文（繁體）](docs/readme/zh-TW.md) · [日本語](docs/readme/ja.md) · [한국어](docs/readme/ko.md)
 
@@ -12,11 +12,12 @@ A 2D boss rush about stealing the rules of a fight. Built with Godot and GDScrip
 | Feature | In the game |
 | --- | --- |
 | Shift exchange | Dodge an attack, approach the exposed core and press **Shift**. You gain the boss’s ability and hand it your previous rule. |
-| Three bosses | Fight the Warden, the Lattice and the Executor. Steal LIFT in the second arena to bring down the floor. |
-| Recorded guide | On first launch, pick a language and watch in-game recordings of movement, jumping, striking, dodging, stealing and using a rule. Open **?** on the title screen to watch them again. |
+| Six sectors | The lower deck becomes a second route after the LIFT theft. Later arenas add live conduits, furnace vents and attacks that echo your last position. The Executor overclocks the rule you give it. |
+| Sector map and saves | Each clear lights up one sector and unlocks the next. Replay any cleared sector from the lobby and compare time, hits and retries. Esc opens Pause. Use the gear menu to save and quit. |
+| Guided practice | First launch walks you through five recorded lessons in order. Reopen them with **?** in the lobby. Every lesson has a real practice arena. |
 | Settings | Choose a language, display mode, window size and text size. Toggle audio, reduced motion or assist mode. Windows opens fullscreen on first launch and remembers your choice. The Web version opens inside its page and can enter fullscreen from Settings. |
 
-![A gameplay recording displayed in the controls guide](docs/guide.png)
+![The sector map with two sectors cleared](docs/map.png)
 
 ## Controls
 
@@ -38,9 +39,9 @@ A 2D boss rush about stealing the rules of a fight. Built with Godot and GDScrip
 
 ## Play and build
 
-On Windows, extract the full archive and open `ShiftProtocol.exe` beside `ShiftProtocol.pck`. In a desktop browser, click the game to focus it. To build from source, open `project.godot` in standard Godot 4.7.2 and press F5. The build instructions cover export templates, tests and the Web and Windows ZIPs.
+On Windows, extract the full archive and double-click `ShiftProtocol.exe`. Keep the `runtime` folder beside the launcher. In a desktop browser, click the game to focus it. To build from source, open `project.godot` in standard Godot 4.7.2 and press F5. The build instructions cover export templates, tests and the Web and Windows ZIPs.
 
-[Build instructions](docs/BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
+[Download a tagged release](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [Build instructions](docs/BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
 
 ## Credits and license
 

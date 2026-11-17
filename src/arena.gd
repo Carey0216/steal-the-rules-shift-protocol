@@ -5,6 +5,7 @@ const Art = preload("res://src/arena_art.gd")
 const AudioRig = preload("res://src/sound.gd")
 const Locale = preload("res://src/locale.gd")
 const Menu = preload("res://src/title_menu.gd")
+const Campaign = preload("res://src/campaign.gd")
 const SAVE = "user://shift_protocol.cfg"
 const SIZE = Vector2(1152, 648)
 const LEFT = 68.0
@@ -12,19 +13,28 @@ const RIGHT = 1084.0
 const BASE = 488.0
 const STEAL_RANGE = 186.0
 const MAX_HP = 7
+const DODGE_TIME := 0.23
+const DODGE_PROTECTION := 0.27
+const DODGE_COOLDOWN := 0.59
+const DECK_LEFT := 404.0
+const DECK_RIGHT := 748.0
 enum Rule { EMPTY, RUSH, LIFT, AEGIS }
 const RULE_NAMES = ["EMPTY", "RUSH", "LIFT", "AEGIS"]
 const RULE_COLORS = [Color("#a5b1bc"), Color("#ffab74"), Color("#80fbd2"), Color("#c8b2ff")]
 const ENCOUNTERS = [
 	{"name": "THE WARDEN", "sector": "01 / INTAKE", "call": "The doors only open from the inside.", "rules": [Rule.RUSH, Rule.AEGIS, Rule.LIFT], "hp": 36, "accent": Color("#ff995e")},
 	{"name": "THE LATTICE", "sector": "02 / SUSPENSION", "call": "Take its lift. See what the floor is made of.", "rules": [Rule.LIFT, Rule.AEGIS, Rule.RUSH], "hp": 45, "accent": Color("#88e7d7")},
-	{"name": "THE EXECUTOR", "sector": "03 / ROOT ACCESS", "call": "Whatever you hand over, it will learn to use.", "rules": [Rule.AEGIS, Rule.RUSH, Rule.LIFT], "hp": 57, "accent": Color("#d5b6ff")},
+	{"name": "CAPACITOR", "sector": "03 / POWER", "call": "The live conduits alternate. Cross on the dark side.", "rules": [Rule.AEGIS, Rule.LIFT, Rule.RUSH], "hp": 49, "accent": Color("#f0ca73")},
+	{"name": "THE FURNACE", "sector": "04 / FORGE", "call": "When the vents flare, get off the floor.", "rules": [Rule.RUSH, Rule.LIFT, Rule.AEGIS], "hp": 54, "accent": Color("#ff795e")},
+	{"name": "THE MIRROR", "sector": "05 / REFLECTION", "call": "The mirror marks where you were. Keep moving.", "rules": [Rule.LIFT, Rule.RUSH, Rule.AEGIS], "hp": 58, "accent": Color("#a1cff8")},
+	{"name": "THE EXECUTOR", "sector": "06 / ROOT ACCESS", "call": "An inherited rule comes back stronger.", "rules": [Rule.AEGIS, Rule.RUSH, Rule.LIFT], "hp": 70, "accent": Color("#d5b6ff")},
 ]
 
 var art: RefCounted
 var audio_rig: Node
 var title_menu: CanvasLayer
 var config := ConfigFile.new()
+var campaign := Campaign.new()
 var save_path := SAVE
 var mode := "title"
 var resume_mode := "fight"
@@ -36,6 +46,24 @@ var boss_rule := Rule.RUSH
 var reserve_rule := Rule.AEGIS
 var floor_y := BASE
 var floor_broken := false
+var sector_time := 0.0
+var sector_retries := 0
+var sector_result: Dictionary = {}
+var replay := false
+var practice := -1
+var practice_origin := 0.0
+var practice_return := ""
+var practice_clear := false
+var practice_hit := false
+var mission_sector := false
+var save_error := false
+var dodge_buffer := 0.0
+var steal_buffer := 0.0
+var dodge_protection := 0.0
+var overclock_pending := false
+var overclock_attack := false
+var rail_return := false
+var echo_target := 576.0
 var p := Vector2(208, BASE)
 var v := Vector2.ZERO
 var b := Vector2(827, BASE)
@@ -114,8 +142,10 @@ func _ready() -> void:
 	_bind(&"assist_mode", [KEY_H], [])
 	_bind(&"quit_run", [KEY_T], [])
 	_bind(&"full", [KEY_F11], [])
-	if not save_path.is_empty():
-		config.load(save_path)
+	if not save_path.is_empty() and config.load(save_path) != OK:
+		config.load(save_path + ".backup")
+	campaign.load_from(config, ENCOUNTERS.size())
+	get_tree().auto_accept_quit = false
 	muted = config.get_value("settings", "mute", false)
 	reduced_motion = config.get_value("settings", "reduced_motion", false)
 	assist = config.get_value("settings", "assist", false)
@@ -171,7 +201,7 @@ func _input(event: InputEvent) -> void:
 			return
 		if mode == "title" and not title_menu.page.is_empty():
 			return
-		if mode == "title" and event.is_action_pressed(&"confirm") and get_viewport().gui_get_focus_owner() != null:
+		if event.is_action_pressed(&"confirm") and get_viewport().gui_get_focus_owner() != null:
 			return
 	if event is InputEventJoypadButton and event.pressed:
 		last_device = "pad"
@@ -180,7 +210,7 @@ func _input(event: InputEvent) -> void:
 		if event.keycode == KEY_SHIFT or event.physical_keycode == KEY_SHIFT:
 			just[&"steal"] = true
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if mode in ["brief", "clear", "paused", "lost", "win"] and Rect2(278, 437, 346, 34).has_point(event.position):
+		if mode == "brief" and Rect2(278, 437, 346, 34).has_point(event.position):
 			just[&"confirm"] = true
 	for action in [&"confirm", &"pause", &"jump", &"dodge", &"rule", &"steal", &"retry", &"mute_game", &"motion", &"assist_mode", &"quit_run"]:
 		if event.is_action_pressed(action):
@@ -192,12 +222,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save_and_quit()
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and not record_demo and mode in ["fight", "brief", "clear"]:
 		resume_mode = mode
 		mode = "paused"
 		just.clear()
 
-func _save() -> void:
+func _save() -> Error:
 	config.set_value("settings", "mute", muted)
 	config.set_value("settings", "reduced_motion", reduced_motion)
 	config.set_value("settings", "assist", assist)
@@ -209,8 +241,58 @@ func _save() -> void:
 	if not OS.has_feature("web"):
 		config.set_value("settings", "fullscreen", fullscreen)
 	config.set_value("records", "clear_time", best_time)
-	if not save_path.is_empty():
-		config.save(save_path)
+	campaign.write_to(config)
+	if save_path.is_empty():
+		return OK
+	var temporary := save_path + ".next"
+	var result := config.save(temporary)
+	if result != OK:
+		return result
+	if FileAccess.file_exists(save_path):
+		result = DirAccess.copy_absolute(save_path, save_path + ".backup")
+		if result != OK:
+			return result
+	return DirAccess.rename_absolute(temporary, save_path)
+
+func save_and_quit() -> void:
+	if _save() != OK:
+		title_menu.show_save_error()
+		return
+	if OS.has_feature("web"):
+		return_to_lobby()
+	else:
+		get_tree().quit()
+
+func return_to_lobby(next_page := "") -> void:
+	if practice >= 0:
+		if title_menu.onboarding:
+			next_page = "guide"
+		practice = -1
+	mode = "title"
+	just.clear()
+	save_error = _save() != OK
+	if title_menu != null:
+		title_menu.previous_mode = mode
+		title_menu._open(next_page)
+
+func return_from_practice() -> void:
+	return_to_lobby(practice_return)
+
+func begin_sector(index: int) -> void:
+	if not campaign.selectable(index, ENCOUNTERS.size()):
+		return
+	var entry: Dictionary = campaign.entry(index)
+	stage = index
+	hp = entry.hp
+	player_rule = entry.rule
+	replay = index < campaign.records.size()
+	mission_sector = true
+	practice = -1
+	run_time = 0.0
+	steals = 0
+	hits_taken = 0
+	sector_retries = 0
+	_load_arena()
 
 func set_language(index: int) -> void:
 	language_index = index
@@ -258,10 +340,13 @@ func _physics_process(dt: float) -> void:
 		_save()
 	if mode == "title":
 		if pressed.has("confirm"):
-			_new_run()
+			if record_demo:
+				_new_run()
+			else:
+				title_menu._open("map")
 	elif mode == "paused":
 		if pressed.has("quit_run"):
-			mode = "title"
+			return_to_lobby()
 		elif pressed.has("retry"):
 			_retry()
 		elif pressed.has("pause") or pressed.has("confirm"):
@@ -277,16 +362,19 @@ func _physics_process(dt: float) -> void:
 		if pressed.has("confirm") or pressed.has("retry"):
 			_retry()
 		elif pressed.has("quit_run"):
-			mode = "title"
+			return_to_lobby()
 	elif mode == "clear":
 		if pressed.has("confirm"):
-			_advance()
+			continue_after_clear()
 		elif pressed.has("pause"):
 			resume_mode = mode
 			mode = "paused"
 	elif mode == "win":
 		if pressed.has("confirm") or pressed.has("quit_run"):
-			mode = "title"
+			return_to_lobby("map")
+	elif mode == "practice_done":
+		if pressed.has("confirm"):
+			return_from_practice()
 	elif mode == "fight":
 		if pressed.has("pause"):
 			resume_mode = mode
@@ -308,6 +396,10 @@ func _physics_process(dt: float) -> void:
 	queue_redraw()
 
 func _new_run() -> void:
+	mission_sector = false
+	replay = false
+	practice = -1
+	sector_retries = 0
 	stage = 0
 	hp = MAX_HP
 	run_time = 0.0
@@ -319,9 +411,20 @@ func _new_run() -> void:
 func _advance() -> void:
 	stage += 1
 	hp = mini(MAX_HP, hp + 3)
+	sector_retries = 0
 	_load_arena()
 
+func continue_after_clear() -> void:
+	if mission_sector:
+		return_to_lobby("map")
+	else:
+		_advance()
+
 func _retry() -> void:
+	sector_retries += 1
+	if practice >= 0:
+		begin_practice(practice, practice_return)
+		return
 	hp = checkpoint.hp
 	player_rule = checkpoint.rule
 	run_time = checkpoint.time
@@ -340,6 +443,14 @@ func _load_arena() -> void:
 	reserve_rule = candidates[1]
 	floor_y = BASE
 	floor_broken = false
+	sector_time = 0.0
+	dodge_buffer = 0.0
+	steal_buffer = 0.0
+	dodge_protection = 0.0
+	overclock_pending = false
+	overclock_attack = false
+	rail_return = false
+	echo_target = 576.0
 	p = Vector2(214, BASE)
 	b = Vector2(819, BASE)
 	v = Vector2.ZERO
@@ -371,10 +482,58 @@ func _load_arena() -> void:
 	_set_state("idle", 0.58)
 	mode = "brief"
 
+func begin_practice(lesson: int, return_page := "guide") -> void:
+	stage = 0
+	hp = MAX_HP
+	player_rule = Rule.EMPTY
+	mission_sector = false
+	run_time = 0.0
+	steals = 0
+	hits_taken = 0
+	regenerate_practice(lesson)
+	practice_return = return_page
+
+func regenerate_practice(lesson: int) -> void:
+	practice = lesson
+	practice_clear = false
+	practice_hit = false
+	_load_arena()
+	p = Vector2(250, BASE)
+	b = Vector2(520, BASE)
+	practice_origin = p.x
+	match practice:
+		0:
+			b.x = 925
+		1:
+			b.x = 344
+			_set_state("exposed", 60.0)
+		2:
+			b.x = 770
+		3:
+			b.x = 484
+			_set_state("exposed", 60.0)
+		4:
+			b.x = 435
+			player_rule = Rule.RUSH
+			_set_state("exposed", 60.0)
+	mode = "fight"
+
+func _finish_practice() -> void:
+	practice_clear = false
+	mode = "practice_done"
+	hazards.clear()
+	zones.clear()
+	audio_rig.fire("open")
+
 func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool) -> void:
 	run_time += dt
+	sector_time += dt
 	if pressed.has("jump"):
 		jump_buffer = 0.12
+	if pressed.has("dodge"):
+		dodge_buffer = 0.15
+	if pressed.has("steal"):
+		steal_buffer = 0.14
 	if freeze > 0.0:
 		freeze -= dt
 		# Preserve a button edge if it fell inside a hit stop.
@@ -383,6 +542,7 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 				just[action] = true
 		return
 	hurt_iframes = maxf(0.0, hurt_iframes - dt)
+	dodge_protection = maxf(0.0, dodge_protection - dt)
 	shift_lock = maxf(0.0, shift_lock - dt)
 	swing_cd = maxf(0.0, swing_cd - dt)
 	swing = maxf(0.0, swing - dt)
@@ -394,22 +554,28 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 	jump_buffer = maxf(0.0, jump_buffer - dt)
 	if absf(axis) > 0.05 and dash <= 0.0 and swing < 0.085:
 		facing = signf(axis)
-	if pressed.has("steal"):
-		_try_shift()
+	if steal_buffer > 0.0:
+		steal_buffer = maxf(0.0, steal_buffer - dt)
+		if can_shift() or steal_buffer <= 0.0:
+			steal_buffer = 0.0
+			_try_shift()
 		if mode != "fight":
 			return
 	if pressed.has("rule"):
 		_use_rule()
 		if mode != "fight":
 			return
-	if pressed.has("dodge") and dash_cd <= 0.0 and dash <= 0.0:
+	if dodge_buffer > 0.0 and dash_cd <= 0.0 and dash <= 0.0:
 		if absf(axis) > 0.05:
 			facing = signf(axis)
-		dash = 0.15
+		dodge_buffer = 0.0
+		dash = DODGE_TIME
 		dash_speed = 705.0
-		dash_cd = 0.72
-		hurt_iframes = maxf(hurt_iframes, 0.16)
+		dash_cd = DODGE_COOLDOWN
+		dodge_protection = DODGE_PROTECTION + (0.06 if assist else 0.0)
 		audio_rig.fire("dodge")
+	else:
+		dodge_buffer = maxf(0.0, dodge_buffer - dt)
 	if jump_buffer > 0.0 and coyote > 0.0:
 		v.y = -560.0
 		grounded = false
@@ -427,14 +593,18 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 		var accel := 2780.0 if absf(axis) > 0.05 else 3560.0
 		v.x = move_toward(v.x, axis * speed, accel * dt)
 		v.y = minf(v.y + (300.0 if lift > 0.0 else 1660.0) * dt, 835.0)
+	var previous_y := p.y
 	p += v * dt
 	p.x = clampf(p.x, LEFT, RIGHT)
 	if floor_broken:
-		floor_y = move_toward(floor_y, BASE + 44.0, 213.0 * dt)
-	if p.y >= floor_y:
+		floor_y = move_toward(floor_y, BASE + 64.0, 213.0 * dt)
+	var surface := floor_y
+	if floor_broken and (p.x <= DECK_LEFT or p.x >= DECK_RIGHT) and previous_y <= BASE + 0.5 and v.y >= 0.0:
+		surface = BASE
+	if p.y >= surface:
 		if not grounded and v.y > 385.0:
 			_burst(p, Color("#719398"), 9, 120.0)
-		p.y = floor_y
+		p.y = surface
 		v.y = 0.0
 		grounded = true
 	else:
@@ -443,9 +613,57 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 		_strike()
 	if mode != "fight":
 		return
+	if practice >= 0:
+		_tick_practice(dt)
+		return
 	_tick_boss(dt)
 	if mode == "fight":
 		_tick_hazards(dt)
+		for zone in environmental_zones():
+			if zone.live:
+				_check_hurt(zone.box, zone.box.get_center().x)
+			if mode != "fight":
+				break
+
+func _tick_practice(dt: float) -> void:
+	match practice:
+		0:
+			practice_clear = p.x - practice_origin >= 110.0 and p.y < BASE - 40.0
+		1:
+			practice_clear = boss_hp < ENCOUNTERS[0].hp
+		2:
+			_tick_boss(dt)
+			if state == "exposed" and not practice_clear:
+				regenerate_practice(2)
+				_report("Try again", "Dodge as the charge reaches you.", 2.0)
+		3:
+			practice_clear = steals > 0
+		4:
+			practice_clear = boss_hp < ENCOUNTERS[0].hp and not charge
+	if practice_clear:
+		_finish_practice()
+
+func environmental_zones() -> Array[Dictionary]:
+	var zones_out: Array[Dictionary] = []
+	if floor_broken:
+		var cycle := fposmod(sector_time, 4.3)
+		if cycle >= 2.1 and cycle < 3.58:
+			zones_out.append({"box": Rect2(DECK_LEFT, floor_y - 22.0, DECK_RIGHT - DECK_LEFT, 25.0), "live": cycle >= 2.85, "color": Color("#89dce6")})
+	elif stage == 2 and sector_time >= 2.0:
+		var cycle := fposmod(sector_time - 2.0, 4.6)
+		if cycle < 1.4:
+			var offset := 0.0 if int((sector_time - 2.0) / 4.6) % 2 == 0 else 245.0
+			for x in [218.0, 708.0]:
+				zones_out.append({"box": Rect2(x + offset, 158, 96, BASE - 158), "live": cycle > 0.95, "color": Color("#f0ca73")})
+	elif stage == 3 and sector_time >= 1.7:
+		var cycle := fposmod(sector_time - 1.7, 4.8)
+		if cycle < 1.23:
+			var start := LEFT if int((sector_time - 1.7) / 4.8) % 2 == 0 else 571.0
+			zones_out.append({"box": Rect2(start, BASE - 22, 513, 25), "live": cycle > 0.78, "color": Color("#ff795e")})
+	elif stage == 4 and state == "exposed" and state_total - state_time > 0.12 and state_total - state_time < 1.05:
+		var elapsed := state_total - state_time
+		zones_out.append({"box": Rect2(echo_target - 68, 173, 136, BASE - 173), "live": elapsed >= 0.80, "color": Color("#a1cff8")})
+	return zones_out
 
 func core_pos() -> Vector2:
 	return b + Vector2(0, -52)
@@ -469,6 +687,8 @@ func _try_shift() -> void:
 	var old: int = player_rule
 	player_rule = boss_rule
 	boss_rule = old
+	if stage == ENCOUNTERS.size() - 1 and boss_rule != Rule.EMPTY:
+		overclock_pending = true
 	steals += 1
 	charge = true
 	shift_lock = 1.7
@@ -563,11 +783,15 @@ func _finish_arena() -> void:
 	hazards.clear()
 	zones.clear()
 	mode = "win" if stage == ENCOUNTERS.size() - 1 else "clear"
+	sector_result = {"seconds": sector_time, "hits": hits_taken - int(checkpoint.hits), "retries": sector_retries}
+	if mission_sector:
+		campaign.complete(stage, checkpoint, sector_result, hp, player_rule)
+		save_error = _save() != OK
 	_set_state("dead", 1.0)
 	_burst(core_pos(), RULE_COLORS[player_rule], 72, 410.0)
 	rings.append({"at": core_pos(), "t": 0.62, "c": RULE_COLORS[player_rule], "r": 365.0})
 	audio_rig.fire("win")
-	if mode == "win" and not assist and (best_time <= 0.0 or run_time < best_time):
+	if not mission_sector and mode == "win" and not assist and (best_time <= 0.0 or run_time < best_time):
 		best_time = run_time
 		_save()
 
@@ -602,14 +826,28 @@ func _tick_boss(dt: float) -> void:
 				b.x = move_toward(b.x, target_x, 840.0 * dt)
 				b.y = move_toward(b.y, floor_y, 1820.0 * dt)
 			if state_time <= 0.0 and mode == "fight":
+				if move_name == "RAIL CUT" and overclock_attack and not rail_return:
+					rail_return = true
+					var previous_start := attack_from
+					attack_from = b.x
+					attack_to = previous_start
+					b_facing = signf(attack_to - attack_from)
+					zones.assign([Rect2(minf(attack_from, attack_to) - 43, floor_y - 61, absf(attack_to - attack_from) + 86, 61)])
+					_set_state("windup", 0.45 + (0.12 if assist else 0.0))
+					audio_rig.fire("warn")
+					return
 				if move_name == "SKY ANVIL":
 					b.y = floor_y
 					b.x = target_x
 					_shockwave(b.x, 1)
 					_shockwave(b.x, -1)
+					if overclock_attack:
+						_shockwave(b.x, 1, 0.28)
+						_shockwave(b.x, -1, 0.28)
 					_impact(core_pos(), RULE_COLORS[Rule.LIFT])
 				charge = true
-				_set_state("exposed", (1.62 - stage * 0.11) + (0.45 if assist else 0.0))
+				echo_target = p.x
+				_set_state("exposed", maxf(1.27, 1.62 - stage * 0.09) + (0.45 if assist else 0.0))
 				audio_rig.fire("open")
 		"exposed":
 			var recovery_y := floor_y - 64.0 if move_name == "SKY ANVIL" else floor_y
@@ -628,9 +866,12 @@ func _tick_boss(dt: float) -> void:
 
 func _windup() -> void:
 	zones.clear()
+	overclock_attack = overclock_pending
+	overclock_pending = false
+	rail_return = false
 	target_x = clampf(p.x, LEFT + 86, RIGHT - 86)
 	b_facing = 1.0 if p.x >= b.x else -1.0
-	var t := 0.73 - stage * 0.065 + (0.18 if assist else 0.0)
+	var t := maxf(0.51, 0.73 - stage * 0.05) + (0.18 if assist else 0.0)
 	match boss_rule:
 		Rule.RUSH:
 			move_name = "RAIL CUT"
@@ -644,8 +885,10 @@ func _windup() -> void:
 		Rule.AEGIS:
 			move_name = "PULSE LATTICE"
 			t += 0.14
-			var w := 118.0 + stage * 17.0
-			for x in [target_x, target_x - 276, target_x + 276]:
+			var w := 118.0 + stage * 9.0 + (26.0 if overclock_attack else 0.0)
+			var intervals := [0, -276, 276, -552, 552] if overclock_attack else [0, -276, 276]
+			for offset in intervals:
+				var x: float = target_x + offset
 				if x + w * 0.5 > LEFT and x - w * 0.5 < RIGHT:
 					var x0 := clampf(x - w * 0.5, LEFT, RIGHT)
 					var x1 := clampf(x + w * 0.5, LEFT, RIGHT)
@@ -681,8 +924,8 @@ func _commit_attack() -> void:
 	zones.clear()
 	audio_rig.fire("slam")
 
-func _shockwave(x: float, direction: int) -> void:
-	hazards.append({"box": Rect2(x - 23.0, floor_y - 34.0, 46.0, 37.0), "t": 1.07, "delay": 0.0, "v": direction * (480.0 + stage * 48.0), "c": ENCOUNTERS[stage].accent})
+func _shockwave(x: float, direction: int, delay := 0.0) -> void:
+	hazards.append({"box": Rect2(x - 23.0, floor_y - 34.0, 46.0, 37.0), "t": 1.07, "delay": delay, "v": direction * (480.0 + stage * 38.0), "c": ENCOUNTERS[stage].accent})
 
 func _tick_hazards(dt: float) -> void:
 	for i in range(hazards.size() - 1, -1, -1):
@@ -703,7 +946,18 @@ func _tick_hazards(dt: float) -> void:
 
 func _check_hurt(rect: Rect2, origin: float) -> void:
 	var hurtbox := Rect2(p.x - 13.0, p.y - 37.0, 26.0, 34.0)
-	if hurt_iframes > 0.0 or not rect.intersects(hurtbox) or mode != "fight":
+	if not rect.intersects(hurtbox) or mode != "fight":
+		return
+	if dodge_protection > 0.0:
+		if practice == 2:
+			practice_clear = true
+		return
+	if hurt_iframes > 0.0:
+		return
+	if practice >= 0:
+		practice_hit = true
+		hurt_iframes = 0.6
+		audio_rig.fire("hurt")
 		return
 	if guard > 0.0:
 		guard = 0.0

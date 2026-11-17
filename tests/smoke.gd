@@ -4,6 +4,7 @@ extends SceneTree
 
 const GAME = preload("res://main.tscn")
 const Locale = preload("res://src/locale.gd")
+const Campaign = preload("res://src/campaign.gd")
 const DT := 1.0 / 120.0
 var failed := 0
 var g: Node2D
@@ -41,6 +42,10 @@ func _run() -> void:
 	g.title_menu.pending_locale = 0
 	g.title_menu._confirm_language()
 	_check(g.title_menu.page == "guide", "Language confirmation must open the guide.")
+	g.title_menu._next_lesson()
+	_check(g.title_menu.chapter == 0 or g.title_menu.lesson_watched.has(0), "A fresh guide requires the first demo before moving on.")
+	for lesson in 5:
+		g.title_menu.lesson_watched[lesson] = true
 	if capture:
 		g.title_menu._choose_demo(3)
 		await process_frame
@@ -48,7 +53,7 @@ func _run() -> void:
 		g.title_menu.demo_time = 2.2
 		g.title_menu._show_frame()
 		await _shot("guide")
-	g.title_menu.back()
+	g.title_menu._finish_guide()
 	_check(g.guide_seen and g.title_menu.page.is_empty(), "Finishing the guide must unlock the title screen.")
 	g.assist = false
 	if capture:
@@ -61,6 +66,8 @@ func _run() -> void:
 	g._input(shift)
 	_check(g.just.has("steal"), "Physical SHIFT must trigger steal even with the modifier flag.")
 	g.just.clear()
+	g.begin_sector(1)
+	_check(g.mode == "title", "Locked sectors cannot start even when invoked directly.")
 	g._new_run()
 	g._physics_process(DT)
 	_check(g.mode == "brief" and g.stage == 0, "Run starts at first sector briefing.")
@@ -87,7 +94,24 @@ func _run() -> void:
 	g._physics_process(DT)
 	_check(g.mode == "fight", "Confirm resumes a paused fight.")
 
-	for sector in 3:
+	g.begin_practice(3)
+	for tick in 105:
+		var action := {"steal": true} if g.can_shift() else {}
+		g._tick_fight(DT, 1.0, action, false)
+		if g.mode == "practice_done":
+			break
+	_check(g.mode == "practice_done" and g.campaign.records.is_empty(), "Practice uses real movement and theft without granting a campaign clear.")
+	g.return_to_lobby()
+	g.begin_sector(0)
+	g.mode = "fight"
+	g._tick_fight(DT, 1.0, {"dodge": true}, false)
+	for tick in 24:
+		g._tick_fight(DT, 0.0, {}, false)
+	g._check_hurt(Rect2(g.p - Vector2(20, 50), Vector2(40, 50)), g.p.x)
+	_check(g.hp == g.MAX_HP, "A dodge still protects after 200 ms.")
+	g._retry()
+
+	for sector in g.ENCOUNTERS.size():
 		var previous_rule: int = g.player_rule
 		for i in 120 * 75:
 			var input := _pilot()
@@ -111,15 +135,19 @@ func _run() -> void:
 				await _shot("breach")
 			if g.mode != "fight":
 				break
-		var desired := "win" if sector == 2 else "clear"
+		var desired := "win" if sector == g.ENCOUNTERS.size() - 1 else "clear"
 		print("Sector ", sector + 1, ": ", g.mode, ", boss HP ", g.boss_hp, ", player HP ", g.hp, ", ", g.steals, " transfers.")
 		_check(g.mode == desired, "Pilot must clear sector %s within 75 seconds." % (sector + 1))
 		if g.mode != desired:
 			break
-		if sector < 2:
+		_check(g.campaign.records.size() == sector + 1, "Each clear must unlock just one new sector.")
+		if capture and sector == 1:
+			g.return_to_lobby("map")
+			await _shot("map")
+		if sector < g.ENCOUNTERS.size() - 1:
 			_check(g.player_rule != previous_rule or g.steals > 0, "Run should use the main mechanic.")
 			var carried: int = g.player_rule
-			g._advance()
+			g.begin_sector(sector + 1)
 			_check(g.player_rule == carried and g.mode == "brief", "New sector carries slot forward.")
 			g.just["confirm"] = true
 			g._physics_process(DT)
@@ -128,9 +156,60 @@ func _run() -> void:
 	_check(returned_rules.size() == 3 and used_rules.size() == 3, "Run must use and return all three rules.")
 	if capture and g.mode == "win":
 		await _shot("clear")
+	_test_save()
+	_test_routes_and_overclock()
 	print("Attacks: ", seen_attacks.keys(), " | Activated rules: ", used_rules.keys(), " | Returned rules: ", returned_rules.keys())
 	print("Smoke result: ", failed, " failures")
 	quit(1 if failed else 0)
+
+func _test_save() -> void:
+	var reached: int = g.campaign.records.size()
+	var rule: int = g.campaign.next_rule
+	var hull: int = g.campaign.next_hull
+	var path := "user://campaign-smoke-%s.cfg" % OS.get_process_id()
+	g.save_path = path
+	_check(g._save() == OK and g._save() == OK, "The real save can replace an existing file.")
+	var loaded := ConfigFile.new()
+	_check(loaded.load(path) == OK and loaded.get_value("campaign", "clears", []).size() == reached, "The saved file retains every cleared sector.")
+	var reloaded := Campaign.new()
+	reloaded.load_from(loaded, g.ENCOUNTERS.size())
+	_check(reloaded.records.size() == reached and reloaded.next_rule == rule and reloaded.next_hull == hull, "Reopening the campaign restores the frontier, base health, and carried rule.")
+	g.begin_sector(0)
+	_check(g.replay and g.stage == 0, "A cleared sector can be started again.")
+	g.campaign.complete(0, g.checkpoint, {"seconds": 0.05, "hits": 0, "retries": 0}, 1, g.Rule.AEGIS)
+	_check(g.campaign.records.size() == reached and g.campaign.next_rule == rule and g.campaign.next_hull == hull, "Replaying a sector cannot overwrite campaign progress.")
+	g.save_path = ""
+	DirAccess.remove_absolute(path)
+	DirAccess.remove_absolute(path + ".backup")
+
+func _test_routes_and_overclock() -> void:
+	g._new_run()
+	g.stage = 1
+	g._load_arena()
+	g.mode = "fight"
+	g.floor_broken = true
+	g.p.x = 333.0
+	g._set_state("idle", 60.0)
+	for tick in 46:
+		g._tick_fight(DT, 0.0, {}, false)
+	_check(g.p.y == g.BASE and g.floor_y > g.BASE + 60.0, "The intact edge of the deck remains a usable high platform.")
+	for tick in 74:
+		g._tick_fight(DT, 1.0, {}, false)
+	_check(g.p.x > g.DECK_LEFT and g.p.x < g.DECK_RIGHT and g.p.y == g.floor_y, "Walking off the platform gives access to the lower route.")
+
+	g.stage = g.ENCOUNTERS.size() - 1
+	g.player_rule = g.Rule.RUSH
+	g._load_arena()
+	g.mode = "fight"
+	g.p.x = g.b.x - 120.0
+	g._set_state("exposed", 1.7)
+	g._try_shift()
+	_check(g.boss_rule == g.Rule.RUSH and g.overclock_pending, "The Executor inherits and arms the old RUSH rule.")
+	for tick in 300:
+		g._tick_boss(DT)
+		if g.rail_return:
+			break
+	_check(g.rail_return and g.state == "windup", "Inherited RUSH warns and charges back for a second sweep.")
 
 func _pilot() -> Dictionary:
 	var next := {}

@@ -1,7 +1,7 @@
 <p align="center"><img src="../../assets/icon.svg" width="112" height="112" alt="SHIFT PROTOCOL 로고"></p>
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
-![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](../../LICENSE)
+![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](../../LICENSE)
 
 [English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · [中文（繁體）](../../docs/readme/zh-TW.md) · [日本語](../../docs/readme/ja.md) · **한국어**
 
@@ -12,11 +12,12 @@
 | 기능 | 게임에서의 동작 |
 | --- | --- |
 | SHIFT 교환 | 공격을 피하고 열린 코어에 접근해 **Shift**를 누르세요. 보스의 능력을 얻고 가지고 있던 규칙을 보스에게 넘깁니다. |
-| 보스 전투 3개 | 감시자, 격자기, 집행자에게 도전합니다. 두 번째 구역에서 LIFT를 빼앗으면 바닥이 무너집니다. |
-| 실제 플레이 조작 가이드 | 처음 실행할 때 언어를 선택하고 이동, 점프, 공격, 회피, 규칙 훔치기와 사용을 실제 플레이 영상으로 볼 수 있습니다. 타이틀 화면의 **?**에서 다시 열 수 있습니다. |
+| 구역 6곳 | 두 번째 구역의 바닥이 무너지면 위아래로 길이 갈립니다. 이후에는 통전 도관, 용광로 분출구, 이전 위치를 노리는 반사 공격과 넘겨받은 규칙을 강화하는 집행자가 등장합니다. |
+| 구역 지도와 저장 | 구역을 완료하면 자동으로 저장되고 다음 구역이 열립니다. 로비에서 완료한 구역을 다시 플레이하고 시간, 피격, 재시도 횟수를 확인할 수 있습니다. Esc로 일시 정지하고 톱니바퀴 메뉴에서 저장하고 종료합니다. |
+| 순서대로 보는 조작 가이드 | 처음 실행하면 실제 플레이 영상 다섯 편을 순서대로 봅니다. 로비의 **?**에서 다시 볼 수 있으며 각 레슨의 조작을 연습장에서 직접 해볼 수 있습니다. |
 | 설정 | 언어, 화면 모드, 창 크기, 글자 크기를 조절하고 소리, 움직임 줄이기, 보조 모드를 설정할 수 있습니다. Windows판은 처음 전체 화면으로 시작하며 이후에는 설정을 기억합니다. 웹판은 페이지 안에서 시작하며 설정에서 전체 화면으로 전환할 수 있습니다. |
 
-![조작 가이드에 표시된 실제 플레이 영상](../guide.png)
+![두 구역을 돌파한 지도](../map.png)
 
 ## 조작 방법
 
@@ -38,9 +39,9 @@
 
 ## 실행과 빌드
 
-Windows에서는 ZIP 전체를 풀고 `ShiftProtocol.pck`와 같은 폴더의 `ShiftProtocol.exe`를 실행하세요. 데스크톱 브라우저에서는 게임 화면을 클릭한 뒤 조작하세요. 소스에서 실행하려면 일반 버전 Godot 4.7.2에서 `project.godot`를 열고 F5를 누르세요. 빌드 안내에 내보내기 템플릿, 테스트 및 웹·Windows ZIP 생성 방법이 있습니다.
+Windows에서는 ZIP 전체를 풀고 `ShiftProtocol.exe`를 두 번 클릭하세요. 옆에 있는 `runtime` 폴더를 그대로 두세요. 데스크톱 브라우저에서는 게임 화면을 클릭한 뒤 조작하세요. 소스에서 실행하려면 일반 버전 Godot 4.7.2에서 `project.godot`를 열고 F5를 누르세요. 빌드 안내에 내보내기 템플릿, 테스트 및 웹·Windows ZIP 생성 방법이 있습니다.
 
-[빌드 안내 (영어)](../BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
+[태그가 붙은 버전 다운로드](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [빌드 안내 (영어)](../BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
 
 ## 제작 및 라이선스
 

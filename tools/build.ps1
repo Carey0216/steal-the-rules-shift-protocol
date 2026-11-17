@@ -38,12 +38,18 @@ try {
     if ((Get-Item -LiteralPath $buildRoot -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) {
         throw "Build directory is a reparse point: $buildRoot"
     }
-    New-Item -ItemType Directory -Path "$stage/web","$stage/windows","$stage/previous" -Force | Out-Null
+    New-Item -ItemType Directory -Path "$stage/web","$stage/windows/runtime","$stage/previous" -Force | Out-Null
     New-Item -ItemType File -Path 'builds/.gdignore' -Force | Out-Null
     Invoke-Engine -EngineArgs @('--import')
     Invoke-Engine -EngineArgs @('--script', 'tests/smoke.gd')
     Invoke-Engine -EngineArgs @('--export-release', 'Web', "$stage/web/index.html")
-    Invoke-Engine -EngineArgs @('--export-release', 'Windows', "$stage/windows/ShiftProtocol.exe")
+    Invoke-Engine -EngineArgs @('--export-release', 'Windows', "$stage/windows/runtime/ShiftProtocolGame.exe")
+    $csc = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
+    if (-not (Test-Path -LiteralPath $csc -PathType Leaf)) { throw 'The Windows launcher requires the .NET Framework C# compiler.' }
+    $launcherOut = Join-Path (Get-Item -LiteralPath "$stage/windows").FullName 'ShiftProtocol.exe'
+    $launcherSource = (Get-Item -LiteralPath 'tools/windows/Launcher.cs').FullName
+    & $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$launcherOut" $launcherSource
+    if ($LASTEXITCODE -ne 0) { throw 'Could not compile the Windows launcher.' }
 
     $notices = @('LICENSE','docs/GODOT_LICENSE.txt','docs/GODOT_COPYRIGHT.txt')
     $notices += @(Get-ChildItem -Path 'assets/OFL-*.txt' -File | Select-Object -ExpandProperty FullName)
@@ -59,7 +65,7 @@ try {
         if (Test-Path -LiteralPath "$stage/web/$optional") { $webFiles += $optional }
     }
     $webPaths = @($webFiles | ForEach-Object { "$stage/web/$_" })
-    $winPaths = @('ShiftProtocol.exe','ShiftProtocol.pck','PLAY-ZH.md','notices' | ForEach-Object { "$stage/windows/$_" })
+    $winPaths = @('ShiftProtocol.exe','runtime','PLAY-ZH.md','notices' | ForEach-Object { "$stage/windows/$_" })
     Compress-Archive -LiteralPath $webPaths -DestinationPath "$stage/shift-protocol-web.zip" -CompressionLevel Optimal
     Compress-Archive -LiteralPath $winPaths -DestinationPath "$stage/shift-protocol-windows-x64.zip" -CompressionLevel Optimal
     $backedUp = @()
