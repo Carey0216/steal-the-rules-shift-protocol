@@ -70,7 +70,14 @@ func _record() -> void:
 	game.assist = false
 	game.combat_rng.seed = 26
 	TranslationServer.set_locale("en")
-	if "--context" in OS.get_cmdline_user_args():
+	var requested := OS.get_cmdline_user_args()
+	if requested.size() == 1 and requested[0].begins_with("--lesson="):
+		var lesson := int(requested[0].get_slice("=", 1))
+		if lesson == 13:
+			await _shop_clip()
+		else:
+			await _context_clip(lesson)
+	elif "--context" in requested:
 		for lesson in range(game.Levels.LESSONS.size()):
 			if lesson == 13:
 				await _shop_clip()
@@ -145,7 +152,7 @@ func _clip(recording: String) -> void:
 	game.just.clear()
 
 func _context_clip(lesson: int) -> void:
-	var training_sector: Array[int] = [0, 1, 3, 4, 6, 7, 9, 10, 14, 18, 23, 1, 1]
+	var training_sector: Array[int] = [0, 1, 3, 4, 6, 7, 9, 10, 14, 18, 23, 1, 1, -1, 24, 25, 27, 30, 29, 34]
 	var index := training_sector[lesson]
 	var folder := "res://builds/recordings/context-%02d" % lesson
 	DirAccess.make_dir_recursive_absolute(folder)
@@ -228,7 +235,7 @@ func _drop_seed(negative: bool) -> int:
 	var rng := RandomNumberGenerator.new()
 	for seed_id in range(1, 1000):
 		rng.seed = seed_id
-		if rng.randf() < 0.12 and (rng.randf() < 0.24) == negative:
+		if rng.randf() < game.Gear.DROP_CHANCE and (rng.randf() < 0.24) == negative:
 			return seed_id
 	return 1
 
@@ -237,9 +244,13 @@ func _context_input(lesson: int, tick: int) -> Array:
 	var keys := []
 	if not route.active():
 		return [KEY_J] if lesson == 10 else keys
+	if lesson >= 14:
+		return _extended_input(route, tick)
 	var target: Vector2 = route.target()
 	var phase := fmod(route.clock, 2.8)
 	match lesson:
+		0:
+			return _extended_input(route, tick)
 		4:
 			if game.player_rule != game.Rule.AEGIS:
 				return [KEY_SHIFT] if tick == 16 else []
@@ -276,6 +287,39 @@ func _context_input(lesson: int, tick: int) -> Array:
 				keys.append(KEY_E)
 			if lesson == 6 and tick % 57 < 4 and game.p.x > 315:
 				keys.append(KEY_K)
+	return keys
+
+func _extended_input(route: RefCounted, tick: int) -> Array:
+	var keys := []
+	var target: Vector2 = route.target()
+	var aim := target
+	match route.kind:
+		"ferry":
+			if not route.ridden:
+				aim = Vector2(route.ferry.get_center().x, route.ferry.position.y)
+		"combo":
+			keys.append(KEY_J)
+		"key":
+			if game.player_rule != route.required_rule:
+				aim = route.socket
+				if route.near(game.p, aim, 84.0) and tick % 18 < 3:
+					keys.append(KEY_SHIFT)
+			elif route.near(game.p, target, 88.0, 55.0) and tick % 18 < 3:
+				keys.append(KEY_E)
+		"evade":
+			if route.near(game.p, target, 73.0) and route.pulse_phase() >= 2.22 and route.pulse_phase() < 2.25:
+				aim.x += 105.0 if game.p.x <= target.x else -105.0
+				keys.append(KEY_K)
+		"hold":
+			if route.echo != Vector2.ZERO:
+				aim.x += 102.0
+	if absf(aim.x - game.p.x) > 18.0:
+		keys.append(KEY_D if aim.x > game.p.x else KEY_A)
+	if (aim.y < game.p.y - 20.0 and absf(aim.x - game.p.x) < 142.0) and game.grounded and tick % 10 < 4:
+		keys.append(KEY_SPACE)
+	var box: Rect2 = route.hazard()
+	if route.kind == "sensor" and box.grow(45).has_point(game.p - Vector2(0, 26)) and game.grounded and tick % 10 < 4:
+		keys.append(KEY_SPACE)
 	return keys
 
 func _shop_clip() -> void:

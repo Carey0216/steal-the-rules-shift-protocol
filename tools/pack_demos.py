@@ -13,9 +13,12 @@ FRAME_SIZE = (576, 258)
 SHEET_SIZE = (FRAME_SIZE[0] * 3, FRAME_SIZE[1] * 5)
 RECORDINGS = ("move", "strike", "dodge", "steal", "rule")
 if "--context" in sys.argv:
-    RECORDINGS = tuple(f"context-{index:02d}" for index in range(14))
+    RECORDINGS = tuple(f"context-{index:02d}" for index in range(20))
 if "--supply" in sys.argv:
     RECORDINGS = ("context-12", "context-13")
+for option in sys.argv[1:]:
+    if option.startswith("--lesson="):
+        RECORDINGS = (f"context-{int(option.split('=', 1)[1]):02d}",)
 
 DEST.mkdir(exist_ok=True)
 for name in RECORDINGS:

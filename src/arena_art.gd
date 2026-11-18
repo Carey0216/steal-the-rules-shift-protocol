@@ -5,6 +5,7 @@ const Menu = preload("res://src/title_menu.gd")
 const Levels = preload("res://src/levels.gd")
 const Gear = preload("res://src/gear.gd")
 const Icons = preload("res://src/equipment_icons.gd")
+const OVERLOOK = preload("res://assets/gate-overlook.webp")
 
 const INK := Color("#0b131b")
 const PAPER := Color("#f5e9cd")
@@ -18,13 +19,16 @@ const H := 648.0
 var g: Node2D
 var accent: Color
 var sec := 0
+var district := 0
 
 func paint(game: Node2D) -> void:
 	g = game
 	sec = g.stage if g.mode != "title" else 0
+	district = 0
 	accent = g.ENCOUNTERS[sec].accent
 	if g.mode != "title" and g.mission_sector:
-		accent = Levels.TINTS[Levels.TABLE[g.sector_index][1]]
+		district = Levels.TABLE[g.sector_index][1]
+		accent = Levels.TINTS[district]
 	if g.mode == "title":
 		_title()
 		return
@@ -55,8 +59,10 @@ func paint(game: Node2D) -> void:
 		_briefing()
 
 func _marker(center: Vector2, glyph: String, tint: Color) -> void:
-	g.draw_circle(center, 28, _soft(INK, 0.8), true, -1, true)
-	g.draw_circle(center, 27, tint, false, 1.5, true)
+	g.draw_circle(center + Vector2(0, 3), 30, Color("#080f199d"), true, -1, true)
+	g.draw_circle(center, 28, Color("#1a2a3be8"), true, -1, true)
+	g.draw_circle(center, 27, Color(tint, 0.74), false, 1.5, true)
+	g.draw_arc(center, 22, -2.97, -1.25, 18, Color(tint, 0.24), 1.1, true)
 	_poly([center + Vector2(-6, 25), center + Vector2(6, 25), center + Vector2(0, 33)], tint)
 	if not glyph.is_empty():
 		_text(glyph, center.x, center.y + 5, 13, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
@@ -70,20 +76,40 @@ func _route() -> void:
 			_line(Vector2(x, deck.position.y + 5), Vector2(x - 4, deck.end.y - 2), INK)
 	if not route.active():
 		return
+	if route.ferry.has_area():
+		var deck: Rect2 = route.ferry
+		_rect(deck.position.x, deck.position.y, deck.size.x, deck.size.y, Color("#334f62"))
+		_line(deck.position, Vector2(deck.end.x, deck.position.y), accent, 2.0)
+		_poly([deck.position + Vector2(8, 14), deck.position + Vector2(25, 32), deck.position + Vector2(96, 32), deck.position + Vector2(116, 14)], Color("#182d3b"))
+		for x in [25, 98]:
+			g.draw_circle(deck.position + Vector2(x, 16), 3.0, accent)
 	var zone: Rect2 = route.hazard()
 	if zone.has_area():
-		var live := fmod(route.clock, 1.8) >= 1.18
+		var live: bool = route.hazard_live()
 		_rect(zone.position.x, zone.position.y, zone.size.x, zone.size.y, _soft(RED, 0.36 if live else 0.13))
 		for x in range(int(zone.position.x), int(zone.end.x), 12):
 			_line(Vector2(x, zone.end.y - 16), Vector2(x + 9, zone.position.y + 7), RED if live else _soft(RED, 0.4))
-	if route.echo != Vector2.ZERO:
+	if route.echo != Vector2.ZERO and route.kind in ["echo", "reflect"]:
 		_rect(route.echo.x - 53, route.echo.y - 66, 106, 66, _soft(accent, 0.14))
 		_line(route.echo + Vector2(0, -145), route.echo, RED, 2.0)
 	for i in range(route.cursor + 1, route.targets.size()):
 		var future: Vector2 = route.targets[i]
 		_line(future + Vector2(0, -15), future, DIM, 2.0)
-	var symbols := {"echo": "!", "reflect": "E", "swap": "Q", "break": "J", "timer": "J", "belt": "J"}
-	_marker(route.target() - Vector2(0, 34), symbols.get(route.kind, ">"), accent)
+	var symbols := {"echo": "!", "reflect": "E", "swap": "Q", "break": "J", "timer": "J", "belt": "J", "combo": "J", "hold": "●", "evade": "K"}
+	var target: Vector2 = route.target() - Vector2(0, 34)
+	_marker(target, symbols.get(route.kind, "" if route.kind == "key" else ">"), accent)
+	if route.kind == "key":
+		Icons.paint_rule(g, target, 1.5, g.RULE_COLORS[route.required_rule], route.required_rule)
+	if route.kind == "combo":
+		for i in range(3):
+			_rect(target.x - 18.0 + 13.0 * i, target.y - 37.0, 10.0, 4.0, accent if i < route.combo and route.timing > 0.0 else LINE)
+	if route.kind == "hold" and route.hold > 0.0:
+		g.draw_arc(target, 36.0, -PI / 2.0, -PI / 2.0 + TAU * route.hold / 2.1, 40, GREEN, 3.0, true)
+	if route.kind in ["evade", "hold"] and route.pulse_phase() >= 1.84:
+		var pulse: Rect2 = route.pulse_box()
+		if pulse.has_area():
+			g.draw_rect(pulse, _soft(RED, 0.16 if route.pulse_phase() < 2.35 else 0.5))
+			_columns(pulse.position.x, pulse.size.x, pulse.end.y, 12, RED)
 	if route.socket_rule > 0:
 		var center: Vector2 = route.socket - Vector2(0, 30)
 		var tint: Color = g.RULE_COLORS[route.socket_rule]
@@ -106,7 +132,8 @@ func _equipment() -> void:
 	if not g.reduced_motion:
 		origin.y += sin(g.clock * 7.0) * 3.5
 	_marker(origin, "", tint)
-	Icons.paint(g, origin, 1.67, tint, id)
+	Icons.paint(g, origin + Vector2(0, 1.6), 1.67, Color("#08131f"), id)
+	Icons.paint(g, origin, 1.67, tint.lerp(PAPER, 0.19), id)
 	g.draw_arc(origin, 32.0, -PI * 0.5, -PI * 0.5 + TAU * g.drop.time / Gear.DROP_LIFETIME, 40, tint, 2.0, true)
 	var polarity := origin + Vector2(25, -22)
 	g.draw_circle(polarity, 7.0, INK)
@@ -202,15 +229,54 @@ func _background(floor: float, age: float) -> void:
 					_rect(x + 13, 411 - rib * 13, 67, 4, _soft(accent, 0.12 + rib * 0.009))
 			elif sec == 4:
 				_poly([Vector2(x, 200), Vector2(x + 89, 225), Vector2(x + 89, 386), Vector2(x, 423)], _soft(accent, 0.13))
+	_district_scenery(floor, age)
 	for i in 72:
 		var x := fposmod(i * 337.1 + (age * (5.0 + i % 4) if not g.reduced_motion else 0.0), W)
 		var y := 146.0 + fposmod(i * 69.7 - (age * (9 + i % 3) if not g.reduced_motion else 0.0), 365.0)
 		_rect(x, y, 1 + i % 3, 1, _soft(accent, 0.10 + (i % 5) * 0.035))
-	for i in 115:
-		_rect(0, 4 + i * 5.0, W, 1, _soft(INK, 0.14))
+	for i in 57:
+		_rect(0, 4 + i * 10.0, W, 1, _soft(INK, 0.13))
 	if not g.record_demo:
 		_text(Locale.text("SUBLEVEL") + "  /  " + str(sec + 1).pad_zeros(2), 59, 176, 12, _soft(DIM, 0.52))
 		_text("AUTHORIZED MACHINES ONLY", 1093, 176, 12, _soft(DIM, 0.52), false, HORIZONTAL_ALIGNMENT_RIGHT)
+
+func _district_scenery(floor: float, time: float) -> void:
+	if not g.mission_sector:
+		return
+	var motion := 0.0 if g.reduced_motion else time
+	match district:
+		0, 6:
+			for i in 5:
+				var x := 85.0 + i * 248.0
+				_poly([Vector2(x, 252), Vector2(x + 98, 195), Vector2(x + 119, 201), Vector2(x + 14, 267)], _soft(INK, 0.64))
+				_line(Vector2(x + 113, 205), Vector2(x + 114, 386), _soft(accent, 0.33), 1.6)
+				_rect(x + 92, 383, 45, 9, _soft(accent, 0.25))
+		1, 7:
+			for i in 7:
+				var x := 99.0 + i * 154.0
+				var height := 51.0 + 15.0 * (i % 3)
+				_rect(x, 408 - height, 67, height, _soft(accent, 0.085))
+				_line(Vector2(x - 18, 408), Vector2(x + 89, 408), _soft(accent, 0.24), 1.1)
+				_rect(x + 13, 395 - height, 8, 8, _soft(accent, 0.29 + 0.11 * sin(motion * 1.8 + i * 0.8)))
+		2, 4:
+			for i in 4:
+				var x := 147.0 + i * 262.0
+				var silo := Vector2(x, 348)
+				g.draw_arc(silo, 49, PI, TAU, 35, _soft(accent, 0.25), 2.0, true)
+				_rect(x - 49, 348, 98, floor - 357, _soft(accent, 0.075))
+				_line(Vector2(x - 49, 348), Vector2(x - 49, floor - 13), _soft(accent, 0.22))
+				for row in 4:
+					_line(Vector2(x - 50, 355 + row * 20), Vector2(x + 49, 355 + row * 20), _soft(accent, 0.16))
+			if district == 4:
+				for row in 4:
+					for i in 15:
+						_rect(fposmod(i * 97.0 + motion * float(8 + row), W), 451 + row * 8.0, 58.0, 1, _soft(accent, 0.30 - row * 0.042))
+		3, 5:
+			for i in 6:
+				var x := 33.0 + i * 207.0
+				_poly([Vector2(x, 238), Vector2(x + 129, 213), Vector2(x + 129, 426), Vector2(x, 452)], _soft(accent, 0.105))
+				_line(Vector2(x + 17, 424), Vector2(x + 108, 252), _soft(accent, 0.22), 2.0)
+				_line(Vector2(x + 23, 431), Vector2(x + 113, 289), _soft(accent, 0.13))
 
 func _floor(y: float) -> void:
 	_rect(-25, y, W + 50, 190, Color("#101921"))
@@ -420,9 +486,10 @@ func _world_fx(foreground: bool) -> void:
 		g.draw_polyline(points, _soft(PAPER, g.wire_time * 1.45), 1, true)
 
 func _hud() -> void:
-	_rect(0, 0, W, 136, INK)
-	_rect(0, 135, W, 1, LINE)
-	_rect(0, 0, W, 3, accent)
+	_rect(0, 0, W, 136, Color("#141f2d"))
+	_rect(0, 135, W, 1, Color("#7d7567"))
+	_rect(326, 0, 500, 2, accent)
+	_poly([Vector2(316, 10), Vector2(836, 10), Vector2(809, 63), Vector2(343, 63)], Color("#1e2b38"))
 	_text("SHIFT PROTOCOL", 42, 35, 27, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 270, 30)
 	_text(Locale.text("SECTOR") + " " + ("%02d" % (g.sector_index + 1) if g.mission_sector else Locale.text(g.ENCOUNTERS[sec].sector)), 42, 55, 12, DIM)
 	_text(g.timecode(g.run_time), 1110, 34, 19, TEXT, false, HORIZONTAL_ALIGNMENT_RIGHT)
@@ -463,7 +530,8 @@ func _hud() -> void:
 		var tint: Color = g.RULE_COLORS[g.boss_rule]
 		Icons.paint_rule(g, Vector2(1100, 113), 0.85, tint, g.boss_rule)
 		_text(g.RULE_NAMES[g.boss_rule], 1082, 123, 26, tint, true, HORIZONTAL_ALIGNMENT_RIGHT, 234, 28)
-	_rect(0, 568, W, 80, INK)
+	_rect(0, 568, W, 80, Color("#141f2d"))
+	_rect(0, 569, 6, 79, accent)
 	_line(Vector2(0, 568), Vector2(W, 568), LINE)
 	var sub := Locale.text(_instruction())
 	if g.last_device == "pad":
@@ -557,28 +625,25 @@ func _briefing() -> void:
 	_text(enter + "   " + Locale.text("ENGAGE"), x + 47, y + 261, 14, INK, false, HORIZONTAL_ALIGNMENT_LEFT, 319)
 
 func _title() -> void:
-	_background(527, g.clock)
-	_floor(527)
-	_boss(Vector2(878, 524), -1, 2.29, g.Rule.RUSH, true)
-	_player(Vector2(639, 524), 1, 1.31)
-	_rect(0, 0, W, 86, INK)
-	_rect(0, 0, W, 3, RED)
-	_line(Vector2(57, 85), Vector2(1095, 85), LINE)
-	_text("Lobby", 58, 60, 23, PAPER, true)
-	_poly([Vector2(0, 86), Vector2(579, 86), Vector2(615, 126), Vector2(615, 568), Vector2(0, 568)], INK)
-	_poly([Vector2(59, 120), Vector2(520, 120), Vector2(546, 146), Vector2(546, 387), Vector2(59, 387)], PAPER)
-	_poly([Vector2(520, 120), Vector2(546, 146), Vector2(520, 146)], Color("#c7ae8c"))
-	_rect(59, 120, 4, 267, RED)
-	_text("STEAL THE", 82, 222, 100, INK, true)
-	_text("RULES", 81, 314, 113, INK, true)
-	_line(Vector2(83, 332), Vector2(520, 332), Color("#b6a38b"))
-	_text("S H I F T   P R O T O C O L", 85, 363, 15, INK)
-	_text("Take a rule. Change the fight.", 60, 429, 16, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 490)
-	_line(Vector2(640, 116), Vector2(1093, 116), _soft(accent, 0.40))
-	_line(Vector2(1093, 116), Vector2(1093, 184), _soft(accent, 0.40))
-	_line(Vector2(629, 503), Vector2(691, 503), _soft(accent, 0.45), 2)
-	_rect(0, 568, W, 80, INK)
-	_line(Vector2(0, 568), Vector2(W, 568), LINE)
-	_text(("%s  /  " % Locale.NAMES[Locale.current()]) + "v" + str(ProjectSettings.get_setting("application/config/version")), 58, 610, 14, PAPER)
-	_text(Locale.text("%d of %d sectors cleared") % [g.campaign.records.size(), Levels.TABLE.size()], 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_columns(962, 132, 596, 19, _soft(RED, 0.58))
+	g.draw_texture_rect(OVERLOOK, Rect2(0, 0, W, H), false)
+	_rect(0, 0, W, H, Color("#0a142c25"))
+	for i in 22:
+		var t := float(i) / 21.0
+		_rect(i * 21.0, 0, 22.0, H, _soft(INK, 0.43 * pow(1.0 - t, 1.6)))
+	_rect(0, 0, W, 88, Color("#0d1728a5"))
+	_line(Vector2(66, 88), Vector2(1095, 88), Color("#edd6ac45"))
+	_text("Lobby", 66, 54, 22, PAPER, true)
+	_line(Vector2(66, 169), Vector2(338, 169), Color("#e5b276"), 1.8)
+	_text("STEAL THE", 65, 269, 96, PAPER, true)
+	_text("RULES", 64, 363, 118, PAPER, true)
+	_text("SHIFT  PROTOCOL", 68, 406, 24, Color("#f5c58d"), true)
+	_rect(0, 565, W, 83, Color("#101a2bc9"))
+	_line(Vector2(66, 566), Vector2(1096, 566), Color("#edd6ac47"))
+	_text(_tally(), 68, 608, 17, PAPER, false)
+	var count: float = float(g.campaign.records.size()) / Levels.TABLE.size()
+	_rect(343, 601, 232, 4, Color("#657386"))
+	_rect(343, 601, 232 * count, 4, Color("#f5c58d"))
+	_text("v" + str(ProjectSettings.get_setting("application/config/version")), 1094, 608, 13, PAPER, false, HORIZONTAL_ALIGNMENT_RIGHT)
+
+func _tally() -> String:
+	return Locale.text("%d of %d sectors cleared") % [g.campaign.records.size(), Levels.TABLE.size()]

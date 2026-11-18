@@ -24,7 +24,7 @@ static func text(key: String) -> String:
 static func face(index: int, headline := false) -> Font:
 	var file: String = FONTS[index]
 	if file.is_empty():
-		file = "BarlowCondensed-ExtraBold" if headline else "SpaceMono-Regular"
+		file = "BarlowCondensed-ExtraBold" if headline else "Inter"
 	else:
 		file = "ShiftSans" + file
 	if not faces.has(file):

@@ -423,6 +423,8 @@ func _physics_process(dt: float) -> void:
 		elif pressed.has("confirm"):
 			mode = "fight"
 			audio_rig.fire("start")
+			if title_menu != null and not record_demo:
+				title_menu.play_arena_reveal()
 	elif mode == "lost":
 		if pressed.has("confirm") or pressed.has("retry"):
 			_retry()
@@ -524,6 +526,8 @@ func _load_arena() -> void:
 		for id in starter:
 			_equip(id)
 	var candidates: Array = ENCOUNTERS[stage].rules.duplicate()
+	if mission_sector and sector_index >= 24 and not route.active():
+		candidates.push_back(candidates.pop_front())
 	candidates.erase(player_rule)
 	boss_rule = candidates[0]
 	reserve_rule = candidates[1]
@@ -689,6 +693,9 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 		v.x = move_toward(v.x, axis * speed, accel * dt)
 		v.y = minf(v.y + (300.0 if lift > 0.0 else 1660.0) * dt, 835.0)
 	var previous_y := p.y
+	if route.active():
+		route.carry_platform(self, dt)
+		previous_y = p.y
 	p += v * dt
 	p.x = clampf(p.x, LEFT, RIGHT)
 	if floor_broken:
@@ -827,6 +834,9 @@ func _use_rule() -> void:
 		audio_rig.fire("deny")
 		return
 	charge = false
+	if route.use_at_gate(self):
+		audio_rig.fire("rule")
+		return
 	if effects.has(8):
 		cell_cooldown = 2.0
 	var color: Color = RULE_COLORS[player_rule]
@@ -901,7 +911,7 @@ func _damage_boss(amount: int) -> void:
 	_burst(core_pos(), Color("#ffe4bd"), 9 + amount, 183.0)
 	audio_rig.fire("hit")
 	if boss_hp == 0:
-		if mission_sector and sector_index == Levels.TABLE.size() - 1 and not evacuated:
+		if mission_sector and stage == 5 and not evacuated:
 			evacuated = true
 			hazards.clear()
 			zones.clear()
@@ -967,7 +977,7 @@ func _tick_equipment(dt: float) -> void:
 		_impact(drop.at, equipment_color(id))
 		_report(Gear.ITEMS[id][0], Gear.ITEMS[id][1], 1.5)
 		drop.clear()
-		audio_rig.fire("rule")
+		audio_rig.fire("pickup" if Gear.ITEMS[id][3] > 0 else "penalty")
 
 func _finish_arena() -> void:
 	if mode != "fight":
@@ -1065,7 +1075,7 @@ func _tick_boss(dt: float) -> void:
 
 func _windup() -> void:
 	zones.clear()
-	overclock_attack = overclock_pending
+	overclock_attack = overclock_pending or (mission_sector and sector_index >= 24 and sector_time > 14.0 and boss_hp < boss_max_hp * 0.62)
 	overclock_pending = false
 	rail_return = false
 	target_x = clampf(p.x, LEFT + 86, RIGHT - 86)

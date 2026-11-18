@@ -4,13 +4,13 @@ const Locale = preload("res://src/locale.gd")
 const Levels = preload("res://src/levels.gd")
 const Gear = preload("res://src/gear.gd")
 const Icons = preload("res://src/equipment_icons.gd")
-const INK := Color("#0b131b")
-const PANEL := Color("#101b23")
-const LINE := Color("#435561")
-const PAPER := Color("#f5e9cd")
-const DIM := Color("#b0bfc4")
-const GREEN := Color("#81fbd2")
-const AMBER := Color("#f4c57b")
+const INK := Color("#101822")
+const PANEL := Color("#18232f")
+const LINE := Color("#4a5968")
+const PAPER := Color("#f7efdc")
+const DIM := Color("#bcc9d4")
+const GREEN := Color("#a9dfcd")
+const AMBER := Color("#f1cc90")
 const SCALES := [1.0, 1.15, 1.3]
 const SIZES := [Vector2i(1152, 648), Vector2i(1280, 720), Vector2i(1600, 900)]
 const DEMOS := [
@@ -23,7 +23,6 @@ const DEMOS := [
 const FRAME_SIZE := Vector2i(576, 258)
 const FRAMES_PER_SHEET := 15
 const FRAME_COUNT := 60
-const FPS := 15.0
 
 var game: Node2D
 var ui: Control
@@ -53,6 +52,13 @@ var active_lesson := -1
 var money_clicks := 0
 var money_deadline := 0
 var money_authorized := false
+var map_region := -1
+var map_focus := -1
+var last_view := ""
+var opening_page := false
+var painted_region := -1
+var demo_rate := 1.0
+var demo_speed: Button
 
 func _ready() -> void:
 	layer = 4
@@ -124,6 +130,8 @@ func _style(fill: Color, border: Color, width := 1) -> StyleBoxFlat:
 	box.bg_color = fill
 	box.border_color = border
 	box.set_border_width_all(width)
+	box.set_corner_radius_all(9)
+	box.corner_detail = 6
 	return box
 
 func _place(node: Control, parent: Control, at: Rect2) -> void:
@@ -161,19 +169,22 @@ func _button(parent: Control, key: String, at: Rect2, callback: Callable, primar
 	button.add_theme_color_override("font_hover_color", INK if primary else GREEN)
 	button.add_theme_color_override("font_pressed_color", INK if primary else GREEN)
 	button.add_theme_color_override("font_focus_color", INK if primary else PAPER)
-	var surface := GREEN if primary else (Color("#23343e") if selected else PANEL)
-	var normal := _style(surface, GREEN if primary else LINE)
+	var surface := AMBER if primary else (Color("#354352") if selected else Color("#23303d"))
+	var normal := _style(surface, AMBER if primary else LINE)
 	if selected:
-		normal.border_color = GREEN
-		normal.border_width_left = 3
+		normal.border_color = AMBER
 	button.add_theme_stylebox_override("normal", normal)
-	button.add_theme_stylebox_override("hover", _style(surface.lightened(0.08), GREEN))
-	button.add_theme_stylebox_override("pressed", _style(surface.darkened(0.06), GREEN))
+	button.add_theme_stylebox_override("hover", _style(surface.lightened(0.13), AMBER))
+	button.add_theme_stylebox_override("pressed", _style(surface.darkened(0.13), AMBER))
 	button.add_theme_stylebox_override("disabled", _style(INK, LINE.darkened(0.4)))
-	var focus := _style(Color.TRANSPARENT, GREEN, 2)
+	var focus := _style(Color.TRANSPARENT, AMBER, 2)
 	focus.draw_center = false
 	button.add_theme_stylebox_override("focus", focus)
-	button.pressed.connect(callback)
+	button.pressed.connect(func():
+		game.audio_rig.fire("ui_confirm")
+		callback.call()
+	)
+	button.focus_entered.connect(func(): game.audio_rig.fire("ui_focus"))
 	_place(button, parent, at)
 	return button
 
@@ -212,16 +223,35 @@ func _option(parent: Control, items: Array, chosen: int, at: Rect2, callback: Ca
 
 func _modal(title: String, at: Rect2) -> Panel:
 	var dim := ColorRect.new()
-	dim.color = Color("#070d15c9")
+	dim.color = Color("#060b14b5")
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_place(dim, ui, Rect2(0, 0, 1152, 648))
-	var panel := _panel(ui, at, PANEL)
-	_panel(panel, Rect2(0, 0, at.size.x, 2), GREEN, GREEN)
-	_label(panel, title, Rect2(28, 21, at.size.x - 56, 45), 31, PAPER, true)
+	var panel := _panel(ui, at, PANEL, Color("#6f675e"))
+	var skin := panel.get_theme_stylebox("panel") as StyleBoxFlat
+	skin.set_corner_radius_all(16)
+	skin.shadow_color = Color("#03061198")
+	skin.shadow_size = 18
+	skin.shadow_offset = Vector2(0, 8)
+	_label(panel, title, Rect2(28, 19, at.size.x - 104, 52), 34, PAPER, true)
+	if opening_page and not game.reduced_motion and not game.save_path.is_empty():
+		dim.modulate.a = 0.0
+		panel.modulate.a = 0.0
+		panel.pivot_offset = at.size / 2.0
+		panel.scale = Vector2(0.982, 0.982)
+		panel.position.y += 10.0
+		var entrance := panel.create_tween().set_parallel(true)
+		entrance.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		entrance.tween_property(dim, "modulate:a", 1.0, 0.18)
+		entrance.tween_property(panel, "modulate:a", 1.0, 0.19)
+		entrance.tween_property(panel, "position:y", at.position.y, 0.25)
+		entrance.tween_property(panel, "scale", Vector2.ONE, 0.25)
 	return panel
 
 func _draw_page() -> void:
 	set_process(false)
+	var view: String = game.mode + ":" + page
+	opening_page = view != last_view
+	last_view = view
 	display_picker = null
 	demo_sheets.clear()
 	for child in ui.get_children():
@@ -249,7 +279,7 @@ func _draw_page() -> void:
 		_: _title_controls()
 
 func _title_controls() -> void:
-	var open_map := _button(ui, "Sector map", Rect2(59, 465, 266, 54), _open.bind("map"), true)
+	var open_map := _button(ui, "Sector map", Rect2(66, 457, 279, 56), _open_map, true)
 	open_map.grab_focus()
 	var gear := _button(ui, "", Rect2(987, 25, 48, 44), _open.bind("settings"))
 	gear.tooltip_text = _t("Settings")
@@ -264,6 +294,23 @@ func _title_controls() -> void:
 	var shop := _button(ui, "", Rect2(925, 25, 48, 44), _open_shop.bind(-1))
 	shop.tooltip_text = _t("Equipment shop")
 	shop.draw.connect(_currency_icon.bind(shop, true))
+
+func _open_map() -> void:
+	map_region = -1
+	painted_region = -1
+	map_focus = -1
+	_open("map")
+
+func _back_arrow(parent: Control, at: Rect2, callback: Callable, tip := "Return to lobby") -> Button:
+	var button := _button(parent, "", at, callback)
+	button.tooltip_text = _t(tip)
+	button.draw.connect(func():
+		var c := button.size / 2.0
+		var tint := AMBER if button.is_hovered() or button.has_focus() else PAPER
+		button.draw_polyline(PackedVector2Array([c + Vector2(-1, -8), c + Vector2(-9, 0), c + Vector2(-1, 8)]), tint, 1.9, true)
+		button.draw_line(c + Vector2(-8, 0), c + Vector2(10, 0), tint, 1.9, true)
+	)
+	return button
 
 func _currency_icon(button: Button, cart: bool) -> void:
 	var center := Vector2(25, 22)
@@ -401,42 +448,81 @@ func _show_save_notice(parent: Control, at: Rect2) -> void:
 		_label(parent, "Could not save. Try again before closing.", at, 13, AMBER)
 
 func _map() -> void:
-	var panel := _modal("Sector map", Rect2(66, 40, 1020, 568))
-	var completed: int = game.campaign.records.size()
-	var total: int = Levels.TABLE.size()
-	_label(panel, _t("%d of %d sectors cleared") % [completed, total], Rect2(29, 71, 720, 35), 15, DIM)
-	_button(panel, "Lobby", Rect2(816, 24, 176, 46), back)
+	var panel := _modal("Sector map", Rect2(49, 38, 1054, 572))
+	_back_arrow(panel, Rect2(982, 24, 44, 42), back)
+	var cleared: int = game.campaign.records.size()
+	if map_region < 0:
+		map_region = mini(Levels.REGIONS.size() - 1, cleared / 6)
+	var tint: Color = Levels.TINTS[map_region]
+	var offset := map_region * 6
+	if map_focus < 0:
+		map_focus = clampi(cleared, offset, offset + 5)
+	for i in Levels.REGIONS.size():
+		var y := 89.0 + i * 53.0
+		var tab := _button(panel, "", Rect2(27, y, 216, 45), _select_region.bind(i), false, map_region == i)
+		var shade: Color = Levels.TINTS[i] if cleared >= i * 6 else DIM
+		_label(tab, "%02d" % (i + 1), Rect2(12, 3, 32, 39), 12, shade)
+		_label(tab, Levels.REGIONS[i], Rect2(50, 2, 155, 41), 15, PAPER if cleared >= i * 6 else DIM, true)
+
+	var map := _panel(panel, Rect2(265, 85, 761, 325), Color("#13202b"), tint.darkened(0.61))
+	map.clip_contents = true
+	if painted_region >= 0 and painted_region != map_region and not game.reduced_motion and not game.save_path.is_empty():
+		map.modulate.a = 0.15
+		map.create_tween().tween_property(map, "modulate:a", 1.0, 0.19).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	painted_region = map_region
+	var backdrop := TextureRect.new()
+	backdrop.texture = preload("res://assets/gate-overlook.webp")
+	backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	backdrop.modulate = Color(tint.lightened(0.48), 0.23)
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(backdrop, map, Rect2(0, 0, 761, 325))
+	_label(map, Levels.REGIONS[map_region], Rect2(27, 12, 550, 44), 28, tint, true)
+	_label(map, _t("%d of %d sectors cleared") % [cleared, Levels.TABLE.size()], Rect2(542, 15, 200, 40), 13, DIM)
+	var points := [Vector2(139, 111), Vector2(375, 109), Vector2(614, 121), Vector2(614, 239), Vector2(375, 248), Vector2(139, 225)]
+	map.draw.connect(func():
+		for i in range(5):
+			var a: Vector2 = points[i]
+			var b: Vector2 = points[i + 1]
+			map.draw_line(a, b, tint.darkened(0.55) if cleared > offset + i else LINE, 3.0, true)
+	)
 	var focused: Button
-	for region in 4:
-		var y := 122.0 + region * 94.0
-		var tint: Color = Levels.TINTS[region]
-		_panel(panel, Rect2(28, y, 964, 82), INK, tint.darkened(0.65))
-		_panel(panel, Rect2(28, y, 4, 82), tint, tint)
-		_label(panel, Levels.REGIONS[region], Rect2(45, y + 10, 158, 59), 20, tint, true, true)
-		_panel(panel, Rect2(212, y + 39, 758, 3), tint.darkened(0.65))
-		for point in 6:
-			var index := region * 6 + point
-			var at := Rect2(213 + point * 128, y + (8 if point % 2 == 0 else 15), 118, 61)
-			var lit := index < completed
-			var next := index == completed
-			var tile := _button(panel, "", at, prepare_sector.bind(index), false, next)
-			tile.disabled = not lit and not next
-			var tone := tint if lit or next else DIM.darkened(0.27)
-			_label(tile, "%02d%s" % [index + 1, "   ›" if next else ""], Rect2(8, 4, 101, 25), 13, tone)
-			if lit:
-				for i in 3:
-					_star(tile, Vector2(43 + i * 13, 14), 5.0, tone if i < game.campaign.records[index].stars else LINE)
-			var caption := _label(tile, Levels.TABLE[index][0], Rect2(8, 22, 104, 32), 12, PAPER if lit or next else DIM, false, true)
-			caption.add_theme_constant_override("line_spacing", -4)
-			caption.max_lines_visible = 2
-			caption.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			tile.tooltip_text = "%s  /  %s" % [_t(Levels.TABLE[index][0]), _t("Cleared" if lit else ("Next sector" if next else "Locked"))]
-			if next or index == total - 1 and completed == total:
-				focused = tile
-	_label(panel, "Select a cleared sector to replay it.", Rect2(29, 505, 700, 36), 14, DIM)
-	_show_save_notice(panel, Rect2(560, 505, 440, 36))
+	for i in range(6):
+		var index := offset + i
+		var point: Vector2 = points[i]
+		var done := index < cleared
+		var available := index <= cleared
+		var tile := _button(map, "", Rect2(point - Vector2(91, 35), Vector2(182, 71)), _focus_sector.bind(index), false, map_focus == index)
+		tile.disabled = not available
+		var ink := tint if available else DIM.darkened(0.13)
+		_label(tile, "%02d" % (index + 1), Rect2(12, 4, 41, 27), 13, ink)
+		_label(tile, Levels.TABLE[index][0], Rect2(12, 30, 160, 33), 15, PAPER if available else DIM, true, true).max_lines_visible = 2
+		if done:
+			for star_index in 3:
+				_star(tile, Vector2(47 + star_index * 14, 17), 5.2, tint if star_index < game.campaign.records[index].stars else LINE)
+		if map_focus == index and available:
+			focused = tile
+	var detail := _panel(panel, Rect2(265, 426, 761, 117), Color("#202f3b"))
+	var selected: Array = Levels.TABLE[map_focus]
+	_label(detail, selected[0], Rect2(19, 6, 463, 41), 25, tint, true)
+	_label(detail, Levels.GOALS[selected[2]], Rect2(19, 47, 490, 54), 15, PAPER, false, true)
+	var go := _button(detail, "Start sector" if map_focus <= cleared else "Locked", Rect2(521, 37, 216, 48), prepare_sector.bind(map_focus), map_focus <= cleared)
+	go.disabled = map_focus > cleared
+	_show_save_notice(panel, Rect2(272, 543, 718, 24))
 	if focused != null:
 		focused.grab_focus()
+
+func _select_region(region: int) -> void:
+	map_region = region
+	map_focus = -1
+	_draw_page.call_deferred()
+
+func _focus_sector(index: int) -> void:
+	if map_focus == index:
+		prepare_sector(index)
+	else:
+		map_focus = index
+		_draw_page.call_deferred()
 
 func prepare_sector(index: int) -> void:
 	if not game.campaign.selectable(index, Levels.TABLE.size()):
@@ -474,7 +560,7 @@ func _shop() -> void:
 		_gear_badge(card, Rect2(12, 24, 50, 50), id)
 		_label(card, item[0], Rect2(73, 6, 211, 36), 20, PAPER, true)
 		_label(card, item[1], Rect2(73, 42, 207, 31), 13, DIM, false, true)
-		_label(card, "%ds" % int(item[2]), Rect2(73, 73, 207, 21), 12, game.equipment_color(id))
+		_label(card, _t("Effect lasts %d seconds") % int(item[2]), Rect2(73, 73, 215, 22), 12, game.equipment_color(id))
 		var buy := _button(card, "Equipped" if id in reserved else str(item[3]), Rect2(297, 26, 136, 47), _buy.bind(id))
 		buy.tooltip_text = _t("Buy for next attempt")
 		buy.disabled = id in reserved or reserved.size() >= Gear.MAX_LOADOUT or game.campaign.coins < item[3]
@@ -483,7 +569,7 @@ func _shop() -> void:
 	prior.disabled = gear_page == 0
 	more.disabled = gear_page >= count - 1
 	_label(panel, "%d/%d" % [gear_page + 1, count], Rect2(78, 476, 43, 42), 15, DIM)
-	_button(panel, "Back", Rect2(186, 475, 158, 45), back)
+	_back_arrow(panel, Rect2(193, 475, 51, 45), back, "Back")
 	if sector_pending >= 0:
 		var start := _button(panel, "Start without equipment" if reserved.is_empty() else "Start sector", Rect2(592, 474, 350, 48), _start_selected, true)
 		start.grab_focus()
@@ -491,14 +577,25 @@ func _shop() -> void:
 		_button(panel, "Equipment index", Rect2(642, 474, 300, 48), _open_archive.bind(1), true)
 	if game.save_error:
 		_show_save_notice(panel, Rect2(28, 525, 910, 28))
-	elif sector_pending >= 0:
-		var level: Array = Levels.TABLE[sector_pending]
-		_label(panel, "%s   /   %s" % [_t("Time ≤ %ds") % int(level[5]), _t("Hits ≤ %d") % (1 if level[2] == "boss" else 0)], Rect2(29, 525, 906, 27), 13, DIM)
+	else:
+		_label(panel, "Equipment timers start when the fight begins.", Rect2(29, 521, 610, 26), 13, DIM)
+		if sector_pending >= 0:
+			var level: Array = Levels.TABLE[sector_pending]
+			_label(panel, "%s   /   %s" % [_t("Time ≤ %ds") % int(level[5]), _t("Hits ≤ %d") % (1 if level[2] == "boss" else 0)], Rect2(660, 521, 283, 29), 13, AMBER)
 
 func _gear_badge(parent: Control, at: Rect2, id: int, interactive := false) -> void:
 	var tint: Color = game.equipment_color(id)
-	var badge := _panel(parent, at, tint.darkened(0.86), tint.darkened(0.51))
-	badge.draw.connect(func(): Icons.paint(badge, badge.size * 0.5, at.size.x / 29.0, tint, id))
+	var badge := _panel(parent, at, Color("#14202c"), tint.darkened(0.43))
+	badge.draw.connect(func():
+		var c := badge.size * 0.5
+		var r := at.size.x * 0.38
+		var plane := PackedVector2Array([c + Vector2(0, -r), c + Vector2(r, -r * 0.45), c + Vector2(r, r * 0.45), c + Vector2(0, r), c + Vector2(-r, r * 0.45), c + Vector2(-r, -r * 0.45)])
+		badge.draw_colored_polygon(plane, tint.darkened(0.79))
+		badge.draw_line(plane[0], plane[1], Color(tint, 0.48), 1.1, true)
+		badge.draw_line(plane[5], plane[0], Color(tint, 0.34), 1.1, true)
+		Icons.paint(badge, c + Vector2(0, 1.15), at.size.x / 31.0, Color("#08131f"), id)
+		Icons.paint(badge, c, at.size.x / 31.0, tint.lerp(PAPER, 0.22), id)
+	)
 	if interactive:
 		badge.mouse_filter = Control.MOUSE_FILTER_PASS
 		badge.tooltip_text = _t(Gear.ITEMS[id][0])
@@ -535,7 +632,7 @@ func _archive() -> void:
 	_button(panel, "Controls guide", Rect2(28, 77, 212, 44), _open.bind("guide"))
 	_button(panel, "Mechanics", Rect2(256, 77, 212, 44), _open_archive.bind(0), false, dossier == 0)
 	_button(panel, "Equipment index", Rect2(483, 77, 240, 44), _open_archive.bind(1), false, dossier == 1)
-	_button(panel, "Lobby", Rect2(813, 77, 186, 44), back)
+	_back_arrow(panel, Rect2(950, 27, 48, 42), back)
 	var total := Levels.LESSONS.size() if dossier == 0 else Gear.ITEMS.size()
 	var progress: int = game.campaign.records.size()
 	for i in range(gear_page * 8, mini(total, (gear_page + 1) * 8)):
@@ -553,7 +650,7 @@ func _archive() -> void:
 				_gear_badge(card, Rect2(12, 12, 48, 48), i)
 			_label(card, item[0] if known else "???", Rect2(74, 4, 390, 30), 17, game.equipment_color(i) if known else DIM, true)
 			if known:
-				_label(card, "%s  ·  %ds  ·  %s" % [_t(item[1]), item[2], str(item[3]) if item[3] > 0 else _t("Drop only")], Rect2(74, 34, 383, 36), 13, DIM, false, true)
+				_label(card, "%s  ·  %s  ·  %s" % [_t(item[1]), _t("Effect lasts %d seconds") % item[2], str(item[3]) if item[3] > 0 else _t("Drop only")], Rect2(74, 34, 383, 36), 13, DIM, false, true)
 	_button(panel, "Previous", Rect2(28, 498, 185, 43), _archive_page.bind(-1)).disabled = gear_page == 0
 	_button(panel, "Next", Rect2(813, 498, 185, 43), _archive_page.bind(1)).disabled = (gear_page + 1) * 8 >= total
 
@@ -578,7 +675,8 @@ func _new_lesson() -> void:
 	if active_lesson < 11:
 		_label(panel, "Pad: A jump · X strike · B dodge · RB swap · Y rule", Rect2(659, 339, 335, 77), 13, DIM, false, true)
 	demo_toggle = _button(panel, "Pause demo", Rect2(29, 407, 218, 45), _toggle_demo)
-	_label(panel, "Gameplay recording", Rect2(261, 407, 360, 45), 13, DIM)
+	_demo_transport(panel, 407.0)
+	_label(panel, "Gameplay recording", Rect2(29, 466, 370, 33), 13, DIM)
 	next_step_button = _button(panel, "Continue" if sector_pending >= 0 else "Back", Rect2(714, 490, 281, 48), _acknowledge_lesson, true)
 	_prepare_preview("context-%02d" % active_lesson, panel, 389)
 	next_step_button.disabled = sector_pending >= 0 and is_playing
@@ -607,7 +705,7 @@ func _pause() -> void:
 	if game.practice >= 0 and onboarding:
 		_button(panel, "Return to guide", Rect2(28, 239, 462, 44), game.return_from_practice)
 	else:
-		_button(panel, "Return to lobby", Rect2(28, 239, 462, 44), game.return_to_lobby)
+		_back_arrow(panel, Rect2(28, 239, 51, 44), game.return_to_lobby)
 	resume.grab_focus()
 
 func _resume() -> void:
@@ -638,7 +736,7 @@ func _result() -> void:
 	_show_save_notice(panel, Rect2(29, 154, 590, 32))
 	var proceed := _button(panel, action, Rect2(28, 202, 298, 52), callback, true)
 	if game.mode in ["lost", "clear", "win"]:
-		_button(panel, "Return to lobby", Rect2(343, 202, 278, 52), game.return_to_lobby)
+		_back_arrow(panel, Rect2(343, 202, 56, 52), game.return_to_lobby)
 	proceed.grab_focus()
 
 func _campaign_result(title: String, summary: String, score: Dictionary) -> void:
@@ -650,7 +748,17 @@ func _campaign_result(title: String, summary: String, score: Dictionary) -> void
 	_label(panel, "%02d / %s" % [game.sector_index + 1, _t(Levels.TABLE[game.sector_index][0])], Rect2(29, 72, 690, 32), 16, DIM)
 	var score_tray := _panel(panel, Rect2(29, 117, 694, 98), INK, AMBER.darkened(0.54))
 	for i in 3:
-		_star(score_tray, Vector2(44 + i * 51, 49), 19.0, AMBER if i < score.get("stars", 1) else LINE)
+		var rank := Control.new()
+		rank.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_place(rank, score_tray, Rect2(24 + i * 51, 29, 40, 40))
+		_star(rank, Vector2(20, 20), 19.0, AMBER if i < score.get("stars", 1) else LINE)
+		if opening_page and i < score.get("stars", 1) and not game.reduced_motion and not game.save_path.is_empty():
+			rank.modulate.a = 0.13
+			rank.pivot_offset = Vector2(20, 20)
+			rank.scale = Vector2(0.70, 0.70)
+			var award := rank.create_tween().set_parallel(true)
+			award.tween_property(rank, "modulate:a", 1.0, 0.20).set_delay(0.17 + i * 0.09)
+			award.tween_property(rank, "scale", Vector2.ONE, 0.25).set_delay(0.17 + i * 0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_label(panel, _t("+%d coins") % score.get("coins", 0), Rect2(259, 129, 450, 48), 27, AMBER, true)
 	_label(panel, summary, Rect2(259, 175, 450, 33), 14, DIM)
 	var clock_target: float = Levels.TABLE[game.sector_index][5]
@@ -659,7 +767,7 @@ func _campaign_result(title: String, summary: String, score: Dictionary) -> void
 	_label(panel, _t("Hits ≤ %d") % hit_target, Rect2(383, 225, 330, 34), 15, GREEN if score.get("clean") else DIM)
 	_show_save_notice(panel, Rect2(29, 266, 690, 33))
 	_button(panel, "Retry", Rect2(29, 307, 185, 48), _retry_from_results)
-	_button(panel, "Lobby", Rect2(229, 307, 185, 48), game.return_to_lobby)
+	_back_arrow(panel, Rect2(229, 307, 56, 48), game.return_to_lobby)
 	var last: bool = game.sector_index == Levels.TABLE.size() - 1
 	var next := _button(panel, "Sector map" if last else "Next sector", Rect2(431, 307, 292, 48), game.continue_after_clear, true)
 	next.grab_focus()
@@ -726,7 +834,7 @@ func _guide() -> void:
 	_label(panel, _t(demo[2]) + "  /  " + _t(demo[3]), Rect2(660, 203, 334, 38), 17, GREEN)
 	_label(panel, demo[4], Rect2(659, 251, 335, 154), 15, PAPER, false, true)
 	demo_toggle = _button(panel, "Pause demo", Rect2(29, 433, 218, 43), _toggle_demo)
-	_label(panel, "Gameplay recording", Rect2(261, 440, 370, 32), 12, DIM)
+	_demo_transport(panel, 433.0)
 	_button(panel, "Try it", Rect2(659, 433, 337, 43), game.begin_practice.bind(chapter, "guide"))
 	_panel(panel, Rect2(28, 490, 969, 1), LINE, LINE)
 	if chapter > 0:
@@ -743,13 +851,19 @@ func _guide() -> void:
 		next_step_button.grab_focus()
 
 func _prepare_preview(filename: String, panel: Panel, bar_y: float) -> void:
+	demo_rate = 1.0
 	demo_progress = ProgressBar.new()
 	demo_progress.show_percentage = false
 	demo_progress.max_value = FRAME_COUNT - 1
 	demo_progress.add_theme_stylebox_override("background", _style(INK, INK, 0))
 	demo_progress.add_theme_stylebox_override("fill", _style(GREEN, GREEN, 0))
-	demo_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_place(demo_progress, panel, Rect2(29, bar_y, 602, 3))
+	demo_progress.mouse_filter = Control.MOUSE_FILTER_STOP
+	demo_progress.tooltip_text = _t("Seek in recording")
+	demo_progress.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			_seek_demo(demo_duration() * clampf(event.position.x / demo_progress.size.x, 0.0, 1.0))
+	)
+	_place(demo_progress, panel, Rect2(29, bar_y - 3.0, 602, 7))
 	demo_texture = AtlasTexture.new()
 	demo_texture.filter_clip = true
 	preview.texture = demo_texture
@@ -794,7 +908,7 @@ func _finish_guide() -> void:
 	_open("")
 
 func _toggle_demo() -> void:
-	if not is_playing and demo_time >= FRAME_COUNT / FPS:
+	if not is_playing and demo_time >= demo_duration():
 		demo_time = 0.0
 		_show_frame()
 	is_playing = not is_playing
@@ -802,9 +916,9 @@ func _toggle_demo() -> void:
 	set_process(is_playing)
 
 func _process(delta: float) -> void:
-	demo_time = minf(demo_time + delta, FRAME_COUNT / FPS)
+	demo_time = minf(demo_time + delta * demo_rate, demo_duration())
 	_show_frame()
-	if demo_time >= FRAME_COUNT / FPS:
+	if demo_time >= demo_duration():
 		is_playing = false
 		set_process(false)
 		demo_toggle.text = _t("Replay demo")
@@ -818,7 +932,9 @@ func _mark_lesson_watched() -> void:
 		next_step_button.grab_focus()
 
 func _show_frame() -> void:
-	var frame := mini(FRAME_COUNT - 1, int(demo_time * FPS))
+	if demo_sheets.is_empty() or demo_texture == null:
+		return
+	var frame := mini(FRAME_COUNT - 1, int(demo_time / demo_duration() * FRAME_COUNT))
 	if frame == demo_frame:
 		return
 	var local := frame % FRAMES_PER_SHEET
@@ -828,6 +944,45 @@ func _show_frame() -> void:
 	demo_texture.region = Rect2(Vector2i(local % 3, local / 3) * FRAME_SIZE, FRAME_SIZE)
 	demo_frame = frame
 	demo_progress.value = frame
+
+func demo_duration() -> float:
+	return 8.0 if page == "new_lesson" else 6.0
+
+func _demo_transport(panel: Panel, y: float) -> void:
+	var rewind := _button(panel, "−1s", Rect2(265, y, 65, 44), func(): _seek_demo(demo_time - 1.0))
+	rewind.tooltip_text = _t("Back one second")
+	var forward := _button(panel, "+1s", Rect2(340, y, 65, 44), func(): _seek_demo(demo_time + 1.0))
+	forward.tooltip_text = _t("Forward one second")
+	demo_speed = _button(panel, "1×", Rect2(418, y, 88, 44), _change_demo_rate)
+	demo_speed.tooltip_text = _t("Playback speed")
+
+func _change_demo_rate() -> void:
+	demo_rate = 0.5 if demo_rate == 1.0 else 1.0
+	demo_speed.text = "0.5×" if demo_rate == 0.5 else "1×"
+
+func _seek_demo(at: float) -> void:
+	if demo_sheets.size() != FRAME_COUNT / FRAMES_PER_SHEET:
+		return
+	demo_time = clampf(at, 0.0, demo_duration())
+	is_playing = false
+	set_process(false)
+	demo_toggle.text = _t("Play")
+	_show_frame()
+
+func play_arena_reveal() -> void:
+	if game.reduced_motion or game.save_path.is_empty():
+		return
+	var screen := CanvasLayer.new()
+	screen.layer = 6
+	add_child(screen)
+	var cover := ColorRect.new()
+	cover.color = Color("#172334c7")
+	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cover.size = Vector2(1152, 648)
+	screen.add_child(cover)
+	var reveal := screen.create_tween()
+	reveal.tween_property(cover, "modulate:a", 0.0, 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	reveal.tween_callback(screen.queue_free)
 
 func back() -> void:
 	if page == "language":

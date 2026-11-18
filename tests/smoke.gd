@@ -33,6 +33,9 @@ func _run() -> void:
 	if capture:
 		g.set_fullscreen(false)
 	_check(g.title_menu.page == "language", "A fresh profile must request a language.")
+	for lesson in g.Levels.LESSONS.size():
+		for sheet in 4:
+			_check(ResourceLoader.exists("res://assets/demos/context-%02d-%d.webp" % [lesson, sheet]), "Mechanic lesson %d has all four recorded sheets." % lesson)
 	for index in Locale.CODES.size():
 		g.set_language(index)
 		_check(Locale.current() == index, "Locale must be selectable: " + Locale.CODES[index])
@@ -164,10 +167,20 @@ func _run() -> void:
 	if capture:
 		var all_records: Array[Dictionary] = g.campaign.records.duplicate(true)
 		g.campaign.records.resize(11)
+		g.title_menu.map_region = -1
+		g.title_menu.map_focus = -1
 		g.return_to_lobby("map")
 		await _shot("map")
 		g.title_menu.prepare_sector(11)
 		await _shot("equipment")
+		g.set_language(1)
+		g.text_size_index = 1
+		g.title_menu._draw_page()
+		await _shot("equipment-zh")
+		g.title_menu.map_region = 7
+		g.title_menu.map_focus = -1
+		g.return_to_lobby("map")
+		await _shot("root")
 		g.campaign.records = all_records
 	print("Attacks: ", seen_attacks.keys(), " | Activated rules: ", used_rules.keys(), " | Returned rules: ", returned_rules.keys())
 	print("Smoke result: ", failed, " failures")
@@ -219,7 +232,7 @@ func _test_operation() -> void:
 				g.charge = true
 				g._use_rule()
 				_check(g.capacitor_power > 2.0 and g.capacitor_power < 3.0, "RUSH opens the Capacitor's short relay window.")
-			if index == 21:
+			if g.stage == 4:
 				g._damage_boss(9)
 				_check(g.boss_hp == g.boss_max_hp, "Mirror is shielded while echo locks remain.")
 				for lock in g.boss_locks.duplicate():
@@ -230,14 +243,14 @@ func _test_operation() -> void:
 				_check(g.boss_locks.is_empty(), "Recorded strikes break the Mirror locks.")
 			g._set_state("exposed", 1.5)
 			g._damage_boss(g.boss_max_hp)
-			if index == 23:
+			if g.stage == 5:
 				_check(g.evacuated and g.route.active() and g.mode == "fight", "Executor requires an evacuation after the core breaks.")
 				_play_route()
 		_check(g.mode in ["clear", "win"] and g.campaign.records.size() == index + 1, "Operation stage %02d clears and saves (x %.0f, y %.0f, checkpoint %d, clock %.1f)." % [index + 1, g.p.x, g.p.y, g.route.cursor, g.route.clock])
 		if not g.mode in ["clear", "win"]:
 			break
 		_check(g.sector_result.coins == g.sector_result.stars * 1000, "Stars pay their actual run value.")
-	_check(route_types.size() == 11, "All route types are exercised.")
+	_check(route_types.size() == 17 and g.Levels.TABLE.size() == 48, "All 17 route types and 48 sectors are exercised.")
 	if g.campaign.records.is_empty():
 		return
 	g.begin_sector(0)
@@ -264,7 +277,7 @@ func _test_operation() -> void:
 		if not g.drop.is_empty():
 			samples += 1
 			negatives += int(g.Gear.ITEMS[g.drop.id][3] == 0)
-	_check(samples > 175 and samples < 300 and negatives > 30 and negatives < 95, "Drop and downside frequency broadly match the announced rates.")
+	_check(samples > 680 and samples < 840 and negatives > 140 and negatives < 230, "Drop and downside frequency broadly match the announced rates.")
 	g.drop = {"id": 11, "at": g.p - Vector2(0, 21), "time": 6.0}
 	g._tick_equipment(DT)
 	_check(g.effects.has(11) and g.drop.is_empty(), "Nearby penalty is automatically equipped.")
@@ -279,7 +292,21 @@ func _play_route() -> void:
 		var target: Vector2 = route.target()
 		var aim := target
 		var presses := {}
-		var strike: bool = route.kind in ["break", "belt", "timer", "cargo"]
+		var strike: bool = route.kind in ["break", "belt", "timer", "cargo", "combo"]
+		if route.kind == "ferry" and not route.ridden:
+			aim = Vector2(route.ferry.get_center().x, route.ferry.position.y)
+		if route.kind == "key":
+			if g.player_rule != route.required_rule:
+				aim = route.socket
+				if route.near(g.p, aim, 84.0):
+					presses.steal = true
+			elif route.near(g.p, target, 87, 55):
+				presses.rule = true
+		if route.kind == "evade" and fmod(route.clock, 2.6) >= 2.22 and fmod(route.clock, 2.6) < 2.25 and route.near(g.p, target, 72.0):
+			aim = target + Vector2(105.0 if g.p.x <= target.x else -105.0, 0)
+			presses.dodge = true
+		if route.kind == "hold" and route.echo != Vector2.ZERO:
+			aim.x += 101.0 if target.x < 990.0 else -101.0
 		if route.kind in ["lift", "reflect"] and g.player_rule != route.socket_rule and route.cursor == 0:
 			var required: int = g.Rule.LIFT if route.kind == "lift" else g.Rule.AEGIS
 			if g.player_rule != required:

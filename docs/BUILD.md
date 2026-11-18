@@ -40,4 +40,4 @@ Set the version in `project.godot` and add `docs/releases/vX.Y.Z.md`. Write comp
 
 ## Record the guide again
 
-The demos are four-second recordings of the playable arena. The capture script operates the game via its normal keyboard inputs and checks each result. Run the graphical Godot binary with `--path . --windowed --resolution 1152x648 --script tools/record_demos.gd`, then run `python tools/pack_demos.py` with Pillow installed. The packer uses the frames in `builds/recordings/` to replace the WebP sheets in `assets/demos/`.
+The capture script operates the playable game with keyboard and mouse inputs and checks each result. Run the graphical Godot binary with `--path . --windowed --resolution 1152x648 --script tools/record_demos.gd`, then run `python tools/pack_demos.py` with Pillow installed. To capture additional mechanics and the shop, add `-- --context` to the Godot command and `--context` to the packer. Intro clips play over six seconds and mechanics clips over eight seconds at the default playback rate.

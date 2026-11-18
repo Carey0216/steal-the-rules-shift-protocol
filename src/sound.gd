@@ -11,6 +11,7 @@ var mix := 0.0
 var muted := false
 var stage_pitch := 1.0
 var live := false
+var menu_active := false
 var noise := RandomNumberGenerator.new()
 
 func _ready() -> void:
@@ -33,7 +34,12 @@ func _ready() -> void:
 		"parry": [115.0, 780.0, 0.34, 0.15, 0.45],
 		"rule": [350.0, 184.0, 0.23, 0.09, 0.30],
 		"win": [220.0, 665.0, 0.64, 0.04, 0.34],
-		"start": [110.0, 220.0, 0.37, 0.13, 0.37]
+		"start": [110.0, 220.0, 0.37, 0.13, 0.37],
+		"ui_focus": [520.0, 470.0, 0.055, 0.014, 0.085],
+		"ui_confirm": [393.0, 590.0, 0.16, 0.028, 0.19],
+		"objective": [329.6, 493.8, 0.30, 0.018, 0.21],
+		"pickup": [523.3, 784.0, 0.26, 0.022, 0.24],
+		"penalty": [286.0, 133.0, 0.25, 0.07, 0.20]
 	}
 	for key in table:
 		var p: Array = table[key]
@@ -53,6 +59,9 @@ func _effect(lo: float, hi: float, duration: float, grit: float, amp: float, key
 		var beep := sin(angle) * 0.67 + sin(angle * 2.01) * 0.18 + sin(angle * 3.0) * 0.10
 		if key in ["steal", "win", "open"]:
 			beep = beep * 0.6 + sin(angle * 1.498) * 0.28 + sin(angle * 2.0) * 0.12
+		elif key in ["ui_confirm", "objective", "pickup", "penalty"]:
+			beep = sin(angle) * 0.61 + sin(angle * 1.50) * 0.17 + sin(angle * 2.00) * 0.10
+			beep += sin(angle * 3.015) * 0.12 * exp(-u * 8.0)
 		var env := minf(u * 45.0, 1.0) * pow(1.0 - u, 2.0)
 		data.encode_s16(i * 2, int((beep + noise.randf_range(-grit, grit)) * amp * env * 32700.0))
 	return _wav(data)
@@ -67,19 +76,19 @@ func _wav(data: PackedByteArray) -> AudioStreamWAV:
 func _compose() -> AudioStreamWAV:
 	# Four-bar industrial loop: half-time kick, offbeat relay clicks and a sequenced bass.
 	var data := PackedByteArray()
-	var measures := 4
+	var measures := 8
 	var steps := 8 * measures
-	data.resize(int(RATE * BEAT * 0.5 * steps) * 2)
+	data.resize(int(RATE * BEAT * 0.5 * steps) * 4)
 	var notes := [46.25, 46.25, 69.30, 46.25, 55.0, 46.25, 41.20, 41.20]
-	var bed := [138.59, 164.81, 110.0, 123.47]
-	for i in range(data.size() / 2):
+	var bed := [138.59, 164.81, 110.0, 123.47, 146.83, 110.0, 130.81, 123.47]
+	for i in range(data.size() / 4):
 		var t := float(i) / float(RATE)
 		var step := mini(steps - 1, int(t / (BEAT * 0.5)))
 		var x := fposmod(t, BEAT * 0.5)
 		var bar := step / 8
 		var freq: float = notes[step % notes.size()] * (1.0 if bar % 2 == 0 else 0.89)
 		var gate := minf(x * 105.0, 1.0) * exp(-x * 11.0)
-		var value := (sin(TAU * freq * x) + sin(TAU * freq * 2.0 * x) * 0.3) * gate * 0.19
+		var value := (sin(TAU * freq * x) + sin(TAU * freq * 2.0 * x) * 0.21) * gate * 0.15
 		if step % 8 in [0, 3, 6]:
 			value += sin(TAU * (53.0 * x + 2.7 * (1.0 - exp(-x * 45.0)))) * exp(-x * 25.0) * minf(x * 600.0, 1.0) * 0.34
 		var hiss := noise.randf_range(-1.0, 1.0)
@@ -89,11 +98,17 @@ func _compose() -> AudioStreamWAV:
 			value += hiss * exp(-x * 91.0) * minf(x * 500.0, 1.0) * 0.12
 		var pad_t := fposmod(t, BEAT * 4.0)
 		var tone: float = bed[bar]
-		value += sin(TAU * tone * pad_t) * pow(sin(PI * pad_t / (BEAT * 4.0)), 2.0) * 0.045
-		data.encode_s16(i * 2, int(clampf(value, -1.0, 1.0) * 32700.0))
+		var envelope := pow(sin(PI * pad_t / (BEAT * 4.0)), 2.0)
+		var pad := sin(TAU * tone * pad_t) * envelope * 0.056
+		var upper := sin(TAU * tone * 1.499 * pad_t) * envelope * 0.038
+		var strike_t := fposmod(t, BEAT * 2.0)
+		var glass := (sin(TAU * tone * 3.0 * strike_t) + sin(TAU * tone * 6.02 * strike_t) * 0.27) * exp(-strike_t * 5.0) * minf(strike_t * 60.0, 1.0) * 0.032
+		data.encode_s16(i * 4, int(clampf(value + pad + upper * 0.48 + glass, -1.0, 1.0) * 32700.0))
+		data.encode_s16(i * 4 + 2, int(clampf(value + pad * 0.84 + upper + glass * 0.59, -1.0, 1.0) * 32700.0))
 	var sample := _wav(data)
+	sample.stereo = true
 	sample.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	sample.loop_end = data.size() / 2
+	sample.loop_end = data.size() / 4
 	return sample
 
 func set_mute(value: bool) -> void:
@@ -106,8 +121,8 @@ func set_mute(value: bool) -> void:
 
 func set_stage(stage: int, in_combat: bool) -> void:
 	live = in_combat
-	stage_pitch = [0.94, 1.0, 1.09][clampi(stage, 0, 2)]
-	if music.playing or muted or stage < 0:
+	stage_pitch = 0.88 if stage < 0 else [0.97, 1.03, 1.0, 0.94, 0.91, 1.05][stage % 6]
+	if music.playing or muted or (stage < 0 and not menu_active):
 		return
 	if score == null:
 		score = _compose()
@@ -122,6 +137,8 @@ func _process(delta: float) -> void:
 	music.pitch_scale = move_toward(music.pitch_scale, stage_pitch, delta * 0.3)
 
 func fire(key: String) -> void:
+	if key == "ui_confirm":
+		menu_active = true
 	if muted or not clips.has(key):
 		return
 	var voice := voices[needle]

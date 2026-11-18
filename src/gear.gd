@@ -1,6 +1,6 @@
 extends RefCounted
 
-const DROP_CHANCE := 0.12
+const DROP_CHANCE := 0.38
 const DROP_LIFETIME := 6.0
 const MAX_COINS := 999999999
 const MAX_LOADOUT := 3
