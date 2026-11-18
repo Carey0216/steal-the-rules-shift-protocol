@@ -6,6 +6,9 @@ const AudioRig = preload("res://src/sound.gd")
 const Locale = preload("res://src/locale.gd")
 const Menu = preload("res://src/title_menu.gd")
 const Campaign = preload("res://src/campaign.gd")
+const Levels = preload("res://src/levels.gd")
+const Gear = preload("res://src/gear.gd")
+const Route = preload("res://src/route.gd")
 const SAVE = "user://shift_protocol.cfg"
 const SIZE = Vector2(1152, 648)
 const LEFT = 68.0
@@ -123,6 +126,19 @@ var record_demo := false
 var last_device := "keyboard"
 var just: Dictionary = {}
 var combat_rng := RandomNumberGenerator.new()
+var gear_rng := RandomNumberGenerator.new()
+var route := Route.new()
+var sector_index := 0
+var boss_max_hp := 49
+var starter: Array[int] = []
+var effects := {}
+var drop := {}
+var drop_cooldown := 0.0
+var cell_cooldown := 0.0
+var evacuated := false
+var boss_locks: Array[Vector2] = []
+var capacitor_power := 0.0
+var boot_time := 0.0
 
 func _ready() -> void:
 	Locale.install()
@@ -144,7 +160,7 @@ func _ready() -> void:
 	_bind(&"full", [KEY_F11], [])
 	if not save_path.is_empty() and config.load(save_path) != OK:
 		config.load(save_path + ".backup")
-	campaign.load_from(config, ENCOUNTERS.size())
+	campaign.load_from(config, Levels.TABLE.size())
 	get_tree().auto_accept_quit = false
 	muted = config.get_value("settings", "mute", false)
 	reduced_motion = config.get_value("settings", "reduced_motion", false)
@@ -167,6 +183,8 @@ func _ready() -> void:
 		_apply_display(config.get_value("settings", "fullscreen", true))
 	best_time = config.get_value("records", "clear_time", 0.0)
 	combat_rng.randomize()
+	gear_rng.randomize()
+	boot_time = 0.82 if not save_path.is_empty() and not reduced_motion and DisplayServer.get_name() != "headless" else 0.0
 	art = Art.new()
 	audio_rig = AudioRig.new()
 	add_child(audio_rig)
@@ -279,10 +297,19 @@ func return_from_practice() -> void:
 	return_to_lobby(practice_return)
 
 func begin_sector(index: int) -> void:
-	if not campaign.selectable(index, ENCOUNTERS.size()):
+	if not campaign.selectable(index, Levels.TABLE.size()):
 		return
+	starter.assign(campaign.reserved)
+	campaign.reserved.clear()
+	if _save() != OK:
+		campaign.reserved.assign(starter)
+		save_error = true
+		title_menu.show_save_error()
+		return
+	save_error = false
 	var entry: Dictionary = campaign.entry(index)
-	stage = index
+	sector_index = index
+	stage = Levels.TABLE[index][3]
 	hp = entry.hp
 	player_rule = entry.rule
 	replay = index < campaign.records.size()
@@ -293,6 +320,43 @@ func begin_sector(index: int) -> void:
 	hits_taken = 0
 	sector_retries = 0
 	_load_arena()
+
+func buy_gear(id: int) -> bool:
+	if id not in Gear.stock(campaign.records.size(), true) or id in campaign.reserved or campaign.reserved.size() >= Gear.MAX_LOADOUT:
+		return false
+	var price: int = Gear.ITEMS[id][3]
+	if campaign.coins < price:
+		return false
+	campaign.coins -= price
+	campaign.reserved.append(id)
+	if _save() == OK:
+		return true
+	campaign.coins += price
+	campaign.reserved.erase(id)
+	title_menu.show_save_error()
+	return false
+
+func reset_progress() -> void:
+	var previous := campaign
+	var legacy := {}
+	if config.has_section("campaign"):
+		for key in config.get_section_keys("campaign"):
+			legacy[key] = config.get_value("campaign", key)
+	var old_best := best_time
+	campaign = Campaign.new()
+	best_time = 0.0
+	if config.has_section("campaign"):
+		config.erase_section("campaign")
+	if _save() != OK:
+		campaign = previous
+		best_time = old_best
+		for key in legacy:
+			config.set_value("campaign", key, legacy[key])
+		title_menu.show_save_error()
+		return
+	if not save_path.is_empty() and FileAccess.file_exists(save_path + ".backup"):
+		DirAccess.remove_absolute(save_path + ".backup")
+	save_error = false
 
 func set_language(index: int) -> void:
 	language_index = index
@@ -328,6 +392,7 @@ func _physics_process(dt: float) -> void:
 	var pressed := just
 	just = {}
 	clock += dt
+	boot_time = maxf(0.0, boot_time - dt)
 	if pressed.has("mute_game"):
 		muted = not muted
 		audio_rig.set_mute(muted)
@@ -364,7 +429,7 @@ func _physics_process(dt: float) -> void:
 		elif pressed.has("quit_run"):
 			return_to_lobby()
 	elif mode == "clear":
-		if pressed.has("confirm"):
+		if pressed.has("confirm") and not mission_sector:
 			continue_after_clear()
 		elif pressed.has("pause"):
 			resume_mode = mode
@@ -416,11 +481,18 @@ func _advance() -> void:
 
 func continue_after_clear() -> void:
 	if mission_sector:
-		return_to_lobby("map")
+		if sector_index < Levels.TABLE.size() - 1:
+			return_to_lobby("map")
+			title_menu.prepare_sector(sector_index + 1)
+		else:
+			return_to_lobby("map")
 	else:
 		_advance()
 
 func _retry() -> void:
+	if mission_sector and (mode in ["clear", "win"] or (mode == "paused" and resume_mode in ["clear", "win"])):
+		title_menu._retry_from_results()
+		return
 	sector_retries += 1
 	if practice >= 0:
 		begin_practice(practice, practice_return)
@@ -436,7 +508,21 @@ func _retry() -> void:
 
 func _load_arena() -> void:
 	checkpoint = {"rule": player_rule, "hp": hp, "time": run_time, "steals": steals, "hits": hits_taken}
-	boss_hp = ENCOUNTERS[stage].hp
+	boss_max_hp = roundi(float(ENCOUNTERS[stage].hp) * 1.35)
+	boss_hp = boss_max_hp
+	route.load_level(Levels.TABLE[sector_index] if mission_sector else Levels.TABLE[2])
+	evacuated = false
+	capacitor_power = 0.0
+	boss_locks.clear()
+	if mission_sector and stage == 4 and not route.active():
+		boss_locks = [Vector2(440, BASE), Vector2(840, BASE)]
+	effects.clear()
+	drop.clear()
+	drop_cooldown = 0.0
+	cell_cooldown = 0.0
+	if mission_sector:
+		for id in starter:
+			_equip(id)
 	var candidates: Array = ENCOUNTERS[stage].rules.duplicate()
 	candidates.erase(player_rule)
 	boss_rule = candidates[0]
@@ -480,6 +566,7 @@ func _load_arena() -> void:
 	trails.clear()
 	zones.clear()
 	_set_state("idle", 0.58)
+	resume_mode = "brief"
 	mode = "brief"
 
 func begin_practice(lesson: int, return_page := "guide") -> void:
@@ -528,6 +615,8 @@ func _finish_practice() -> void:
 func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool) -> void:
 	run_time += dt
 	sector_time += dt
+	capacitor_power = maxf(0.0, capacitor_power - dt)
+	_tick_equipment(dt)
 	if pressed.has("jump"):
 		jump_buffer = 0.12
 	if pressed.has("dodge"):
@@ -554,6 +643,11 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 	jump_buffer = maxf(0.0, jump_buffer - dt)
 	if absf(axis) > 0.05 and dash <= 0.0 and swing < 0.085:
 		facing = signf(axis)
+	if steal_buffer > 0.0 and route.active():
+		route.steal(self)
+		steal_buffer = 0.0
+		if mode != "fight":
+			return
 	if steal_buffer > 0.0:
 		steal_buffer = maxf(0.0, steal_buffer - dt)
 		if can_shift() or steal_buffer <= 0.0:
@@ -570,14 +664,14 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 			facing = signf(axis)
 		dodge_buffer = 0.0
 		dash = DODGE_TIME
-		dash_speed = 705.0
-		dash_cd = DODGE_COOLDOWN
-		dodge_protection = DODGE_PROTECTION + (0.06 if assist else 0.0)
+		dash_speed = 493.5 if effects.has(19) else 705.0
+		dash_cd = DODGE_COOLDOWN * _factor(2, 0.68, 12, 1.5)
+		dodge_protection = DODGE_PROTECTION + (0.06 if assist else 0.0) + (0.14 if effects.has(7) else 0.0)
 		audio_rig.fire("dodge")
 	else:
 		dodge_buffer = maxf(0.0, dodge_buffer - dt)
 	if jump_buffer > 0.0 and coyote > 0.0:
-		v.y = -560.0
+		v.y = -560.0 * _factor(3, 1.2, 13, 0.78)
 		grounded = false
 		coyote = 0.0
 		jump_buffer = 0.0
@@ -591,6 +685,7 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 	else:
 		var speed := 326.0 if player_rule != Rule.RUSH else 357.0
 		var accel := 2780.0 if absf(axis) > 0.05 else 3560.0
+		speed *= _factor(1, 1.2, 11, 0.70) * (0.85 if effects.has(9) else 1.0)
 		v.x = move_toward(v.x, axis * speed, accel * dt)
 		v.y = minf(v.y + (300.0 if lift > 0.0 else 1660.0) * dt, 835.0)
 	var previous_y := p.y
@@ -599,6 +694,8 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 	if floor_broken:
 		floor_y = move_toward(floor_y, BASE + 64.0, 213.0 * dt)
 	var surface := floor_y
+	if route.active() and v.y >= 0.0:
+		surface = route.surface(p, previous_y, surface)
 	if floor_broken and (p.x <= DECK_LEFT or p.x >= DECK_RIGHT) and previous_y <= BASE + 0.5 and v.y >= 0.0:
 		surface = BASE
 	if p.y >= surface:
@@ -616,12 +713,19 @@ func _tick_fight(dt: float, axis: float, pressed: Dictionary, strike_held: bool)
 	if practice >= 0:
 		_tick_practice(dt)
 		return
+	if route.active():
+		route.tick(self, dt)
+		return
 	_tick_boss(dt)
 	if mode == "fight":
 		_tick_hazards(dt)
 		for zone in environmental_zones():
 			if zone.live:
-				_check_hurt(zone.box, zone.box.get_center().x)
+				for lock in boss_locks.duplicate():
+					if absf(lock.x - zone.box.get_center().x) <= 68.0:
+						boss_locks.erase(lock)
+						_impact(lock - Vector2(0, 24), Color("#badfff"))
+				_check_hurt(zone.box, zone.box.get_center().x, stage in [1, 2, 3])
 			if mode != "fight":
 				break
 
@@ -630,7 +734,7 @@ func _tick_practice(dt: float) -> void:
 		0:
 			practice_clear = p.x - practice_origin >= 110.0 and p.y < BASE - 40.0
 		1:
-			practice_clear = boss_hp < ENCOUNTERS[0].hp
+			practice_clear = boss_hp < boss_max_hp
 		2:
 			_tick_boss(dt)
 			if state == "exposed" and not practice_clear:
@@ -639,7 +743,7 @@ func _tick_practice(dt: float) -> void:
 		3:
 			practice_clear = steals > 0
 		4:
-			practice_clear = boss_hp < ENCOUNTERS[0].hp and not charge
+			practice_clear = boss_hp < boss_max_hp and not charge
 	if practice_clear:
 		_finish_practice()
 
@@ -719,10 +823,12 @@ func _try_shift() -> void:
 	_damage_boss(4)
 
 func _use_rule() -> void:
-	if player_rule == Rule.EMPTY or not charge:
+	if player_rule == Rule.EMPTY or not charge or effects.has(18):
 		audio_rig.fire("deny")
 		return
 	charge = false
+	if effects.has(8):
+		cell_cooldown = 2.0
 	var color: Color = RULE_COLORS[player_rule]
 	match player_rule:
 		Rule.RUSH:
@@ -733,7 +839,11 @@ func _use_rule() -> void:
 			swing = 0.22
 			swing_cd = 0.29
 			var ahead := (b.x - p.x) * facing
-			if ahead > -38.0 and ahead < 292.0 and absf(p.y - b.y) < 159.0:
+			if route.active():
+				route.strike(self)
+			elif mission_sector and stage == 2 and absf(p.x - 952.0) < 155.0:
+				_open_capacitor(2.15)
+			elif ahead > -38.0 and ahead < 292.0 and absf(p.y - b.y) < 159.0:
 				_damage_boss(7 if state in ["exposed", "reboot"] else 4)
 		Rule.LIFT:
 			lift = 0.66
@@ -749,10 +859,15 @@ func _use_rule() -> void:
 
 func _strike() -> void:
 	swing = 0.19
-	swing_cd = 0.265
+	swing_cd = 0.265 * _factor(4, 0.72, 14, 1.4)
 	audio_rig.fire("slash")
+	if route.active():
+		route.strike(self)
+		return
+	if mission_sector and stage == 2 and player_rule == Rule.RUSH and absf(p.x - 952.0) < 90.0:
+		_open_capacitor(2.15)
 	var ahead := (b.x - p.x) * facing
-	var reach := 115.0
+	var reach := 115.0 * _factor(5, 1.35, 15, 0.75)
 	if ahead < -53.0 or ahead > reach or p.y > b.y + 33.0 or p.y < b.y - 138.0:
 		return
 	var damage := 3 if state in ["exposed", "reboot"] else 1
@@ -768,8 +883,17 @@ func _strike() -> void:
 	_damage_boss(damage)
 
 func _damage_boss(amount: int) -> void:
-	if mode != "fight":
+	if mode != "fight" or not boss_locks.is_empty():
 		return
+	if mission_sector and stage == 2 and capacitor_power <= 0.0 and not state in ["reboot", "exposed"]:
+		return
+	if mission_sector:
+		var bonus := _factor(0, 1.5, 10, 0.65) * (1.8 if effects.has(9) else 1.0)
+		var exact := amount * bonus
+		amount = floori(exact) + int(gear_rng.randf() < fposmod(exact, 1.0)) if not is_equal_approx(bonus, 1.0) else amount
+		if amount <= 0:
+			return
+		_roll_drop(core_pos())
 	boss_hp = maxi(0, boss_hp - amount)
 	boss_flash = 0.14
 	shake = maxf(shake, 5.0 if amount < 4 else 8.0)
@@ -777,15 +901,90 @@ func _damage_boss(amount: int) -> void:
 	_burst(core_pos(), Color("#ffe4bd"), 9 + amount, 183.0)
 	audio_rig.fire("hit")
 	if boss_hp == 0:
-		_finish_arena()
+		if mission_sector and sector_index == Levels.TABLE.size() - 1 and not evacuated:
+			evacuated = true
+			hazards.clear()
+			zones.clear()
+			p.x = 218.0
+			p.y = BASE
+			route.evacuation()
+			_set_state("dead", 1.0)
+			_report("Evacuate", Levels.GOALS.chase, 3.0)
+		else:
+			_finish_arena()
+
+func _open_capacitor(duration: float) -> void:
+	if capacitor_power > 0.0:
+		return
+	capacitor_power = duration
+	zones.clear()
+	_set_state("exposed", duration)
+	_impact(core_pos(), RULE_COLORS[Rule.AEGIS])
+
+func _factor(positive: int, gain: float, negative: int, loss: float) -> float:
+	return (gain if effects.has(positive) else 1.0) * (loss if effects.has(negative) else 1.0)
+
+func _roll_drop(at: Vector2) -> void:
+	if not mission_sector or not drop.is_empty() or drop_cooldown > 0.0 or gear_rng.randf() >= Gear.DROP_CHANCE:
+		return
+	var stock := Gear.stock(campaign.records.size(), gear_rng.randf() >= 0.24)
+	var id := stock[gear_rng.randi_range(0, stock.size() - 1)]
+	var spot := Vector2(clampf(at.x, LEFT + 20.0, RIGHT - 20.0), clampf(at.y, 205.0, floor_y - 18.0))
+	if absf(spot.x - p.x) < 67.0:
+		spot.x = clampf(p.x + (84.0 if p.x < 576.0 else -84.0), LEFT, RIGHT)
+	drop = {"id": id, "at": spot, "time": Gear.DROP_LIFETIME}
+	drop_cooldown = 2.0
+	_burst(spot, equipment_color(id), 13, 121.0)
+
+func equipment_color(id: int) -> Color:
+	return Color("#94efd0") if Gear.ITEMS[id][3] > 0 else Color("#ff947f")
+
+func _equip(id: int) -> void:
+	effects[id] = Gear.ITEMS[id][2]
+
+func _tick_equipment(dt: float) -> void:
+	drop_cooldown = maxf(0.0, drop_cooldown - dt)
+	for id in effects.keys():
+		if id == 16 and effects[id] > 4.0 and effects[id] - dt <= 4.0:
+			hp = mini(MAX_HP, hp + 1)
+			audio_rig.fire("rule")
+		effects[id] -= dt
+		if effects[id] <= 0.0:
+			effects.erase(id)
+	if cell_cooldown > 0.0:
+		cell_cooldown -= dt
+		if cell_cooldown <= 0.0 and effects.has(8):
+			charge = true
+	if drop.is_empty():
+		return
+	drop.time -= dt
+	drop.at.y = move_toward(drop.at.y, route.surface(drop.at, drop.at.y, floor_y) - 21.0, dt * 145.0)
+	if drop.time <= 0.0:
+		drop.clear()
+	elif (p - Vector2(0, 24)).distance_to(drop.at) <= 39.0:
+		var id: int = drop.id
+		_equip(id)
+		_impact(drop.at, equipment_color(id))
+		_report(Gear.ITEMS[id][0], Gear.ITEMS[id][1], 1.5)
+		drop.clear()
+		audio_rig.fire("rule")
 
 func _finish_arena() -> void:
+	if mode != "fight":
+		return
 	hazards.clear()
 	zones.clear()
-	mode = "win" if stage == ENCOUNTERS.size() - 1 else "clear"
+	mode = "win" if (sector_index == Levels.TABLE.size() - 1 if mission_sector else stage == ENCOUNTERS.size() - 1) else "clear"
 	sector_result = {"seconds": sector_time, "hits": hits_taken - int(checkpoint.hits), "retries": sector_retries}
 	if mission_sector:
-		campaign.complete(stage, checkpoint, sector_result, hp, player_rule)
+		var fast: bool = sector_time <= Levels.TABLE[sector_index][5]
+		var clean: bool = sector_result.hits <= (1 if Levels.TABLE[sector_index][2] == "boss" else 0)
+		sector_result.stars = 1 + int(fast) + int(clean)
+		sector_result.coins = sector_result.stars * 1000
+		sector_result.fast = fast
+		sector_result.clean = clean
+		campaign.coins = mini(Gear.MAX_COINS, campaign.coins + sector_result.coins)
+		campaign.complete(sector_index, checkpoint, sector_result, hp, player_rule)
 		save_error = _save() != OK
 	_set_state("dead", 1.0)
 	_burst(core_pos(), RULE_COLORS[player_rule], 72, 410.0)
@@ -944,9 +1143,11 @@ func _tick_hazards(dt: float) -> void:
 		if mode != "fight":
 			return
 
-func _check_hurt(rect: Rect2, origin: float) -> void:
+func _check_hurt(rect: Rect2, origin: float, floor_trap := false) -> void:
 	var hurtbox := Rect2(p.x - 13.0, p.y - 37.0, 26.0, 34.0)
 	if not rect.intersects(hurtbox) or mode != "fight":
+		return
+	if floor_trap and effects.has(17):
 		return
 	if dodge_protection > 0.0:
 		if practice == 2:
@@ -964,10 +1165,19 @@ func _check_hurt(rect: Rect2, origin: float) -> void:
 		hurt_iframes = 0.42
 		_impact(p - Vector2(0, 22), RULE_COLORS[Rule.AEGIS])
 		audio_rig.fire("parry")
+		if route.active():
+			return
 		var reflected := absf(p.x - b.x) < 396.0
 		_report("PULSE PARRIED", "Reflected to the core" if reflected else "Too far to reflect", 1.3)
 		if reflected:
+			if mission_sector and stage == 2:
+				_open_capacitor(3.0)
 			_damage_boss(8)
+		return
+	if effects.has(6):
+		effects.erase(6)
+		hurt_iframes = 0.45
+		_impact(p - Vector2(0, 22), equipment_color(6))
 		return
 	hp -= 1
 	hits_taken += 1

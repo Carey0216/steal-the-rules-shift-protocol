@@ -62,6 +62,7 @@ func _record() -> void:
 	root.add_child(game)
 	game.set_physics_process(false)
 	game.title_menu.hide()
+	game.title_menu.set_process(false)
 	slate = InputSlate.new()
 	root.add_child(slate)
 	game.audio_rig.set_mute(true)
@@ -69,8 +70,18 @@ func _record() -> void:
 	game.assist = false
 	game.combat_rng.seed = 26
 	TranslationServer.set_locale("en")
-	for recording in RECORDINGS:
-		await _clip(recording)
+	if "--context" in OS.get_cmdline_user_args():
+		for lesson in range(game.Levels.LESSONS.size()):
+			if lesson == 13:
+				await _shop_clip()
+			else:
+				await _context_clip(lesson)
+	elif "--supply" in OS.get_cmdline_user_args():
+		await _context_clip(12)
+		await _shop_clip()
+	else:
+		for recording in RECORDINGS:
+			await _clip(recording)
 	quit(1 if failed else 0)
 
 func _clip(recording: String) -> void:
@@ -121,7 +132,7 @@ func _clip(recording: String) -> void:
 				failed = true
 	var outcome: bool = {
 		"move": jump_seen and game.p.x > 350.0,
-		"strike": strike_seen and game.boss_hp < 30,
+		"strike": strike_seen and game.boss_hp < game.boss_max_hp,
 		"dodge": dodge_seen and game.hits_taken == 0,
 		"steal": game.steals == 1 and game.player_rule == game.Rule.RUSH,
 		"rule": ability_seen and game.steals == 1,
@@ -132,6 +143,182 @@ func _clip(recording: String) -> void:
 	print("%s: %s, hull %s, boss HP %s, steals %s" % [recording, "recorded" if outcome else "failed", game.hp, game.boss_hp, game.steals])
 	game.mode = "title"
 	game.just.clear()
+
+func _context_clip(lesson: int) -> void:
+	var training_sector: Array[int] = [0, 1, 3, 4, 6, 7, 9, 10, 14, 18, 23, 1, 1]
+	var index := training_sector[lesson]
+	var folder := "res://builds/recordings/context-%02d" % lesson
+	DirAccess.make_dir_recursive_absolute(folder)
+	game.campaign.records.clear()
+	for i in index:
+		game.campaign.records.append({"entry_hp": 7, "entry_rule": 0, "seconds": 0, "stars": 1})
+	game.campaign.next_rule = 0
+	game.campaign.next_hull = 7
+	game.campaign.reserved.clear()
+	game.begin_sector(index)
+	game.mode = "fight"
+	game.record_demo = false
+	game.title_menu.previous_mode = game.mode
+	game.gear_rng.seed = 1
+	slate.active.clear()
+	slate.keys = [KEY_D, KEY_SPACE, KEY_J, KEY_K, KEY_SHIFT, KEY_E]
+	var held := {}
+	var focus := Vector2(game.p.x, 400)
+	var success := false
+	# Set a safe practice setup. The demonstration itself uses the shipped keyboard actions.
+	match lesson:
+		4, 9:
+			game.p = game.route.socket if lesson == 4 else game.route.target()
+		10:
+			game.p.x = game.b.x - 74.0
+			game.boss_hp = 1
+			game._set_state("exposed", 5.0)
+		11, 12:
+			game.p.x = 389.0
+			game.gear_rng.seed = _drop_seed(lesson == 12)
+	for tick in 960:
+		if game.mode == "fight":
+			var desired := _context_input(lesson, tick)
+			for key in slate.keys + [KEY_A]:
+				var down: bool = desired.has(key)
+				if down != held.has(key):
+					_key(key, down)
+					if down:
+						held[key] = true
+					else:
+						held.erase(key)
+			game._physics_process(STEP)
+			if lesson == 3:
+				success = success or game.route.cursor > 0
+			elif lesson == 10:
+				success = success or (game.evacuated and game.route.cursor > 0)
+			elif lesson in [11, 12]:
+				success = success or not game.effects.is_empty()
+			else:
+				success = success or game.route.cursor > 0
+		if tick % 16 == 0:
+			focus.x = lerpf(focus.x, game.p.x, 0.32)
+			var camera_x := clampi(int(focus.x) - 410, 0, 332)
+			slate.origin = Vector2(camera_x, 195.0)
+			slate.rule_status = "YOU: %s" % game.RULE_NAMES[game.player_rule]
+			slate.dodge_ready = clampf(1.0 - game.dash_cd / game.DODGE_COOLDOWN, 0.0, 1.0)
+			for key in slate.active:
+				slate.active[key] -= 16
+			slate.queue_redraw()
+			game.queue_redraw()
+			await RenderingServer.frame_post_draw
+			var frame := root.get_texture().get_image()
+			if frame.get_size() != Vector2i(1152, 648):
+				frame.resize(1152, 648, Image.INTERPOLATE_LANCZOS)
+			var cropped := frame.get_region(Rect2i(camera_x, 195, 820, 367))
+			cropped.resize(576, 258, Image.INTERPOLATE_LANCZOS)
+			if cropped.save_png("%s/%03d.png" % [folder, tick / 16]) != OK:
+				failed = true
+	for key in held:
+		_key(key, false)
+	if not success:
+		failed = true
+		push_error("Context %02d failed its gameplay check (x %.0f, y %.0f; cursor %d; clock %.2f)." % [lesson, game.p.x, game.p.y, game.route.cursor, game.route.clock])
+	else:
+		print("Context %02d recorded" % lesson)
+	game.mode = "title"
+	game.just.clear()
+
+func _drop_seed(negative: bool) -> int:
+	var rng := RandomNumberGenerator.new()
+	for seed_id in range(1, 1000):
+		rng.seed = seed_id
+		if rng.randf() < 0.12 and (rng.randf() < 0.24) == negative:
+			return seed_id
+	return 1
+
+func _context_input(lesson: int, tick: int) -> Array:
+	var route: RefCounted = game.route
+	var keys := []
+	if not route.active():
+		return [KEY_J] if lesson == 10 else keys
+	var target: Vector2 = route.target()
+	var phase := fmod(route.clock, 2.8)
+	match lesson:
+		4:
+			if game.player_rule != game.Rule.AEGIS:
+				return [KEY_SHIFT] if tick == 16 else []
+			if absf(game.p.x - target.x) > 25:
+				keys.append(KEY_D)
+			if phase >= 2.18 and phase < 2.22:
+				keys.append(KEY_E)
+		9:
+			if not route.echo.is_zero_approx() and phase < 2.65:
+				keys.append(KEY_D)
+			elif absf(game.p.x - target.x) > 30:
+				keys.append(KEY_D if game.p.x < target.x else KEY_A)
+		11, 12:
+			if tick >= 19:
+				keys.append(KEY_J)
+			if tick >= 35:
+				keys.append(KEY_D)
+		_:
+			if route.kind == "lift" and game.player_rule != game.Rule.LIFT:
+				return [KEY_D] if game.p.x < 224 else ([KEY_SHIFT] if tick % 10 < 2 else [])
+			if absf(game.p.x - target.x) > 22:
+				keys.append(KEY_D if game.p.x < target.x else KEY_A)
+			if lesson in [1, 7, 8]:
+				keys.append(KEY_J)
+			if lesson in [2, 3, 6] and game.p.x < 336 and tick % 40 == 24:
+				keys.append(KEY_SHIFT)
+			if lesson == 3 and game.charge and game.p.y > target.y and absf(game.p.x - target.x) < 172 and tick % 14 < 2:
+				keys.append(KEY_E)
+			elif ((lesson in [0, 2, 6] and tick % 84 < 4 and game.p.x > 350) or (target.y < game.BASE and absf(game.p.x - target.x) < 168)) and game.grounded and tick % 12 < 3:
+				keys.append(KEY_SPACE)
+			if lesson == 5 and absf(game.p.x - target.x) < 100 and tick % 24 < 4:
+				keys.append(KEY_SHIFT)
+			if lesson == 2 and tick % 29 < 3 and game.charge and game.player_rule == game.Rule.RUSH:
+				keys.append(KEY_E)
+			if lesson == 6 and tick % 57 < 4 and game.p.x > 315:
+				keys.append(KEY_K)
+	return keys
+
+func _shop_clip() -> void:
+	var folder := "res://builds/recordings/context-13"
+	DirAccess.make_dir_recursive_absolute(folder)
+	game.mode = "title"
+	game.record_demo = false
+	slate.hide()
+	game.title_menu.show()
+	game.title_menu.onboarding = false
+	game.set_fullscreen(false)
+	game.campaign.coins = 18000
+	game.title_menu._open("")
+	await process_frame
+	await process_frame
+	for index in 60:
+		match index:
+			6: _mouse(Vector2(949, 46))
+			24: _mouse(Vector2(486, 201))
+			40: _mouse(Vector2(950, 207))
+		await process_frame
+		game.queue_redraw()
+		await RenderingServer.frame_post_draw
+		var frame := root.get_texture().get_image()
+		frame.resize(576, 324, Image.INTERPOLATE_LANCZOS)
+		var cropped := frame.get_region(Rect2i(0, 22, 576, 258))
+		if cropped.save_png("%s/%03d.png" % [folder, index]) != OK:
+			failed = true
+	if game.campaign.reserved.size() != 2 or game.campaign.coins != 6000:
+		failed = true
+		push_error("Catalog recording did not buy two items through the shop.")
+	else:
+		print("Context 13 recorded")
+
+func _mouse(at: Vector2) -> void:
+	for down in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.position = at
+		event.global_position = at
+		event.button_index = MOUSE_BUTTON_LEFT
+		event.pressed = down
+		Input.parse_input_event(event)
+		Input.flush_buffered_events()
 
 func _play(recording: String, tick: int) -> void:
 	if recording == "move":

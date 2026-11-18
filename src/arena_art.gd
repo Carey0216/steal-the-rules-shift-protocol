@@ -2,6 +2,9 @@ extends RefCounted
 
 const Locale = preload("res://src/locale.gd")
 const Menu = preload("res://src/title_menu.gd")
+const Levels = preload("res://src/levels.gd")
+const Gear = preload("res://src/gear.gd")
+const Icons = preload("res://src/equipment_icons.gd")
 
 const INK := Color("#0b131b")
 const PAPER := Color("#f5e9cd")
@@ -20,6 +23,8 @@ func paint(game: Node2D) -> void:
 	g = game
 	sec = g.stage if g.mode != "title" else 0
 	accent = g.ENCOUNTERS[sec].accent
+	if g.mode != "title" and g.mission_sector:
+		accent = Levels.TINTS[Levels.TABLE[g.sector_index][1]]
 	if g.mode == "title":
 		_title()
 		return
@@ -29,16 +34,85 @@ func paint(game: Node2D) -> void:
 	_background(g.floor_y, g.clock)
 	g.draw_set_transform(shift)
 	_floor(g.floor_y)
-	_warnings()
+	if g.route.kind.is_empty():
+		_warnings()
 	_world_fx(false)
-	_boss(g.b, g.b_facing, 1.0, g.boss_rule, false)
+	if not g.route.kind.is_empty():
+		_route()
+	else:
+		_boss(g.b, g.b_facing, 1.0, g.boss_rule, false)
+		if g.mission_sector and sec == 2:
+			_marker(Vector2(952, g.floor_y - 30), "#", accent)
+		for lock in g.boss_locks:
+			_marker(lock - Vector2(0, 30), "!", accent)
 	_player(g.p, g.facing, 1.0)
+	_equipment()
 	_world_fx(true)
 	g.draw_set_transform(Vector2.ZERO)
 	if not g.record_demo:
 		_hud()
 	if g.mode == "brief":
 		_briefing()
+
+func _marker(center: Vector2, glyph: String, tint: Color) -> void:
+	g.draw_circle(center, 28, _soft(INK, 0.8), true, -1, true)
+	g.draw_circle(center, 27, tint, false, 1.5, true)
+	_poly([center + Vector2(-6, 25), center + Vector2(6, 25), center + Vector2(0, 33)], tint)
+	if not glyph.is_empty():
+		_text(glyph, center.x, center.y + 5, 13, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
+
+func _route() -> void:
+	var route: RefCounted = g.route
+	for deck in route.ledges:
+		_rect(deck.position.x, deck.position.y, deck.size.x, deck.size.y, LINE)
+		_rect(deck.position.x, deck.position.y, deck.size.x, 2, accent)
+		for x in range(int(deck.position.x) + 12, int(deck.end.x) - 3, 16):
+			_line(Vector2(x, deck.position.y + 5), Vector2(x - 4, deck.end.y - 2), INK)
+	if not route.active():
+		return
+	var zone: Rect2 = route.hazard()
+	if zone.has_area():
+		var live := fmod(route.clock, 1.8) >= 1.18
+		_rect(zone.position.x, zone.position.y, zone.size.x, zone.size.y, _soft(RED, 0.36 if live else 0.13))
+		for x in range(int(zone.position.x), int(zone.end.x), 12):
+			_line(Vector2(x, zone.end.y - 16), Vector2(x + 9, zone.position.y + 7), RED if live else _soft(RED, 0.4))
+	if route.echo != Vector2.ZERO:
+		_rect(route.echo.x - 53, route.echo.y - 66, 106, 66, _soft(accent, 0.14))
+		_line(route.echo + Vector2(0, -145), route.echo, RED, 2.0)
+	for i in range(route.cursor + 1, route.targets.size()):
+		var future: Vector2 = route.targets[i]
+		_line(future + Vector2(0, -15), future, DIM, 2.0)
+	var symbols := {"echo": "!", "reflect": "E", "swap": "Q", "break": "J", "timer": "J", "belt": "J"}
+	_marker(route.target() - Vector2(0, 34), symbols.get(route.kind, ">"), accent)
+	if route.socket_rule > 0:
+		var center: Vector2 = route.socket - Vector2(0, 30)
+		var tint: Color = g.RULE_COLORS[route.socket_rule]
+		_marker(center, "", tint)
+		Icons.paint_rule(g, center, 1.5, tint, route.socket_rule)
+	if route.kind == "cargo":
+		_marker(route.cargo - Vector2(-23 if route.attached else 0, 23), "+" if route.attached else "J", GREEN)
+	if route.kind == "timer" and route.cursor == 0:
+		_rect(route.plate.x - 60.0, route.plate.y - 5.0, 120, 5, GREEN if route.timing > 0.0 else RED)
+		if route.timing > 0.0:
+			_rect(route.target().x - 36.0, route.target().y - 74.0, 72.0, 3, LINE)
+			_rect(route.target().x - 36.0, route.target().y - 74.0, 72.0 * route.timing / 5.0, 3, GREEN)
+
+func _equipment() -> void:
+	if g.drop.is_empty():
+		return
+	var id: int = g.drop.id
+	var tint: Color = g.equipment_color(id)
+	var origin: Vector2 = g.drop.at
+	if not g.reduced_motion:
+		origin.y += sin(g.clock * 7.0) * 3.5
+	_marker(origin, "", tint)
+	Icons.paint(g, origin, 1.67, tint, id)
+	g.draw_arc(origin, 32.0, -PI * 0.5, -PI * 0.5 + TAU * g.drop.time / Gear.DROP_LIFETIME, 40, tint, 2.0, true)
+	var polarity := origin + Vector2(25, -22)
+	g.draw_circle(polarity, 7.0, INK)
+	_line(polarity - Vector2(3, 0), polarity + Vector2(3, 0), tint, 1.6)
+	if Gear.ITEMS[id][3] > 0:
+		_line(polarity - Vector2(0, 3), polarity + Vector2(0, 3), tint, 1.6)
 
 func _rect(x: float, y: float, w: float, h: float, color: Color, solid := true, thickness := 1.0) -> void:
 	g.draw_rect(Rect2(x, y, w, h), color, solid, -1.0 if solid else thickness)
@@ -350,12 +424,13 @@ func _hud() -> void:
 	_rect(0, 135, W, 1, LINE)
 	_rect(0, 0, W, 3, accent)
 	_text("SHIFT PROTOCOL", 42, 35, 27, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 270, 30)
-	_text(Locale.text("SECTOR") + " " + Locale.text(g.ENCOUNTERS[sec].sector), 42, 55, 12, DIM)
+	_text(Locale.text("SECTOR") + " " + ("%02d" % (g.sector_index + 1) if g.mission_sector else Locale.text(g.ENCOUNTERS[sec].sector)), 42, 55, 12, DIM)
 	_text(g.timecode(g.run_time), 1110, 34, 19, TEXT, false, HORIZONTAL_ALIGNMENT_RIGHT)
 	_text("RUN CLOCK", 1110, 55, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(g.ENCOUNTERS[sec].name, 576, 41, 32, PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 480, 34)
+	var level: Array = Levels.TABLE[g.sector_index]
+	_text(level[0] if g.mission_sector else g.ENCOUNTERS[sec].name, 576, 41, 32, PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 480, 34)
 	_rect(326, 51, 500, 8, LINE)
-	var fraction: float = float(g.boss_hp) / g.ENCOUNTERS[sec].hp
+	var fraction: float = float(g.route.cursor) / g.route.targets.size() if not g.route.kind.is_empty() else float(g.boss_hp) / g.boss_max_hp
 	if fraction > 0:
 		_rect(326, 51, 500 * fraction, 8, accent)
 	for i in range(1, 10):
@@ -369,15 +444,25 @@ func _hud() -> void:
 	_text("Dodge", 207, 124, 10, DIM)
 	var slot_color: Color = g.RULE_COLORS[g.player_rule]
 	_text("YOUR RULE", 315, 91, 12, DIM)
-	_text(g.RULE_NAMES[g.player_rule], 313, 123, 26, slot_color, true, HORIZONTAL_ALIGNMENT_LEFT, 130, 28)
+	Icons.paint_rule(g, Vector2(325, 114), 0.85, slot_color, g.player_rule)
+	_text(g.RULE_NAMES[g.player_rule], 344, 123, 26, slot_color, true, HORIZONTAL_ALIGNMENT_LEFT, 105, 28)
 	var charge_label := "Y" if g.last_device == "pad" else "E"
 	if g.player_rule != g.Rule.EMPTY:
 		_text(Locale.text("[%s] READY") % charge_label if g.charge else "RECHARGING", 450, 113, 12, slot_color if g.charge else DIM)
 	_text("SHIFT LINK", 692, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
 	var link := "IN RANGE" if g.can_shift() else ("APPROACH" if g.state == "exposed" and g.boss_rule != g.Rule.EMPTY else "WAIT")
 	_text(link, 692, 115, 18, GREEN if g.can_shift() else DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
-	_text("BOSS RULE", 1110, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(g.RULE_NAMES[g.boss_rule], 1110, 123, 26, g.RULE_COLORS[g.boss_rule], true, HORIZONTAL_ALIGNMENT_RIGHT, 264, 28)
+	if not g.route.kind.is_empty():
+		var readout := "%d / %d" % [g.route.cursor, g.route.targets.size()]
+		if g.route.limit > 0.0:
+			readout = "%s   %0.1fs" % [readout, maxf(0, g.route.limit - g.route.clock)]
+		_text("Checkpoints", 1110, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+		_text(readout, 1110, 123, 22, accent, true, HORIZONTAL_ALIGNMENT_RIGHT)
+	else:
+		_text("BOSS RULE", 1110, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+		var tint: Color = g.RULE_COLORS[g.boss_rule]
+		Icons.paint_rule(g, Vector2(1100, 113), 0.85, tint, g.boss_rule)
+		_text(g.RULE_NAMES[g.boss_rule], 1082, 123, 26, tint, true, HORIZONTAL_ALIGNMENT_RIGHT, 234, 28)
 	_rect(0, 568, W, 80, INK)
 	_line(Vector2(0, 568), Vector2(W, 568), LINE)
 	var sub := Locale.text(_instruction())
@@ -387,6 +472,15 @@ func _hud() -> void:
 	var inputs := "STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE" if g.last_device == "pad" else "A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE"
 	_text(inputs, 42, 627, 12, DIM, false, HORIZONTAL_ALIGNMENT_LEFT, 751)
 	_text("M AUDIO  /  V MOTION  /  ESC PAUSE", 1110, 627, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT, 300)
+	var n := 0
+	for id in g.effects:
+		var x := 1108.0 - n * 85.0
+		var tint: Color = g.equipment_color(id)
+		_rect(x - 81, 541, 81, 24, _soft(INK, 0.93))
+		_rect(x - 81, 563, clampf(g.effects[id] / Gear.ITEMS[id][2], 0.0, 1.0) * 81, 2, tint)
+		Icons.paint(g, Vector2(x - 66, 553), 0.63, tint, id)
+		_text("%.1fs" % g.effects[id], x - 32, 558, 12, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
+		n += 1
 	if g.practice >= 0:
 		_text("Practice", 576, 175, 22, GREEN, true, HORIZONTAL_ALIGNMENT_CENTER)
 	elif g.state == "windup":
@@ -409,6 +503,12 @@ func _hud() -> void:
 		_rect(4, 139, W - 8, 424, _soft(RED, g.hit_flash * 0.9), false, 4.0)
 
 func _instruction() -> String:
+	if g.route.active():
+		return Levels.GOALS[g.route.kind]
+	if not g.boss_locks.is_empty():
+		return "Lure the recorded strike onto each lock."
+	if g.mission_sector and sec == 2 and g.state == "idle":
+		return "Reflect with AEGIS or strike the right relay with RUSH."
 	if g.practice >= 0:
 		if g.notice_time > 0.0:
 			return g.notice_sub
@@ -445,9 +545,9 @@ func _briefing() -> void:
 	_rect(x, y, 664, 296, LINE, false)
 	_rect(x, y, 4, 296, accent)
 	_text(Locale.text("INTRUSION") + "  /  " + Locale.text(encounter.sector), x + 34, y + 41, 14, accent)
-	_text(encounter.name, x + 32, y + 113, 63, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 604, 62)
-	_text(encounter.call, x + 35, y + 153, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
-	if sec == 0:
+	_text(Levels.TABLE[g.sector_index][0] if g.mission_sector else encounter.name, x + 32, y + 113, 63, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 604, 62)
+	_text(Levels.GOALS[g.route.kind] if g.route.active() else encounter.call, x + 35, y + 153, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
+	if sec == 0 and not g.route.active():
 		_text("Get close when the core opens. Press SHIFT or Q.", x + 35, y + 179, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 600)
 	else:
 		var loadout := Locale.text("Carried: %s   /   Hull %s of 7") % [Locale.text(g.RULE_NAMES[g.player_rule]), g.hp]
@@ -480,5 +580,5 @@ func _title() -> void:
 	_rect(0, 568, W, 80, INK)
 	_line(Vector2(0, 568), Vector2(W, 568), LINE)
 	_text(("%s  /  " % Locale.NAMES[Locale.current()]) + "v" + str(ProjectSettings.get_setting("application/config/version")), 58, 610, 14, PAPER)
-	_text(Locale.text("%d of %d sectors cleared") % [g.campaign.records.size(), g.ENCOUNTERS.size()], 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(Locale.text("%d of %d sectors cleared") % [g.campaign.records.size(), Levels.TABLE.size()], 844, 610, 14, GREEN, false, HORIZONTAL_ALIGNMENT_RIGHT)
 	_columns(962, 132, 596, 19, _soft(RED, 0.58))

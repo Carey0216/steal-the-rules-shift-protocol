@@ -1,6 +1,7 @@
 """Pack the frames recorded by tools/record_demos.gd into WebP atlases."""
 
 from pathlib import Path
+import sys
 
 from PIL import Image
 
@@ -11,6 +12,10 @@ DEST = ROOT / "assets" / "demos"
 FRAME_SIZE = (576, 258)
 SHEET_SIZE = (FRAME_SIZE[0] * 3, FRAME_SIZE[1] * 5)
 RECORDINGS = ("move", "strike", "dodge", "steal", "rule")
+if "--context" in sys.argv:
+    RECORDINGS = tuple(f"context-{index:02d}" for index in range(14))
+if "--supply" in sys.argv:
+    RECORDINGS = ("context-12", "context-13")
 
 DEST.mkdir(exist_ok=True)
 for name in RECORDINGS:
@@ -25,5 +30,5 @@ for name in RECORDINGS:
                     raise ValueError(f"{path} has unexpected size {image.size}")
                 atlas.paste(image, ((cell % 3) * FRAME_SIZE[0], (cell // 3) * FRAME_SIZE[1]))
         destination = DEST / f"{name}-{index}.webp"
-        atlas.save(destination, quality=88, method=6)
+        atlas.save(destination, quality=83 if name.startswith("context-") else 88, method=4)
         print(f"{destination.name}: {destination.stat().st_size:,} bytes")

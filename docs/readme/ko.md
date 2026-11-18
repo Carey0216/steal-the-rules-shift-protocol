@@ -1,7 +1,12 @@
 <p align="center"><img src="../../assets/icon.svg" width="112" height="112" alt="SHIFT PROTOCOL 로고"></p>
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
-![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](../../LICENSE)
+<p align="center">
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/Versions-v1.3.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP 다운로드" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP 다운로드" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
+  <a href="#플레이-가이드"><img alt="플레이 가이드" src="https://img.shields.io/badge/Guide-%ED%95%9C%EA%B5%AD%EC%96%B4-795c35?style=for-the-badge"></a>
+</p>
 
 [English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · [中文（繁體）](../../docs/readme/zh-TW.md) · [日本語](../../docs/readme/ja.md) · **한국어**
 
@@ -12,12 +17,15 @@
 | 기능 | 게임에서의 동작 |
 | --- | --- |
 | SHIFT 교환 | 공격을 피하고 열린 코어에 접근해 **Shift**를 누르세요. 보스의 능력을 얻고 가지고 있던 규칙을 보스에게 넘깁니다. |
-| 구역 6곳 | 두 번째 구역의 바닥이 무너지면 위아래로 길이 갈립니다. 이후에는 통전 도관, 용광로 분출구, 이전 위치를 노리는 반사 공격과 넘겨받은 규칙을 강화하는 집행자가 등장합니다. |
-| 구역 지도와 저장 | 구역을 완료하면 자동으로 저장되고 다음 구역이 열립니다. 로비에서 완료한 구역을 다시 플레이하고 시간, 피격, 재시도 횟수를 확인할 수 있습니다. Esc로 일시 정지하고 톱니바퀴 메뉴에서 저장하고 종료합니다. |
-| 순서대로 보는 조작 가이드 | 처음 실행하면 실제 플레이 영상 다섯 편을 순서대로 봅니다. 로비의 **?**에서 다시 볼 수 있으며 각 레슨의 조작을 연습장에서 직접 해볼 수 있습니다. |
+| 4개 지역, 24개 구역 | 잠금장치 파괴, 관문 추격, 통전 통로, 펄스 반사, 화물 운반과 잔향 잠금장치가 등장합니다. 보스 6종의 내구도는 약 35% 늘었으며 최종전 후에는 탈출해야 합니다. |
+| 지도와 저장 | 클리어하면 구역이 점등되고 다음 구역이 열립니다. 클리어한 구역에서 다시 평가와 보상을 받을 수 있습니다. Esc로 정지하고 톱니바퀴 메뉴에서 저장 종료 또는 진행 삭제를 선택합니다. |
+| 실제 플레이 가이드 | 첫 5개 레슨은 직접 연습할 수 있습니다. 새로운 장치가 등장하기 전에 영상을 재생합니다. 로비의 **?**에서 영상과 장비 도감을 확인하세요. |
+| 장비와 상점 | 장비 20종에 각각 아이콘이 있습니다. 클리어마다 코인 1000~3000개를 받고, 출격 전에 서로 다른 장비를 최대 3종 살 수 있습니다. 약화 장비는 전투에서만 떨어집니다. |
 | 설정 | 언어, 화면 모드, 창 크기, 글자 크기를 조절하고 소리, 움직임 줄이기, 보조 모드를 설정할 수 있습니다. Windows판은 처음 전체 화면으로 시작하며 이후에는 설정을 기억합니다. 웹판은 페이지 안에서 시작하며 설정에서 전체 화면으로 전환할 수 있습니다. |
 
 ![두 구역을 돌파한 지도](../map.png)
+
+![장비 6종이 열린 상점](../equipment.png)
 
 ## 조작 방법
 
@@ -36,6 +44,15 @@
 ## 규칙과 회복
 
 **RUSH**는 전방 돌진 공격입니다. **LIFT**로 상승하면서 공격하면 장갑을 뚫을 수 있습니다. **AEGIS**는 공격을 한 번 막고 보스가 가까우면 피해를 반사합니다. 다음 보스 공격이 끝나거나 규칙을 교환하면 충전됩니다. 다음 구역에 들어갈 때 내구도가 최대 3 회복됩니다. 다시 시작하면 해당 구역 진입 시의 상태로 돌아갑니다.
+
+## 플레이 가이드
+
+1. **실행.** Windows x64는 ZIP 전체를 풀고 `ShiftProtocol.exe`를 실행합니다. Web HTML5는 HTTP 서버에서 `index.html`을 열거나 ZIP을 itch.io에 브라우저 게임으로 업로드합니다. 브라우저에서는 화면을 클릭해 입력을 활성화합니다.
+2. **첫 교환.** 경고를 읽고 공격 직전 K로 회피합니다. 열린 코어에 접근해 범위 표시가 뜨면 Shift, Q 또는 오른쪽 범퍼를 누르세요. E 또는 Y로 규칙을 사용하고 J 또는 X로 공격합니다. 실패하면 다음에 코어가 열릴 때 더 가까이 가세요.
+3. **시설 장치.** 반사 표식에서 경고가 끝나기 직전에 E로 AEGIS를 사용합니다. 잔향 잠금장치 옆에서 조준이 고정될 때까지 기다렸다가 벗어나세요. 화물은 옆에서 J로 연결한 뒤 순서대로 운반합니다.
+4. **캡슐.** 거품이 없고 대기 시간이 끝났다면 유효타에 12% 확률로 떨어집니다. 6초 뒤 사라지며 접근하면 5~9초간 효과가 적용됩니다. 민트는 강화, 산호색은 5초 약화입니다. HUD에 남은 시간이 표시됩니다.
+5. **코인과 점수.** 클리어하면 별 1개, 구역별 제한 시간과 피격 횟수 조건으로 최대 2개를 추가로 받습니다. 다시 플레이해도 별 하나당 코인 1000개입니다. 상점은 6000코인부터 시작하며 로비 카트 또는 출격 화면에서 열 수 있습니다. 장비는 종류당 1개만 구매할 수 있습니다.
+6. **다시 플레이와 저장.** 결과에서 재도전, 로비 또는 다음 구역을 선택합니다. 톱니바퀴의 진행 삭제를 확인하면 기록, 별, 코인, 구매 장비가 지워집니다. 언어, 화면 및 접근성 설정은 유지됩니다.
 
 ## 실행과 빌드
 

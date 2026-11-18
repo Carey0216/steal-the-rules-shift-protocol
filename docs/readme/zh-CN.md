@@ -1,7 +1,12 @@
 <p align="center"><img src="../../assets/icon.svg" width="112" height="112" alt="SHIFT PROTOCOL 标志"></p>
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
-![Version 1.2.0](https://img.shields.io/badge/version-1.2.0-4caa94) ![Godot 4.7.2](https://img.shields.io/badge/Godot-4.7.2-478cbf) ![Platform Windows and Web](https://img.shields.io/badge/platform-Windows%20%7C%20Web-30363d) [![MIT license](https://img.shields.io/badge/license-MIT-cc8850)](../../LICENSE)
+<p align="center">
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/Versions-v1.3.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下载 Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下载 Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
+  <a href="#行动指南"><img alt="行动指南" src="https://img.shields.io/badge/Guide-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
+</p>
 
 [English](../../README.md) · **中文（简体）** · [中文（繁體）](../../docs/readme/zh-TW.md) · [日本語](../../docs/readme/ja.md) · [한국어](../../docs/readme/ko.md)
 
@@ -12,12 +17,15 @@
 | 功能 | 游戏中的表现 |
 | --- | --- |
 | SHIFT 交换 | 躲过攻击，靠近开启的核心，按 **Shift**。你拿到 Boss 的能力，并把原有规则交给它。 |
-| 六个关卡 | 第二关坍塌后可走上下两层。后续有通电柱、熔炉喷口、锁定旧位置的镜像攻击，以及会强化你交出的规则的执行者。 |
-| 关卡地图与存档 | 每过一关都会保存、点亮地图并开放下一关。大厅可重玩已通关的关卡，查看用时、受击和重试次数。Esc 暂停，齿轮菜单可保存并退出。 |
-| 逐步引导与实练 | 首次启动按顺序看完五段实战录像。大厅的 **？** 可重看，每课都能进入实战场地亲手练习。 |
+| 24 关 / 四大区域 | 破拆锁具、追赶闸门、通过通电走廊、反射脉冲、运送货物并利用回声锁。六台 Boss 的耐久约提升 35%，终战还要撤离。 |
+| 地图与存档 | 每次通关点亮地图并开放下一关。已通关的关卡可重玩并重新结算。Esc 暂停，齿轮菜单可保存退出或确认清档。 |
+| 实机引导 | 开场五课可以实练。新玩法首次出现时战前自动播放示范，大厅的 **？** 可回看，也能打开装备图鉴。 |
+| 装备与商店 | 20 种图标装备。通关每次发 1000–3000 金币，战前最多购买三种不同装备。减益装备只会在对抗中掉落。 |
 | 设置 | 可修改语言、显示模式、窗口大小和文字大小，也可切换声音、减少动效和辅助模式。Windows 首次启动默认全屏，之后记住你的选择。网页版在页面内启动，可在设置里切换全屏。 |
 
 ![点亮了两个关卡的地图](../map.png)
+
+![六种已解锁装备的商城](../equipment.png)
 
 ## 操作方式
 
@@ -36,6 +44,15 @@
 ## 规则与恢复
 
 **RUSH** 向前冲刺斩击。**LIFT** 向上喷射，上升时挥刀可破甲。**AEGIS** 挡下一击，Boss 在近处时反弹伤害。下一次 Boss 攻击结束或交换成功后，能力会重新充能。进入新区域最多恢复三格耐久，重试会恢复到进入本区域时的状态。
+
+## 行动指南
+
+1. **启动。** Windows x64 解压整包，双击 `ShiftProtocol.exe`。Web HTML5 版可通过本地 HTTP 服务打开 `index.html`，或把 ZIP 上传为 itch.io 浏览器游戏。浏览器里先点画面获得键盘焦点。
+2. **完成第一次交换。** 看预警，攻击将到时按 K。跑向开启的核心，等到界面显示进入范围，按 Shift、Q 或右肩键。界面会显示交换双方的规则。E 或 Y 用技能，J 或 X 挥刀。失败时等下一次亮核，再靠近一点。
+3. **用场地解机关。** 反射关站在标记上，预警要结束时按 E 用 AEGIS。回声锁等准星固定再离开。货物旁按 J 接驳，依次运到每个检查点。
+4. **辨认气泡。** 场上没有气泡、掉落冷却已结束时，有效命中有 12% 掉率。气泡的环在 6 秒内耗尽，靠近自动生效 5–9 秒。薄荷绿是增益，珊瑚红是持续 5 秒的减益，可以跳过。装备图标旁有倒计时。
+5. **金币和结算。** 通关先得一星，再按本关的用时、受击上限分别加星。每颗星 1000 金币，重玩也照当次成绩发放。商城 6000 金币起，从大厅购物车或入场前打开。每种装备限一件，下一次出战开始时装备才计时，详见 **？→ 装备图鉴**。
+6. **重玩和存档。** 结算可重试、回大厅或进入下一关。齿轮菜单确认清档会清除关卡、星级、金币和已购装备，保留语言、显示和无障碍设置。
 
 ## 运行与构建
 

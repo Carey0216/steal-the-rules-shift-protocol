@@ -32,7 +32,7 @@ Open `http://127.0.0.1:8060/` in a desktop browser with WebGL 2. The Web preset 
 
 ## Before submitting
 
-On the hosted page, verify first launch in a fresh browser profile. Complete the five guide steps and try a practice arena. Clear a sector, reload, and check the map retains the clear and unlocks only the next sector. Replay a cleared sector and verify that it leaves the campaign frontier intact. Check the Windows fullscreen startup and the save-and-quit button.
+On the hosted page, verify first launch in a fresh browser profile. Complete the five guide steps and try a practice arena. Start the first sector, confirm its new-mechanic recording plays, and clear it. Replay a sector and check its payout. Reload and verify the wallet, map and bought loadout. Check the Windows fullscreen startup and the save-and-quit button.
 
 ## Publish a tagged release
 

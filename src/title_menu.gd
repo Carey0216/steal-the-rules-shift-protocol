@@ -1,6 +1,9 @@
 extends CanvasLayer
 
 const Locale = preload("res://src/locale.gd")
+const Levels = preload("res://src/levels.gd")
+const Gear = preload("res://src/gear.gd")
+const Icons = preload("res://src/equipment_icons.gd")
 const INK := Color("#0b131b")
 const PANEL := Color("#101b23")
 const LINE := Color("#435561")
@@ -42,6 +45,14 @@ var web_document
 var fullscreen_listener
 var next_step_button: Button
 var lesson_watched := {}
+var sector_pending := -1
+var gear_page := 0
+var dossier := 0
+var lesson_pending: Array[int] = []
+var active_lesson := -1
+var money_clicks := 0
+var money_deadline := 0
+var money_authorized := false
 
 func _ready() -> void:
 	layer = 4
@@ -64,6 +75,29 @@ func _ready() -> void:
 		web_document.addEventListener("fullscreenchange", fullscreen_listener)
 	_draw_page()
 	previous_mode = game.mode
+	if game.boot_time > 0.0:
+		var intro := CanvasLayer.new()
+		intro.layer = 8
+		add_child(intro)
+		var cover := ColorRect.new()
+		cover.color = INK
+		cover.size = Vector2(1152, 648)
+		cover.mouse_filter = Control.MOUSE_FILTER_STOP
+		intro.add_child(cover)
+		var emblem := TextureRect.new()
+		emblem.texture = preload("res://assets/icon.svg")
+		emblem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		emblem.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_place(emblem, cover, Rect2(526, 156, 100, 100))
+		var mark := _label(cover, "SHIFT PROTOCOL", Rect2(216, 274, 720, 78), 48, PAPER, true)
+		mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		mark.modulate.a = 0.0
+		var beam := _panel(cover, Rect2(138, 375, 1, 2), GREEN, GREEN)
+		var animation := create_tween()
+		animation.tween_property(beam, "size:x", 876.0, 0.48).set_trans(Tween.TRANS_CUBIC)
+		animation.parallel().tween_property(mark, "modulate:a", 1.0, 0.35).set_delay(0.09)
+		animation.tween_property(cover, "modulate:a", 0.0, 0.30)
+		animation.tween_callback(intro.queue_free)
 
 func _exit_tree() -> void:
 	if web_document != null:
@@ -135,6 +169,7 @@ func _button(parent: Control, key: String, at: Rect2, callback: Callable, primar
 	button.add_theme_stylebox_override("normal", normal)
 	button.add_theme_stylebox_override("hover", _style(surface.lightened(0.08), GREEN))
 	button.add_theme_stylebox_override("pressed", _style(surface.darkened(0.06), GREEN))
+	button.add_theme_stylebox_override("disabled", _style(INK, LINE.darkened(0.4)))
 	var focus := _style(Color.TRANSPARENT, GREEN, 2)
 	focus.draw_center = false
 	button.add_theme_stylebox_override("focus", focus)
@@ -206,6 +241,11 @@ func _draw_page() -> void:
 		"settings": _settings()
 		"guide": _guide()
 		"map": _map()
+		"shop": _shop()
+		"archive": _archive()
+		"new_lesson": _new_lesson()
+		"reset": _reset()
+		"money": _money()
 		_: _title_controls()
 
 func _title_controls() -> void:
@@ -214,8 +254,62 @@ func _title_controls() -> void:
 	var gear := _button(ui, "", Rect2(987, 25, 48, 44), _open.bind("settings"))
 	gear.tooltip_text = _t("Settings")
 	gear.draw.connect(_draw_gear.bind(gear))
-	var help := _button(ui, "?", Rect2(1047, 25, 48, 44), _open.bind("guide"))
+	var help := _button(ui, "?", Rect2(1047, 25, 48, 44), _open_archive.bind(0))
 	help.tooltip_text = _t("Controls guide")
+	var wallet := _button(ui, "", Rect2(719, 25, 188, 44), _wallet_pressed)
+	wallet.focus_mode = Control.FOCUS_NONE
+	wallet.tooltip_text = _t("Coins")
+	_label(wallet, str(game.campaign.coins), Rect2(51, 3, 132, 37), 17, AMBER)
+	wallet.draw.connect(_currency_icon.bind(wallet, false))
+	var shop := _button(ui, "", Rect2(925, 25, 48, 44), _open_shop.bind(-1))
+	shop.tooltip_text = _t("Equipment shop")
+	shop.draw.connect(_currency_icon.bind(shop, true))
+
+func _currency_icon(button: Button, cart: bool) -> void:
+	var center := Vector2(25, 22)
+	var color := GREEN if button.is_hovered() else AMBER
+	if cart:
+		var outline := PackedVector2Array([center + Vector2(-14, -9), center + Vector2(-10, -9), center + Vector2(-6, 4), center + Vector2(8, 4), center + Vector2(12, -5), center + Vector2(-8, -5)])
+		button.draw_polyline(outline, color, 1.6, true)
+		button.draw_circle(center + Vector2(-3, 9), 2, color)
+		button.draw_circle(center + Vector2(7, 9), 2, color)
+	else:
+		button.draw_circle(center, 11.0, color, false, 1.8, true)
+		button.draw_arc(center, 7.0, 0.07, TAU - 0.07, 26, color.darkened(0.12), 1.2, true)
+		button.draw_line(center + Vector2(0, -4), center + Vector2(0, 4), color, 1.8, true)
+
+func _wallet_pressed() -> void:
+	var now := Time.get_ticks_msec()
+	money_clicks = money_clicks + 1 if now <= money_deadline else 1
+	if money_clicks == 1:
+		money_deadline = now + 2400
+	if money_clicks == 5:
+		money_clicks = 0
+		money_authorized = false
+		_open.call_deferred("money")
+
+func _money() -> void:
+	var panel := _modal("", Rect2(341, 245, 470, 138))
+	var entry := LineEdit.new()
+	entry.max_length = 9
+	entry.secret = not money_authorized
+	_place(entry, panel, Rect2(22, 39, 303, 49))
+	var submit := func(value: String):
+		if not money_authorized:
+			if value == "MONEY":
+				money_authorized = true
+				_draw_page.call_deferred()
+		elif value.is_valid_int() and int(value) >= 0 and int(value) <= Gear.MAX_COINS:
+			var previous: int = game.campaign.coins
+			game.campaign.coins = int(value)
+			if game._save() == OK:
+				money_authorized = false
+				_open.call_deferred("")
+			else:
+				game.campaign.coins = previous
+	entry.text_submitted.connect(submit)
+	_button(panel, "Confirm", Rect2(340, 39, 108, 49), func(): submit.call(entry.text), true)
+	entry.grab_focus()
 
 func _draw_gear(gear: Button) -> void:
 	var center := gear.size * 0.5
@@ -227,6 +321,8 @@ func _draw_gear(gear: Button) -> void:
 	gear.draw_circle(center, 3.2, tint, false, 1.6, true)
 
 func _open(next: String) -> void:
+	if next != "money":
+		money_clicks = 0
 	page = next
 	_draw_page()
 
@@ -283,10 +379,18 @@ func _settings() -> void:
 				var assist_option := _option(panel, ["Off", "On"], int(game.assist), row, _change_assist)
 				assist_option.tooltip_text = _t("Larger timing windows for steals and dodges.")
 	var exit_label := "Save and return" if is_web else "Save and quit"
-	_button(panel, exit_label, Rect2(28, 462, 260, 46), game.save_and_quit)
+	_button(panel, exit_label, Rect2(28, 462, 193, 46), game.save_and_quit)
+	_button(panel, "Clear save", Rect2(235, 462, 220, 46), _open.bind("reset"))
 	_button(panel, "Done", Rect2(475, 462, 205, 46), back, true)
 	_show_save_notice(panel, Rect2(28, 419, 650, 32))
 	selected_language.grab_focus()
+
+func _reset() -> void:
+	var panel := _modal("Clear save", Rect2(248, 201, 656, 246))
+	_label(panel, "Erase sector records, stars, coins and purchased equipment?", Rect2(28, 79, 596, 60), 18, AMBER, false, true)
+	var cancel := _button(panel, "Cancel", Rect2(28, 157, 280, 52), _open.bind("settings"), true)
+	_button(panel, "Erase progress", Rect2(335, 157, 289, 52), func(): game.reset_progress(); _open("settings"))
+	cancel.grab_focus()
 
 func show_save_error() -> void:
 	game.save_error = true
@@ -299,40 +403,198 @@ func _show_save_notice(parent: Control, at: Rect2) -> void:
 func _map() -> void:
 	var panel := _modal("Sector map", Rect2(66, 40, 1020, 568))
 	var completed: int = game.campaign.records.size()
-	var total: int = game.ENCOUNTERS.size()
+	var total: int = Levels.TABLE.size()
 	_label(panel, _t("%d of %d sectors cleared") % [completed, total], Rect2(29, 71, 720, 35), 15, DIM)
 	_button(panel, "Lobby", Rect2(816, 24, 176, 46), back)
 	var focused: Button
-	for index in total:
-		var row := index / 3
-		var col := index % 3 if row == 0 else 2 - index % 3
-		var x := 28.0 + col * 329.0
-		var y := 135.0 + row * 173.0
-		var lit := index < completed
-		var next := index == completed
-		if index < total - 1:
-			var rail := GREEN.darkened(0.4) if index < completed else LINE
-			if index == 2:
-				_panel(panel, Rect2(x + 152, y + 119, 2, 54), rail, rail)
-			else:
-				var edge := x + 304.0 if row == 0 else x - 25.0
-				_panel(panel, Rect2(edge, y + 55, 25, 2), rail, rail)
-		var tile := _button(panel, "", Rect2(x, y, 304, 119), game.begin_sector.bind(index), false, next)
-		tile.disabled = not lit and not next
-		var status := "Cleared" if lit else ("Next sector" if next else "Locked")
-		var tone := GREEN if lit else (AMBER if next else DIM)
-		_panel(tile, Rect2(0, 0, 304, 3), tone.darkened(0.33 if lit or next else 0.65), tone)
-		_label(tile, "%02d  /  %s" % [index + 1, _t(status)], Rect2(14, 9, 270, 28), 13, tone)
-		_label(tile, game.ENCOUNTERS[index].name, Rect2(14, 36, 271, 42), 27, PAPER if lit or next else DIM, true)
-		if lit:
-			var result: Dictionary = game.campaign.records[index]
-			_label(tile, _t("%s  /  %s hits  /  %s retries") % [game.timecode(result.seconds), result.hits, result.retries], Rect2(14, 84, 275, 26), 11, DIM)
-		if next or (completed == total and index == total - 1):
-			focused = tile
-	_label(panel, "Select a cleared sector to replay it.", Rect2(29, 499, 700, 36), 14, DIM)
-	_show_save_notice(panel, Rect2(560, 499, 440, 36))
+	for region in 4:
+		var y := 122.0 + region * 94.0
+		var tint: Color = Levels.TINTS[region]
+		_panel(panel, Rect2(28, y, 964, 82), INK, tint.darkened(0.65))
+		_panel(panel, Rect2(28, y, 4, 82), tint, tint)
+		_label(panel, Levels.REGIONS[region], Rect2(45, y + 10, 158, 59), 20, tint, true, true)
+		_panel(panel, Rect2(212, y + 39, 758, 3), tint.darkened(0.65))
+		for point in 6:
+			var index := region * 6 + point
+			var at := Rect2(213 + point * 128, y + (8 if point % 2 == 0 else 15), 118, 61)
+			var lit := index < completed
+			var next := index == completed
+			var tile := _button(panel, "", at, prepare_sector.bind(index), false, next)
+			tile.disabled = not lit and not next
+			var tone := tint if lit or next else DIM.darkened(0.27)
+			_label(tile, "%02d%s" % [index + 1, "   ›" if next else ""], Rect2(8, 4, 101, 25), 13, tone)
+			if lit:
+				for i in 3:
+					_star(tile, Vector2(43 + i * 13, 14), 5.0, tone if i < game.campaign.records[index].stars else LINE)
+			var caption := _label(tile, Levels.TABLE[index][0], Rect2(8, 22, 104, 32), 12, PAPER if lit or next else DIM, false, true)
+			caption.add_theme_constant_override("line_spacing", -4)
+			caption.max_lines_visible = 2
+			caption.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			tile.tooltip_text = "%s  /  %s" % [_t(Levels.TABLE[index][0]), _t("Cleared" if lit else ("Next sector" if next else "Locked"))]
+			if next or index == total - 1 and completed == total:
+				focused = tile
+	_label(panel, "Select a cleared sector to replay it.", Rect2(29, 505, 700, 36), 14, DIM)
+	_show_save_notice(panel, Rect2(560, 505, 440, 36))
 	if focused != null:
 		focused.grab_focus()
+
+func prepare_sector(index: int) -> void:
+	if not game.campaign.selectable(index, Levels.TABLE.size()):
+		return
+	_open_shop(index)
+
+func _open_shop(index: int) -> void:
+	sector_pending = index
+	gear_page = 0
+	_open("shop")
+
+func _shop() -> void:
+	var panel := _modal("Equipment shop", Rect2(91, 40, 970, 568))
+	var reserved: Array = game.campaign.reserved
+	var stock := Gear.stock(game.campaign.records.size(), true)
+	var count := ceili(stock.size() / 6.0)
+	var heading := _t("Equip up to 3 items for the next attempt.")
+	if sector_pending >= 0:
+		heading = "%02d / %s   ·   %s" % [sector_pending + 1, _t(Levels.TABLE[sector_pending][0]), _t("Equip up to 3 items for the next attempt.")]
+	_label(panel, heading, Rect2(28, 69, 907, 41), 16, DIM, false, true)
+	_label(panel, _t("%d coins  ·  %d / 3 equipped") % [game.campaign.coins, reserved.size()], Rect2(514, 23, 286, 44), 15, AMBER)
+	for i in Gear.MAX_LOADOUT:
+		var at := Rect2(807 + i * 45, 21, 40, 43)
+		if i < reserved.size():
+			_gear_badge(panel, at, reserved[i], true)
+		else:
+			var empty := _panel(panel, at, INK)
+			_label(empty, "+", Rect2(14, 7, 14, 27), 15, DIM)
+	for i in range(gear_page * 6, mini(gear_page * 6 + 6, stock.size())):
+		var id := stock[i]
+		var item: Array = Gear.ITEMS[id]
+		var slot := i % 6
+		var at := Rect2(28 + slot % 2 * 464, 120 + (slot / 2) * 110, 447, 101)
+		var card := _panel(panel, at, INK, GREEN.darkened(0.45) if id in reserved else LINE)
+		_gear_badge(card, Rect2(12, 24, 50, 50), id)
+		_label(card, item[0], Rect2(73, 6, 211, 36), 20, PAPER, true)
+		_label(card, item[1], Rect2(73, 42, 207, 31), 13, DIM, false, true)
+		_label(card, "%ds" % int(item[2]), Rect2(73, 73, 207, 21), 12, game.equipment_color(id))
+		var buy := _button(card, "Equipped" if id in reserved else str(item[3]), Rect2(297, 26, 136, 47), _buy.bind(id))
+		buy.tooltip_text = _t("Buy for next attempt")
+		buy.disabled = id in reserved or reserved.size() >= Gear.MAX_LOADOUT or game.campaign.coins < item[3]
+	var prior := _button(panel, "‹", Rect2(28, 475, 44, 45), _shop_page.bind(-1))
+	var more := _button(panel, "›", Rect2(123, 475, 44, 45), _shop_page.bind(1))
+	prior.disabled = gear_page == 0
+	more.disabled = gear_page >= count - 1
+	_label(panel, "%d/%d" % [gear_page + 1, count], Rect2(78, 476, 43, 42), 15, DIM)
+	_button(panel, "Back", Rect2(186, 475, 158, 45), back)
+	if sector_pending >= 0:
+		var start := _button(panel, "Start without equipment" if reserved.is_empty() else "Start sector", Rect2(592, 474, 350, 48), _start_selected, true)
+		start.grab_focus()
+	else:
+		_button(panel, "Equipment index", Rect2(642, 474, 300, 48), _open_archive.bind(1), true)
+	if game.save_error:
+		_show_save_notice(panel, Rect2(28, 525, 910, 28))
+	elif sector_pending >= 0:
+		var level: Array = Levels.TABLE[sector_pending]
+		_label(panel, "%s   /   %s" % [_t("Time ≤ %ds") % int(level[5]), _t("Hits ≤ %d") % (1 if level[2] == "boss" else 0)], Rect2(29, 525, 906, 27), 13, DIM)
+
+func _gear_badge(parent: Control, at: Rect2, id: int, interactive := false) -> void:
+	var tint: Color = game.equipment_color(id)
+	var badge := _panel(parent, at, tint.darkened(0.86), tint.darkened(0.51))
+	badge.draw.connect(func(): Icons.paint(badge, badge.size * 0.5, at.size.x / 29.0, tint, id))
+	if interactive:
+		badge.mouse_filter = Control.MOUSE_FILTER_PASS
+		badge.tooltip_text = _t(Gear.ITEMS[id][0])
+
+func _shop_page(direction: int) -> void:
+	gear_page += direction
+	_draw_page.call_deferred()
+
+func _buy(id: int) -> void:
+	game.buy_gear(id)
+	_draw_page.call_deferred()
+
+func _start_selected() -> void:
+	lesson_pending.clear()
+	for id in Levels.lessons_at(sector_pending):
+		if id not in game.campaign.lessons:
+			lesson_pending.append(id)
+	_next_context_lesson()
+
+func _next_context_lesson() -> void:
+	if lesson_pending.is_empty():
+		game.begin_sector(sector_pending)
+	else:
+		active_lesson = lesson_pending.pop_front()
+		_open("new_lesson")
+
+func _open_archive(tab: int) -> void:
+	dossier = tab
+	gear_page = 0
+	_open("archive")
+
+func _archive() -> void:
+	var panel := _modal("Field archive", Rect2(62, 38, 1028, 572))
+	_button(panel, "Controls guide", Rect2(28, 77, 212, 44), _open.bind("guide"))
+	_button(panel, "Mechanics", Rect2(256, 77, 212, 44), _open_archive.bind(0), false, dossier == 0)
+	_button(panel, "Equipment index", Rect2(483, 77, 240, 44), _open_archive.bind(1), false, dossier == 1)
+	_button(panel, "Lobby", Rect2(813, 77, 186, 44), back)
+	var total := Levels.LESSONS.size() if dossier == 0 else Gear.ITEMS.size()
+	var progress: int = game.campaign.records.size()
+	for i in range(gear_page * 8, mini(total, (gear_page + 1) * 8)):
+		var slot := i % 8
+		var at := Rect2(28 + slot % 2 * 489, 145 + (slot / 2) * 82, 474, 75)
+		if dossier == 0:
+			var known := Levels.unlocked_lesson(i, progress)
+			var tile := _button(panel, Levels.LESSONS[i][0] if known else "???", at, _replay_context.bind(i))
+			tile.disabled = not known
+		else:
+			var item: Array = Gear.ITEMS[i]
+			var known: bool = progress >= item[4]
+			var card := _panel(panel, at, INK)
+			if known:
+				_gear_badge(card, Rect2(12, 12, 48, 48), i)
+			_label(card, item[0] if known else "???", Rect2(74, 4, 390, 30), 17, game.equipment_color(i) if known else DIM, true)
+			if known:
+				_label(card, "%s  ·  %ds  ·  %s" % [_t(item[1]), item[2], str(item[3]) if item[3] > 0 else _t("Drop only")], Rect2(74, 34, 383, 36), 13, DIM, false, true)
+	_button(panel, "Previous", Rect2(28, 498, 185, 43), _archive_page.bind(-1)).disabled = gear_page == 0
+	_button(panel, "Next", Rect2(813, 498, 185, 43), _archive_page.bind(1)).disabled = (gear_page + 1) * 8 >= total
+
+func _archive_page(direction: int) -> void:
+	gear_page += direction
+	_draw_page.call_deferred()
+
+func _replay_context(id: int) -> void:
+	sector_pending = -1
+	active_lesson = id
+	_open("new_lesson")
+
+func _new_lesson() -> void:
+	var panel := _modal(Levels.LESSONS[active_lesson][0], Rect2(62, 38, 1028, 572))
+	_panel(panel, Rect2(28, 117, 604, 273), INK)
+	preview = TextureRect.new()
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(preview, panel, Rect2(29, 118, 602, 271))
+	_label(panel, Levels.LESSONS[active_lesson][1], Rect2(659, 120, 335, 210), 17, PAPER, false, true)
+	if active_lesson < 11:
+		_label(panel, "Pad: A jump · X strike · B dodge · RB swap · Y rule", Rect2(659, 339, 335, 77), 13, DIM, false, true)
+	demo_toggle = _button(panel, "Pause demo", Rect2(29, 407, 218, 45), _toggle_demo)
+	_label(panel, "Gameplay recording", Rect2(261, 407, 360, 45), 13, DIM)
+	next_step_button = _button(panel, "Continue" if sector_pending >= 0 else "Back", Rect2(714, 490, 281, 48), _acknowledge_lesson, true)
+	_prepare_preview("context-%02d" % active_lesson, panel, 389)
+	next_step_button.disabled = sector_pending >= 0 and is_playing
+	if next_step_button.disabled:
+		demo_toggle.grab_focus()
+	else:
+		next_step_button.grab_focus()
+
+func _acknowledge_lesson() -> void:
+	if sector_pending < 0:
+		_open("archive")
+		return
+	if active_lesson not in game.campaign.lessons:
+		game.campaign.lessons.append(active_lesson)
+		game._save()
+	_next_context_lesson()
 
 func _pause() -> void:
 	var panel := _modal("LINK PAUSED", Rect2(317, 163, 518, 322))
@@ -363,6 +625,9 @@ func _result() -> void:
 	if game.mode in ["clear", "win"]:
 		var score: Dictionary = game.sector_result
 		text_line = _t("%s  /  %s hits  /  %s retries") % [game.timecode(score.get("seconds", 0.0)), score.get("hits", 0), score.get("retries", 0)]
+		if game.mission_sector:
+			_campaign_result(title, text_line, score)
+			return
 		action = "Sector map"
 		callback = game.return_to_lobby.bind("map")
 	elif game.mode == "lost":
@@ -375,6 +640,41 @@ func _result() -> void:
 	if game.mode in ["lost", "clear", "win"]:
 		_button(panel, "Return to lobby", Rect2(343, 202, 278, 52), game.return_to_lobby)
 	proceed.grab_focus()
+
+func _campaign_result(title: String, summary: String, score: Dictionary) -> void:
+	# Replace the small arcade result with the campaign report.
+	for child in ui.get_children():
+		ui.remove_child(child)
+		child.queue_free()
+	var panel := _modal(title, Rect2(200, 135, 752, 378))
+	_label(panel, "%02d / %s" % [game.sector_index + 1, _t(Levels.TABLE[game.sector_index][0])], Rect2(29, 72, 690, 32), 16, DIM)
+	var score_tray := _panel(panel, Rect2(29, 117, 694, 98), INK, AMBER.darkened(0.54))
+	for i in 3:
+		_star(score_tray, Vector2(44 + i * 51, 49), 19.0, AMBER if i < score.get("stars", 1) else LINE)
+	_label(panel, _t("+%d coins") % score.get("coins", 0), Rect2(259, 129, 450, 48), 27, AMBER, true)
+	_label(panel, summary, Rect2(259, 175, 450, 33), 14, DIM)
+	var clock_target: float = Levels.TABLE[game.sector_index][5]
+	var hit_target := 1 if Levels.TABLE[game.sector_index][2] == "boss" else 0
+	_label(panel, _t("Time ≤ %ds") % int(clock_target), Rect2(29, 225, 330, 34), 15, GREEN if score.get("fast") else DIM)
+	_label(panel, _t("Hits ≤ %d") % hit_target, Rect2(383, 225, 330, 34), 15, GREEN if score.get("clean") else DIM)
+	_show_save_notice(panel, Rect2(29, 266, 690, 33))
+	_button(panel, "Retry", Rect2(29, 307, 185, 48), _retry_from_results)
+	_button(panel, "Lobby", Rect2(229, 307, 185, 48), game.return_to_lobby)
+	var last: bool = game.sector_index == Levels.TABLE.size() - 1
+	var next := _button(panel, "Sector map" if last else "Next sector", Rect2(431, 307, 292, 48), game.continue_after_clear, true)
+	next.grab_focus()
+
+func _star(parent: Control, center: Vector2, radius: float, color: Color) -> void:
+	parent.draw.connect(func():
+		var points := PackedVector2Array()
+		for i in 10:
+			points.append(center + Vector2.from_angle(-PI / 2.0 + i * TAU / 10.0) * radius * (1.0 if i % 2 == 0 else 0.46))
+		parent.draw_colored_polygon(points, color)
+	)
+
+func _retry_from_results() -> void:
+	game.return_to_lobby("map")
+	prepare_sector(game.sector_index)
 
 func _change_language(index: int) -> void:
 	game.set_language(index)
@@ -432,26 +732,34 @@ func _guide() -> void:
 	if chapter > 0:
 		_button(panel, "Previous", Rect2(28, 509, 198, 44), _choose_demo.bind(chapter - 1))
 	if not onboarding:
-		_button(panel, "Lobby", Rect2(239 if chapter > 0 else 28, 509, 174, 44), back)
+		_button(panel, "Field archive", Rect2(239 if chapter > 0 else 28, 509, 235, 44), _open_archive.bind(0))
 	var last := chapter == DEMOS.size() - 1
 	next_step_button = _button(panel, ("Enter lobby" if onboarding else "Done") if last else "Next lesson", Rect2(756, 508, 240, 46), _next_lesson, true)
 	next_step_button.disabled = onboarding and not lesson_watched.has(chapter) and not game.reduced_motion
+	_prepare_preview(demo[0], panel, 419)
+	if next_step_button.disabled:
+		demo_toggle.grab_focus()
+	else:
+		next_step_button.grab_focus()
+
+func _prepare_preview(filename: String, panel: Panel, bar_y: float) -> void:
 	demo_progress = ProgressBar.new()
 	demo_progress.show_percentage = false
 	demo_progress.max_value = FRAME_COUNT - 1
 	demo_progress.add_theme_stylebox_override("background", _style(INK, INK, 0))
 	demo_progress.add_theme_stylebox_override("fill", _style(GREEN, GREEN, 0))
 	demo_progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_place(demo_progress, panel, Rect2(29, 419, 602, 3))
+	_place(demo_progress, panel, Rect2(29, bar_y, 602, 3))
 	demo_texture = AtlasTexture.new()
 	demo_texture.filter_clip = true
 	preview.texture = demo_texture
 	for i in range(ceili(float(FRAME_COUNT) / FRAMES_PER_SHEET)):
-		var path := "res://assets/demos/%s-%s.webp" % [demo[0], i]
+		var path := "res://assets/demos/%s-%s.webp" % [filename, i]
 		if ResourceLoader.exists(path):
 			demo_sheets.append(load(path))
 	if demo_sheets.size() != ceili(float(FRAME_COUNT) / FRAMES_PER_SHEET):
 		_label(panel, "Demo unavailable", Rect2(58, 252, 525, 38), 17, DIM)
+		is_playing = false
 		demo_toggle.disabled = true
 		_mark_lesson_watched()
 	else:
@@ -463,10 +771,6 @@ func _guide() -> void:
 		set_process(is_playing)
 		if game.reduced_motion:
 			_mark_lesson_watched()
-	if next_step_button.disabled:
-		demo_toggle.grab_focus()
-	else:
-		next_step_button.grab_focus()
 
 func _choose_demo(index: int) -> void:
 	if onboarding and index > chapter and not lesson_watched.has(index - 1):
@@ -507,7 +811,8 @@ func _process(delta: float) -> void:
 		_mark_lesson_watched()
 
 func _mark_lesson_watched() -> void:
-	lesson_watched[chapter] = true
+	if page != "new_lesson":
+		lesson_watched[chapter] = true
 	next_step_button.disabled = false
 	if onboarding and get_viewport().gui_get_focus_owner() == demo_toggle:
 		next_step_button.grab_focus()
@@ -530,6 +835,18 @@ func back() -> void:
 	if onboarding and page == "guide":
 		if chapter > 0:
 			_choose_demo(chapter - 1)
+		return
+	if page == "new_lesson":
+		if sector_pending >= 0:
+			_open("shop")
+		else:
+			_open("archive")
+		return
+	if page == "shop" and sector_pending >= 0:
+		_open("map")
+		return
+	if page == "reset":
+		_open("settings")
 		return
 	chapter = 0
 	_open("")

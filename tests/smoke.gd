@@ -30,6 +30,8 @@ func _run() -> void:
 	root.add_child(g)
 	g.set_physics_process(false)
 	g.audio_rig.set_mute(true)
+	if capture:
+		g.set_fullscreen(false)
 	_check(g.title_menu.page == "language", "A fresh profile must request a language.")
 	for index in Locale.CODES.size():
 		g.set_language(index)
@@ -75,7 +77,7 @@ func _run() -> void:
 	g._physics_process(DT)
 	_check(g.mode == "fight", "Confirm starts combat.")
 	g._try_shift()
-	_check(g.player_rule == g.Rule.EMPTY and g.boss_hp == 36, "Cannot steal from a sealed core.")
+	_check(g.player_rule == g.Rule.EMPTY and g.boss_hp == 49, "Sealed Warden retains its scaled health.")
 
 	# Make sure the failure path works without stubbing health loss.
 	for i in 120 * 90:
@@ -109,11 +111,12 @@ func _run() -> void:
 		g._tick_fight(DT, 0.0, {}, false)
 	g._check_hurt(Rect2(g.p - Vector2(20, 50), Vector2(40, 50)), g.p.x)
 	_check(g.hp == g.MAX_HP, "A dodge still protects after 200 ms.")
-	g._retry()
+	g._new_run()
+	g.mode = "fight"
 
 	for sector in g.ENCOUNTERS.size():
 		var previous_rule: int = g.player_rule
-		for i in 120 * 75:
+		for i in 120 * 100:
 			var input := _pilot()
 			var was_rule: int = g.player_rule
 			var was_charge: bool = g.charge
@@ -137,17 +140,16 @@ func _run() -> void:
 				break
 		var desired := "win" if sector == g.ENCOUNTERS.size() - 1 else "clear"
 		print("Sector ", sector + 1, ": ", g.mode, ", boss HP ", g.boss_hp, ", player HP ", g.hp, ", ", g.steals, " transfers.")
-		_check(g.mode == desired, "Pilot must clear sector %s within 75 seconds." % (sector + 1))
+		_check(g.mode == desired, "Pilot must clear combat chassis %s within 100 seconds." % (sector + 1))
 		if g.mode != desired:
 			break
-		_check(g.campaign.records.size() == sector + 1, "Each clear must unlock just one new sector.")
 		if capture and sector == 1:
 			g.return_to_lobby("map")
 			await _shot("map")
 		if sector < g.ENCOUNTERS.size() - 1:
 			_check(g.player_rule != previous_rule or g.steals > 0, "Run should use the main mechanic.")
 			var carried: int = g.player_rule
-			g.begin_sector(sector + 1)
+			g._advance()
 			_check(g.player_rule == carried and g.mode == "brief", "New sector carries slot forward.")
 			g.just["confirm"] = true
 			g._physics_process(DT)
@@ -156,8 +158,17 @@ func _run() -> void:
 	_check(returned_rules.size() == 3 and used_rules.size() == 3, "Run must use and return all three rules.")
 	if capture and g.mode == "win":
 		await _shot("clear")
-	_test_save()
 	_test_routes_and_overclock()
+	_test_operation()
+	_test_save()
+	if capture:
+		var all_records: Array[Dictionary] = g.campaign.records.duplicate(true)
+		g.campaign.records.resize(11)
+		g.return_to_lobby("map")
+		await _shot("map")
+		g.title_menu.prepare_sector(11)
+		await _shot("equipment")
+		g.campaign.records = all_records
 	print("Attacks: ", seen_attacks.keys(), " | Activated rules: ", used_rules.keys(), " | Returned rules: ", returned_rules.keys())
 	print("Smoke result: ", failed, " failures")
 	quit(1 if failed else 0)
@@ -170,10 +181,10 @@ func _test_save() -> void:
 	g.save_path = path
 	_check(g._save() == OK and g._save() == OK, "The real save can replace an existing file.")
 	var loaded := ConfigFile.new()
-	_check(loaded.load(path) == OK and loaded.get_value("campaign", "clears", []).size() == reached, "The saved file retains every cleared sector.")
+	_check(loaded.load(path) == OK and loaded.get_value("operation", "clears", []).size() == reached, "The saved file retains every cleared sector.")
 	var reloaded := Campaign.new()
-	reloaded.load_from(loaded, g.ENCOUNTERS.size())
-	_check(reloaded.records.size() == reached and reloaded.next_rule == rule and reloaded.next_hull == hull, "Reopening the campaign restores the frontier, base health, and carried rule.")
+	reloaded.load_from(loaded, g.Levels.TABLE.size())
+	_check(reloaded.records.size() == reached and reloaded.next_rule == rule and reloaded.next_hull == hull and reloaded.coins == g.campaign.coins, "Reopening restores the frontier, loadout and coins.")
 	g.begin_sector(0)
 	_check(g.replay and g.stage == 0, "A cleared sector can be started again.")
 	g.campaign.complete(0, g.checkpoint, {"seconds": 0.05, "hits": 0, "retries": 0}, 1, g.Rule.AEGIS)
@@ -181,6 +192,121 @@ func _test_save() -> void:
 	g.save_path = ""
 	DirAccess.remove_absolute(path)
 	DirAccess.remove_absolute(path + ".backup")
+
+func _test_operation() -> void:
+	g.return_to_lobby()
+	g.campaign = Campaign.new()
+	var route_types := {}
+	for index in g.Levels.TABLE.size():
+		_check(not g.campaign.selectable(index + 1, g.Levels.TABLE.size()), "Only the next stage is unlocked.")
+		g.begin_sector(index)
+		g.mode = "fight"
+		if g.route.active():
+			route_types[g.route.kind] = true
+			_play_route()
+		else:
+			_check(g.boss_hp == roundi(float(g.ENCOUNTERS[g.stage].hp) * 1.35), "Boss health is scaled by 35 percent.")
+			if index == 11:
+				var before: int = g.boss_hp
+				g.player_rule = g.Rule.AEGIS
+				g.p = g.b - Vector2(60, 0)
+				g._use_rule()
+				g._check_hurt(Rect2(g.p - Vector2(22, 64), Vector2(44, 72)), g.b.x)
+				_check(g.boss_hp < before and g.capacitor_power >= 3.0, "A close AEGIS reflection opens the Capacitor's longer window.")
+				g.capacitor_power = 0.0
+				g.player_rule = g.Rule.RUSH
+				g.p.x = 934.0
+				g.charge = true
+				g._use_rule()
+				_check(g.capacitor_power > 2.0 and g.capacitor_power < 3.0, "RUSH opens the Capacitor's short relay window.")
+			if index == 21:
+				g._damage_boss(9)
+				_check(g.boss_hp == g.boss_max_hp, "Mirror is shielded while echo locks remain.")
+				for lock in g.boss_locks.duplicate():
+					g.echo_target = lock.x
+					g._set_state("exposed", 1.5)
+					g.state_time = 0.59
+					g._tick_fight(DT, 0.0, {}, false)
+				_check(g.boss_locks.is_empty(), "Recorded strikes break the Mirror locks.")
+			g._set_state("exposed", 1.5)
+			g._damage_boss(g.boss_max_hp)
+			if index == 23:
+				_check(g.evacuated and g.route.active() and g.mode == "fight", "Executor requires an evacuation after the core breaks.")
+				_play_route()
+		_check(g.mode in ["clear", "win"] and g.campaign.records.size() == index + 1, "Operation stage %02d clears and saves (x %.0f, y %.0f, checkpoint %d, clock %.1f)." % [index + 1, g.p.x, g.p.y, g.route.cursor, g.route.clock])
+		if not g.mode in ["clear", "win"]:
+			break
+		_check(g.sector_result.coins == g.sector_result.stars * 1000, "Stars pay their actual run value.")
+	_check(route_types.size() == 11, "All route types are exercised.")
+	if g.campaign.records.is_empty():
+		return
+	g.begin_sector(0)
+	g.mode = "fight"
+	var previous: int = g.campaign.coins
+	_play_route()
+	_check(g.campaign.coins == previous + 3000, "Three-star replay pays 3000 even when the earlier best was three stars.")
+	g._finish_arena()
+	_check(g.campaign.coins == previous + 3000, "Settlement cannot be paid twice.")
+	g.campaign.coins = 25000
+	_check(g.buy_gear(0) and not g.buy_gear(0) and g.buy_gear(1) and g.buy_gear(2) and not g.buy_gear(3), "A loadout holds three distinct affordable purchases.")
+	_check(g.campaign.coins == 6500, "Only successful purchases change the wallet.")
+	g.begin_sector(0)
+	_check(g.effects.size() == 3 and g.campaign.reserved.is_empty(), "Entry consumes the reserved gear and activates it.")
+	g._tick_equipment(12.0)
+	_check(g.effects.is_empty(), "Temporary gear expires.")
+	var samples := 0
+	var negatives := 0
+	g.gear_rng.seed = 94
+	for roll in 2000:
+		g.drop.clear()
+		g.drop_cooldown = 0.0
+		g._roll_drop(g.p)
+		if not g.drop.is_empty():
+			samples += 1
+			negatives += int(g.Gear.ITEMS[g.drop.id][3] == 0)
+	_check(samples > 175 and samples < 300 and negatives > 30 and negatives < 95, "Drop and downside frequency broadly match the announced rates.")
+	g.drop = {"id": 11, "at": g.p - Vector2(0, 21), "time": 6.0}
+	g._tick_equipment(DT)
+	_check(g.effects.has(11) and g.drop.is_empty(), "Nearby penalty is automatically equipped.")
+	g._tick_equipment(5.1)
+	_check(not g.effects.has(11), "Penalty expires after five seconds.")
+
+func _play_route() -> void:
+	var route: RefCounted = g.route
+	for tick in 120 * 80:
+		if g.mode != "fight":
+			break
+		var target: Vector2 = route.target()
+		var aim := target
+		var presses := {}
+		var strike: bool = route.kind in ["break", "belt", "timer", "cargo"]
+		if route.kind in ["lift", "reflect"] and g.player_rule != route.socket_rule and route.cursor == 0:
+			var required: int = g.Rule.LIFT if route.kind == "lift" else g.Rule.AEGIS
+			if g.player_rule != required:
+				aim = route.socket
+				if route.near(g.p, aim, 88):
+					presses.steal = true
+		if route.kind == "cargo" and not route.attached:
+			aim = route.cargo
+		if route.kind == "timer" and route.cursor == 0 and route.timing < 1.5:
+			aim = route.plate
+		if route.kind == "swap" and route.near(g.p, target, 88):
+			presses.steal = true
+		if route.kind == "echo" and route.echo != Vector2.ZERO and route.near(route.echo, target, 68) and fmod(route.clock, 2.8) < 2.50:
+			var escape := 85.0 if target.x < 985 else -85.0
+			aim = target + Vector2(escape, 0.0)
+		if route.kind == "reflect" and g.player_rule == g.Rule.AEGIS and fmod(route.clock, 2.8) >= 2.17 and fmod(route.clock, 2.8) < 2.26:
+			presses.rule = true
+		if route.kind == "lift" and g.player_rule == g.Rule.LIFT and g.charge and g.p.y > aim.y + 20.0 and absf(aim.x - g.p.x) < 180.0:
+			presses.rule = true
+		elif g.grounded and aim.y < g.p.y - 18.0 and absf(aim.x - g.p.x) < 151.0:
+			presses.jump = true
+		var hazard: Rect2 = route.hazard()
+		if hazard.has_area() and hazard.grow(27).has_point(g.p - Vector2(0, 26)) and fmod(route.clock, 1.8) > 1.07:
+			presses.jump = true
+		var diff: float = aim.x - g.p.x
+		var axis := signf(diff) if absf(diff) > 17 else 0.0
+		g._tick_fight(DT, axis, presses, strike)
 
 func _test_routes_and_overclock() -> void:
 	g._new_run()
@@ -261,6 +387,17 @@ func _pilot() -> Dictionary:
 			next["jump"] = true
 	if g.grounded and g.state == "active" and g.move_name == "DEAD CIRCUIT" and absf(diff) < 56.0:
 		next["dodge"] = true
+	for warning in g.environmental_zones():
+		var box: Rect2 = warning.box.grow(24.0)
+		if not box.has_point(g.p - Vector2(0, 18)):
+			continue
+		if g.stage == 3:
+			if g.grounded:
+				next["jump"] = true
+		elif g.stage in [2, 4] and not warning.live:
+			axis = -1.0 if g.p.x < box.get_center().x else 1.0
+			if g.stage == 4 and absf(g.p.x - g.echo_target) < 5.0:
+				axis = 1.0 if g.p.x < 850.0 else -1.0
 	return {"axis": axis, "pressed": next, "strike": strike}
 
 func _escape_columns() -> float:
