@@ -95,7 +95,7 @@ func _route() -> void:
 	for i in range(route.cursor + 1, route.targets.size()):
 		var future: Vector2 = route.targets[i]
 		_line(future + Vector2(0, -15), future, DIM, 2.0)
-	var symbols := {"echo": "!", "reflect": "E", "swap": "Q", "break": "J", "timer": "J", "belt": "J", "combo": "J", "hold": "●", "evade": "K"}
+	var symbols := {"echo": "!", "reflect": "E", "swap": "Q", "break": "J", "timer": "J", "belt": "J", "combo": "J", "hold": "", "evade": "K"}
 	var target: Vector2 = route.target() - Vector2(0, 34)
 	_marker(target, symbols.get(route.kind, "" if route.kind == "key" else ">"), accent)
 	if route.kind == "key":
@@ -105,6 +105,8 @@ func _route() -> void:
 			_rect(target.x - 18.0 + 13.0 * i, target.y - 37.0, 10.0, 4.0, accent if i < route.combo and route.timing > 0.0 else LINE)
 	if route.kind == "hold" and route.hold > 0.0:
 		g.draw_arc(target, 36.0, -PI / 2.0, -PI / 2.0 + TAU * route.hold / 2.1, 40, GREEN, 3.0, true)
+	if route.kind == "hold":
+		g.draw_circle(target, 6.0, accent, true, -1, true)
 	if route.kind in ["evade", "hold"] and route.pulse_phase() >= 1.84:
 		var pulse: Rect2 = route.pulse_box()
 		if pulse.has_area():

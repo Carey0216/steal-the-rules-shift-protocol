@@ -301,14 +301,15 @@ func _open_map() -> void:
 	map_focus = -1
 	_open("map")
 
-func _back_arrow(parent: Control, at: Rect2, callback: Callable, tip := "Return to lobby") -> Button:
+func _back_arrow(parent: Control, at: Rect2, callback: Callable, tip := "Return to lobby", right := false) -> Button:
 	var button := _button(parent, "", at, callback)
 	button.tooltip_text = _t(tip)
 	button.draw.connect(func():
 		var c := button.size / 2.0
-		var tint := AMBER if button.is_hovered() or button.has_focus() else PAPER
-		button.draw_polyline(PackedVector2Array([c + Vector2(-1, -8), c + Vector2(-9, 0), c + Vector2(-1, 8)]), tint, 1.9, true)
-		button.draw_line(c + Vector2(-8, 0), c + Vector2(10, 0), tint, 1.9, true)
+		var tint := DIM.darkened(0.51) if button.disabled else (AMBER if button.is_hovered() or button.has_focus() else PAPER)
+		var direction := -1.0 if right else 1.0
+		button.draw_polyline(PackedVector2Array([c + Vector2(-direction, -8), c + Vector2(-9 * direction, 0), c + Vector2(-direction, 8)]), tint, 1.9, true)
+		button.draw_line(c + Vector2(-8 * direction, 0), c + Vector2(10 * direction, 0), tint, 1.9, true)
 	)
 	return button
 
@@ -564,8 +565,8 @@ func _shop() -> void:
 		var buy := _button(card, "Equipped" if id in reserved else str(item[3]), Rect2(297, 26, 136, 47), _buy.bind(id))
 		buy.tooltip_text = _t("Buy for next attempt")
 		buy.disabled = id in reserved or reserved.size() >= Gear.MAX_LOADOUT or game.campaign.coins < item[3]
-	var prior := _button(panel, "‹", Rect2(28, 475, 44, 45), _shop_page.bind(-1))
-	var more := _button(panel, "›", Rect2(123, 475, 44, 45), _shop_page.bind(1))
+	var prior := _back_arrow(panel, Rect2(28, 475, 44, 45), _shop_page.bind(-1), "Previous")
+	var more := _back_arrow(panel, Rect2(123, 475, 44, 45), _shop_page.bind(1), "Next", true)
 	prior.disabled = gear_page == 0
 	more.disabled = gear_page >= count - 1
 	_label(panel, "%d/%d" % [gear_page + 1, count], Rect2(78, 476, 43, 42), 15, DIM)
@@ -949,7 +950,7 @@ func demo_duration() -> float:
 	return 8.0 if page == "new_lesson" else 6.0
 
 func _demo_transport(panel: Panel, y: float) -> void:
-	var rewind := _button(panel, "−1s", Rect2(265, y, 65, 44), func(): _seek_demo(demo_time - 1.0))
+	var rewind := _button(panel, "-1s", Rect2(265, y, 65, 44), func(): _seek_demo(demo_time - 1.0))
 	rewind.tooltip_text = _t("Back one second")
 	var forward := _button(panel, "+1s", Rect2(340, y, 65, 44), func(): _seek_demo(demo_time + 1.0))
 	forward.tooltip_text = _t("Forward one second")
