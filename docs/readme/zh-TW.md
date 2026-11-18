@@ -2,10 +2,10 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本與更新日誌" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下載 Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下載 Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
-  <a href="#行動指南"><img alt="行動指南" src="https://img.shields.io/badge/Guide-%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本與更新日誌" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.5.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下載 Windows x64 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89-Windows%20x64-3b5d88?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下載 Web HTML5 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89-Web%20HTML5-825874?style=for-the-badge"></a>
+  <a href="#行動指南"><img alt="行動指南" src="https://img.shields.io/badge/%E6%8C%87%E5%8D%97-%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
 </p>
 
 [English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · **中文（繁體）** · [日本語](../../docs/readme/ja.md) · [한국어](../../docs/readme/ko.md)
@@ -23,11 +23,22 @@
 | 裝備與商店 | 20 種各有圖示的裝備。通關發 1000–3000 金幣，戰前最多購買三種不同裝備。減益裝備僅在對抗中掉落。 |
 | 設定 | 可變更語言、顯示模式、視窗大小及文字大小，也可切換音效、減少動態效果和輔助模式。Windows 首次啟動預設為全螢幕，之後會記住你的選擇。網頁版在頁面內啟動，可在設定切換全螢幕。 |
 
-![峽谷閘門大廳](../lobby.png)
+![繁體中文大廳：繼續作戰、關卡地圖、金幣與設定](../lobby-zh-TW.png)
 
-![八大區域的關卡地圖](../map.png)
+從大廳繼續下一關；齒輪可開啟設定，**？**可開啟指南。
 
-![六種已解鎖裝備的商店](../equipment.png)
+![繁體中文關卡地圖：左側切換區域，右側顯示關卡目標](../map-zh-TW.png)
+
+左側切換區域。選擇關卡後，可先在右側查看目標。
+
+![繁體中文商店：裝備效果、持續時間、價格和持有金幣](../equipment-zh-TW.png)
+
+每件裝備下方列出效果、持續時間與售價。
+
+![繁體中文移動渡台指南：左側播放實機示範，右側列出步驟與跳躍鍵](../guide-zh-TW.png)
+
+左側播放實機操作，右側說明步驟與按鍵。
+
 
 ## 操作方式
 

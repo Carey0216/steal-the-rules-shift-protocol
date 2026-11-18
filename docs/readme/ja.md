@@ -2,10 +2,10 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="バージョンと更新履歴" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP をダウンロード" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP をダウンロード" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
-  <a href="#攻略ガイド"><img alt="攻略ガイド" src="https://img.shields.io/badge/Guide-%E6%97%A5%E6%9C%AC%E8%AA%9E-795c35?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="バージョンと更新履歴" src="https://img.shields.io/badge/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3-v1.5.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP をダウンロード" src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89-Windows%20x64-3b5d88?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP をダウンロード" src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89-Web%20HTML5-825874?style=for-the-badge"></a>
+  <a href="#攻略ガイド"><img alt="攻略ガイド" src="https://img.shields.io/badge/%E3%82%AC%E3%82%A4%E3%83%89-%E6%97%A5%E6%9C%AC%E8%AA%9E-795c35?style=for-the-badge"></a>
 </p>
 
 [English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · [中文（繁體）](../../docs/readme/zh-TW.md) · **日本語** · [한국어](../../docs/readme/ko.md)
@@ -23,11 +23,22 @@
 | 装備とショップ | 個別のアイコンを持つ装備が 20 種類。1 回のクリアで 1000～3000 コイン。出撃前に異なる装備を最大 3 種類購入できます。弱体化装備はドロップ専用です。 |
 | 設定 | 言語、画面モード、ウィンドウサイズ、文字サイズを変更できます。音声、動きの軽減、アシストも切り替えられます。Windows 版は初回に全画面で起動し、以降は設定を保存します。Web 版はページ内で起動し、設定から全画面にできます。 |
 
-![渓谷ゲートのロビー](../lobby.png)
+![日本語のロビー：作戦の続行、区画マップ、所持コイン、設定](../lobby-ja.png)
 
-![8 エリアの区画マップ](../map.png)
+ロビーから次の区画へ進めます。歯車で設定、**？**でガイドを開きます。
 
-![6 種類の装備を解放したショップ](../equipment.png)
+![日本語の区画マップ：左でエリアを選び、右で区画の目標を確認](../map-ja.png)
+
+左でエリアを選びます。区画を選択すると右側で目標を確認できます。
+
+![日本語のショップ：装備の効果、効果時間、価格、所持コイン](../equipment-ja.png)
+
+装備ごとに効果、効果時間、価格が表示されます。
+
+![日本語の移動足場ガイド：左側が実機映像、右側に手順とジャンプキー](../guide-ja.png)
+
+左で実機映像を再生し、右で手順と操作ボタンを確認できます。
+
 
 ## 操作方法
 

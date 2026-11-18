@@ -2,10 +2,10 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP 다운로드" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP 다운로드" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
-  <a href="#플레이-가이드"><img alt="플레이 가이드" src="https://img.shields.io/badge/Guide-%ED%95%9C%EA%B5%AD%EC%96%B4-795c35?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/%EB%B2%84%EC%A0%84-v1.5.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP 다운로드" src="https://img.shields.io/badge/%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C-Windows%20x64-3b5d88?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP 다운로드" src="https://img.shields.io/badge/%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C-Web%20HTML5-825874?style=for-the-badge"></a>
+  <a href="#플레이-가이드"><img alt="플레이 가이드" src="https://img.shields.io/badge/%EA%B0%80%EC%9D%B4%EB%93%9C-%ED%95%9C%EA%B5%AD%EC%96%B4-795c35?style=for-the-badge"></a>
 </p>
 
 [English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · [中文（繁體）](../../docs/readme/zh-TW.md) · [日本語](../../docs/readme/ja.md) · **한국어**
@@ -23,11 +23,22 @@
 | 장비와 상점 | 장비 20종에 각각 아이콘이 있습니다. 클리어마다 코인 1000~3000개를 받고, 출격 전에 서로 다른 장비를 최대 3종 살 수 있습니다. 약화 장비는 전투에서만 떨어집니다. |
 | 설정 | 언어, 화면 모드, 창 크기, 글자 크기를 조절하고 소리, 움직임 줄이기, 보조 모드를 설정할 수 있습니다. Windows판은 처음 전체 화면으로 시작하며 이후에는 설정을 기억합니다. 웹판은 페이지 안에서 시작하며 설정에서 전체 화면으로 전환할 수 있습니다. |
 
-![협곡 관문의 로비](../lobby.png)
+![한국어 로비: 작전 계속, 구역 지도, 보유 코인, 설정](../lobby-ko.png)
 
-![8개 지역 구역 지도](../map.png)
+로비에서 다음 구역을 이어서 시작합니다. 톱니바퀴는 설정, **?**는 가이드입니다.
 
-![장비 6종이 열린 상점](../equipment.png)
+![한국어 구역 지도: 왼쪽에서 지역 선택, 오른쪽에서 목표 확인](../map-ko.png)
+
+왼쪽에서 지역을 선택한 뒤 구역을 눌러 오른쪽에서 목표를 확인하세요.
+
+![한국어 상점: 장비 효과, 지속 시간, 가격, 보유 코인](../equipment-ko.png)
+
+장비마다 효과, 지속 시간, 가격이 표시됩니다.
+
+![한국어 이동 발판 가이드: 왼쪽에 플레이 영상, 오른쪽에 설명과 점프 키](../guide-ko.png)
+
+왼쪽에는 실제 플레이 영상, 오른쪽에는 조작 방법과 필요한 버튼이 표시됩니다.
+
 
 ## 조작 방법
 

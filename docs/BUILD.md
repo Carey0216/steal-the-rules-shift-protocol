@@ -41,3 +41,5 @@ Set the version in `project.godot` and add `docs/releases/vX.Y.Z.md`. Write comp
 ## Record the guide again
 
 The capture script operates the playable game with keyboard and mouse inputs and checks each result. Run the graphical Godot binary with `--path . --windowed --resolution 1152x648 --script tools/record_demos.gd`, then run `python tools/pack_demos.py` with Pillow installed. To capture additional mechanics and the shop, add `-- --context` to the Godot command and `--context` to the packer. To make one clean pass over all 25 recordings, use `-- --all` and `python tools/pack_demos.py --all`. Intro clips play over seven seconds and mechanics clips over ten seconds. The canvas stays at 16:9 throughout the capture and playback.
+
+For the five localized READMEs, run the graphical binary with `--path . --windowed --resolution 1152x648 --script tools/capture_readme.gd`. It captures the lobby, map, shop and an example tutorial in each locale under `builds/screens/readme`. Move the reviewed screenshots to the matching names in `docs/`. Keep the English files unsuffixed.

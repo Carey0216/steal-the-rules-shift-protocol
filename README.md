@@ -25,9 +25,19 @@ A 2D boss rush about stealing the rules of a fight. Built with Godot and GDScrip
 
 ![The lobby on the overlook](docs/lobby.png)
 
+The lobby resumes the next available sector. Open Settings with the gear icon, or the guide with **?**.
+
 ![The eight-region sector map](docs/map.png)
 
+Choose a region on the left. Select a sector to read its goal before you deploy.
+
 ![The shop with six unlocked items](docs/equipment.png)
+
+Each item states what it does, how long it lasts and what it costs.
+
+![The moving ferry lesson with a full arena recording and its controls](docs/guide.png)
+
+The left side shows the move in play. The right side explains the move and lists the key.
 
 ## Controls
 

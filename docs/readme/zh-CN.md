@@ -2,10 +2,10 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下载 Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下载 Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
-  <a href="#行动指南"><img alt="行动指南" src="https://img.shields.io/badge/Guide-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.5.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下载 Windows x64 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Windows%20x64-3b5d88?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下载 Web HTML5 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Web%20HTML5-825874?style=for-the-badge"></a>
+  <a href="#行动指南"><img alt="行动指南" src="https://img.shields.io/badge/%E6%8C%87%E5%8D%97-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
 </p>
 
 [English](../../README.md) · **中文（简体）** · [中文（繁體）](../../docs/readme/zh-TW.md) · [日本語](../../docs/readme/ja.md) · [한국어](../../docs/readme/ko.md)
@@ -23,11 +23,22 @@
 | 装备与商店 | 20 种图标装备。通关每次发 1000–3000 金币，战前最多购买三种不同装备。减益装备只会在对抗中掉落。 |
 | 设置 | 可修改语言、显示模式、窗口大小和文字大小，也可切换声音、减少动效和辅助模式。Windows 首次启动默认全屏，之后记住你的选择。网页版在页面内启动，可在设置里切换全屏。 |
 
-![峡谷闸门大厅](../lobby.png)
+![简体中文大厅：继续作战、关卡地图、金币和设置](../lobby-zh-CN.png)
 
-![八大区域的关卡地图](../map.png)
+在大厅继续下一关；齿轮打开设置，**？**打开指南。
 
-![六种已解锁装备的商城](../equipment.png)
+![简体中文关卡地图：左侧切换区域，右侧查看所选关卡目标](../map-zh-CN.png)
+
+左侧切换区域，点关卡节点后，可以先在右侧看目标。
+
+![简体中文商城：装备效果、持续时间、价格和剩余金币](../equipment-zh-CN.png)
+
+每件装备下方写明效果、持续时间和售价。
+
+![简体中文移动渡台教程：左侧是实机示范，右侧是说明和跳跃键](../guide-zh-CN.png)
+
+左侧播放实机操作，右侧讲清楚怎么做、按哪个键。
+
 
 ## 操作方式
 
