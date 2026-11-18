@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/Versions-v1.4.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP 다운로드" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP 다운로드" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#플레이-가이드"><img alt="플레이 가이드" src="https://img.shields.io/badge/Guide-%ED%95%9C%EA%B5%AD%EC%96%B4-795c35?style=for-the-badge"></a>
@@ -56,7 +56,7 @@
 5. **코인과 점수.** 클리어하면 별 1개, 구역별 제한 시간과 피격 횟수 조건으로 최대 2개를 추가로 받습니다. 다시 플레이해도 별 하나당 코인 1000개입니다. 상점은 6000코인부터 시작하며 로비 카트 또는 출격 화면에서 열 수 있습니다. 장비는 종류당 1개만 구매할 수 있습니다.
 6. **다시 플레이와 저장.** 결과에서 재도전, 로비 또는 다음 구역을 선택합니다. 톱니바퀴의 진행 삭제를 확인하면 기록, 별, 코인, 구매 장비가 지워집니다. 언어, 화면 및 접근성 설정은 유지됩니다.
 
-영상은 절반 속도로 재생하거나 일시 정지하고 1초씩 이동할 수 있습니다. 상점은 각 효과의 지속 시간과 타이머 시작 시점을 표시합니다.
+가이드는 전장 전체 영상으로 자동 재생됩니다. 일시 정지하거나 다시 볼 수 있고 기본 동작은 직접 해보기로 연습할 수 있습니다. 브리핑에는 체크포인트가, 상점에는 장비 효과의 지속 시간과 시작 시점이 표시됩니다.
 
 ## 실행과 빌드
 

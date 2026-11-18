@@ -53,7 +53,7 @@ func paint(game: Node2D) -> void:
 	_equipment()
 	_world_fx(true)
 	g.draw_set_transform(Vector2.ZERO)
-	if not g.record_demo:
+	if not g.record_demo and not (g.mission_sector and g.mode in ["clear", "win"]):
 		_hud()
 	if g.mode == "brief":
 		_briefing()
@@ -78,6 +78,11 @@ func _route() -> void:
 		return
 	if route.ferry.has_area():
 		var deck: Rect2 = route.ferry
+		var rail := PackedVector2Array()
+		for sample in 17:
+			var future_deck: Rect2 = route._ferry_at(float(sample) * PI / 16.0 / (0.95 + route.variant * 0.10))
+			rail.append(Vector2(future_deck.get_center().x, future_deck.end.y + 17))
+		g.draw_polyline(rail, _soft(accent, 0.34), 2.0, true)
 		_rect(deck.position.x, deck.position.y, deck.size.x, deck.size.y, Color("#334f62"))
 		_line(deck.position, Vector2(deck.end.x, deck.position.y), accent, 2.0)
 		_poly([deck.position + Vector2(8, 14), deck.position + Vector2(25, 32), deck.position + Vector2(96, 32), deck.position + Vector2(116, 14)], Color("#182d3b"))
@@ -86,7 +91,9 @@ func _route() -> void:
 	var zone: Rect2 = route.hazard()
 	if zone.has_area():
 		var live: bool = route.hazard_live()
-		_rect(zone.position.x, zone.position.y, zone.size.x, zone.size.y, _soft(RED, 0.36 if live else 0.13))
+		var charge: float = route.hazard_charge()
+		_rect(zone.position.x, zone.position.y, zone.size.x, zone.size.y, _soft(RED, 0.38 if live else 0.08 + 0.11 * charge))
+		_rect(zone.position.x, zone.end.y - 3, zone.size.x * (1.0 if live else charge), 3, RED)
 		for x in range(int(zone.position.x), int(zone.end.x), 12):
 			_line(Vector2(x, zone.end.y - 16), Vector2(x + 9, zone.position.y + 7), RED if live else _soft(RED, 0.4))
 	if route.echo != Vector2.ZERO and route.kind in ["echo", "reflect"]:
@@ -95,9 +102,21 @@ func _route() -> void:
 	for i in range(route.cursor + 1, route.targets.size()):
 		var future: Vector2 = route.targets[i]
 		_line(future + Vector2(0, -15), future, DIM, 2.0)
-	var symbols := {"echo": "!", "reflect": "E", "swap": "Q", "break": "J", "timer": "J", "belt": "J", "combo": "J", "hold": "", "evade": "K"}
+	var pad: bool = g.last_device == "pad"
+	var strike := "X" if pad else "J"
+	var rule := "Y" if pad else "E"
+	var dodge := "B" if pad else "K"
+	var symbols := {"echo": "!", "reflect": rule, "swap": ("RB" if pad else "SHIFT"), "break": strike, "timer": strike, "belt": strike, "combo": strike, "hold": "", "evade": dodge}
 	var target: Vector2 = route.target() - Vector2(0, 34)
+	_line(target + Vector2(0, 35), target + Vector2(0, 43), accent, 1.4)
 	_marker(target, symbols.get(route.kind, "" if route.kind == "key" else ">"), accent)
+	if route.checkpoint_age > 0.0:
+		var confirmed: Vector2 = route.last_checkpoint - Vector2(0, 29)
+		var opacity: float = minf(route.checkpoint_age * 1.8, 1.0)
+		var radius: float = 21.0 if g.reduced_motion else 21.0 + 10.0 * (1.0 - route.checkpoint_age)
+		g.draw_circle(confirmed, radius, _soft(GREEN, opacity * 0.64), false, 1.8, true)
+		_line(confirmed + Vector2(-8, 0), confirmed + Vector2(-2, 6), _soft(GREEN, opacity), 2.5)
+		_line(confirmed + Vector2(-2, 6), confirmed + Vector2(9, -6), _soft(GREEN, opacity), 2.5)
 	if route.kind == "key":
 		Icons.paint_rule(g, target, 1.5, g.RULE_COLORS[route.required_rule], route.required_rule)
 	if route.kind == "combo":
@@ -118,7 +137,7 @@ func _route() -> void:
 		_marker(center, "", tint)
 		Icons.paint_rule(g, center, 1.5, tint, route.socket_rule)
 	if route.kind == "cargo":
-		_marker(route.cargo - Vector2(-23 if route.attached else 0, 23), "+" if route.attached else "J", GREEN)
+		_marker(route.cargo - Vector2(-23 if route.attached else 0, 23), "+" if route.attached else strike, GREEN)
 	if route.kind == "timer" and route.cursor == 0:
 		_rect(route.plate.x - 60.0, route.plate.y - 5.0, 120, 5, GREEN if route.timing > 0.0 else RED)
 		if route.timing > 0.0:
@@ -247,20 +266,20 @@ func _district_scenery(floor: float, time: float) -> void:
 		return
 	var motion := 0.0 if g.reduced_motion else time
 	match district:
-		0, 6:
+		0:
 			for i in 5:
 				var x := 85.0 + i * 248.0
 				_poly([Vector2(x, 252), Vector2(x + 98, 195), Vector2(x + 119, 201), Vector2(x + 14, 267)], _soft(INK, 0.64))
 				_line(Vector2(x + 113, 205), Vector2(x + 114, 386), _soft(accent, 0.33), 1.6)
 				_rect(x + 92, 383, 45, 9, _soft(accent, 0.25))
-		1, 7:
+		1:
 			for i in 7:
 				var x := 99.0 + i * 154.0
 				var height := 51.0 + 15.0 * (i % 3)
 				_rect(x, 408 - height, 67, height, _soft(accent, 0.085))
 				_line(Vector2(x - 18, 408), Vector2(x + 89, 408), _soft(accent, 0.24), 1.1)
 				_rect(x + 13, 395 - height, 8, 8, _soft(accent, 0.29 + 0.11 * sin(motion * 1.8 + i * 0.8)))
-		2, 4:
+		2:
 			for i in 4:
 				var x := 147.0 + i * 262.0
 				var silo := Vector2(x, 348)
@@ -269,16 +288,53 @@ func _district_scenery(floor: float, time: float) -> void:
 				_line(Vector2(x - 49, 348), Vector2(x - 49, floor - 13), _soft(accent, 0.22))
 				for row in 4:
 					_line(Vector2(x - 50, 355 + row * 20), Vector2(x + 49, 355 + row * 20), _soft(accent, 0.16))
-			if district == 4:
-				for row in 4:
-					for i in 15:
-						_rect(fposmod(i * 97.0 + motion * float(8 + row), W), 451 + row * 8.0, 58.0, 1, _soft(accent, 0.30 - row * 0.042))
-		3, 5:
+				_rect(x - 34, 436, 68, 34, _soft(accent, 0.14))
+				for spark in 6:
+					var t := fposmod(motion * (0.61 + spark * 0.072) + i * 0.22 + spark * 0.17, 1.0)
+					_rect(x - 31 + spark * 11.0, 438.0 - t * 94.0, 2, 4, _soft(accent, (1.0 - t) * 0.47))
+		3:
 			for i in 6:
 				var x := 33.0 + i * 207.0
 				_poly([Vector2(x, 238), Vector2(x + 129, 213), Vector2(x + 129, 426), Vector2(x, 452)], _soft(accent, 0.105))
 				_line(Vector2(x + 17, 424), Vector2(x + 108, 252), _soft(accent, 0.22), 2.0)
 				_line(Vector2(x + 23, 431), Vector2(x + 113, 289), _soft(accent, 0.13))
+
+		4:
+			for column in 4:
+				var x := 84.0 + column * 315.0
+				_rect(x, 237, 40, 210, _soft(INK, 0.62))
+				_rect(x + 10, 270, 18, 112, _soft(accent, 0.21))
+				for rung in 8:
+					_line(Vector2(x - 30, 276 + rung * 21), Vector2(x + 8, 276 + rung * 21), _soft(accent, 0.15))
+			for row in 7:
+				var speed := 4.0 + row * 7.0
+				for segment in 15:
+					_rect(fposmod(segment * 91.0 + motion * speed, W), 378 + row * 14, 58, 1, _soft(accent, 0.27 - row * 0.02))
+		5:
+			for bay in 5:
+				var x := 50.0 + bay * 232.0
+				_rect(x, 211, 132, 226, _soft(INK, 0.69))
+				_rect(x + 16, 231, 100, 187, _soft(accent, 0.16), false, 1.4)
+				var beam := 252.0 + (cos(motion * 0.8 + bay) + 1.0) * 63.0
+				_rect(x + 23, beam, 86, 2, _soft(accent, 0.27))
+		6:
+			for bank in 5:
+				var x := 118.0 + bank * 244.0
+				_poly([Vector2(x - 114, 452), Vector2(x, 199), Vector2(x + 91, 452)], _soft(INK, 0.51))
+				_line(Vector2(x, 198), Vector2(x, 465), _soft(accent, 0.25), 2.2)
+				g.draw_arc(Vector2(x, 264), 43, 0.0, TAU, 34, _soft(accent, 0.24), 1.3, true)
+			for streak in 27:
+				var x := fposmod(streak * 109.0 + motion * (19 + streak % 7), W)
+				_rect(x, 249 + (streak * 61) % 194, 23 + streak % 4 * 12, 1, _soft(accent, 0.18))
+		7:
+			var root := Vector2(570, 286)
+			for r in range(41, 220, 23):
+				g.draw_arc(root, r, 0.12, TAU - 0.1, 54, _soft(accent, 0.16), 1.4, true)
+			for branch in 10:
+				var direction := Vector2.from_angle(branch * TAU / 10.0)
+				var tip := root + direction * 350
+				_line(root + direction * 56, tip, _soft(accent, 0.27), 2.2)
+				g.draw_circle(root + direction * (72 + fposmod(motion * 94 + branch * 39, 180.0)), 2.8, _soft(accent, 0.49))
 
 func _floor(y: float) -> void:
 	_rect(-25, y, W + 50, 190, Color("#101921"))
@@ -488,93 +544,121 @@ func _world_fx(foreground: bool) -> void:
 		g.draw_polyline(points, _soft(PAPER, g.wire_time * 1.45), 1, true)
 
 func _hud() -> void:
-	_rect(0, 0, W, 136, Color("#141f2d"))
-	_rect(0, 135, W, 1, Color("#7d7567"))
-	_rect(326, 0, 500, 2, accent)
-	_poly([Vector2(316, 10), Vector2(836, 10), Vector2(809, 63), Vector2(343, 63)], Color("#1e2b38"))
-	_text("SHIFT PROTOCOL", 42, 35, 27, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 270, 30)
-	_text(Locale.text("SECTOR") + " " + ("%02d" % (g.sector_index + 1) if g.mission_sector else Locale.text(g.ENCOUNTERS[sec].sector)), 42, 55, 12, DIM)
-	_text(g.timecode(g.run_time), 1110, 34, 19, TEXT, false, HORIZONTAL_ALIGNMENT_RIGHT)
-	_text("RUN CLOCK", 1110, 55, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	var route_run: bool = not g.route.kind.is_empty()
 	var level: Array = Levels.TABLE[g.sector_index]
-	_text(level[0] if g.mission_sector else g.ENCOUNTERS[sec].name, 576, 41, 32, PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 480, 34)
-	_rect(326, 51, 500, 8, LINE)
-	var fraction: float = float(g.route.cursor) / g.route.targets.size() if not g.route.kind.is_empty() else float(g.boss_hp) / g.boss_max_hp
-	if fraction > 0:
-		_rect(326, 51, 500 * fraction, 8, accent)
-	for i in range(1, 10):
-		_rect(326 + i * 50, 51, 1, 8, INK)
-	_line(Vector2(42, 68), Vector2(1110, 68), LINE)
-	_text("HULL", 42, 91, 12, DIM)
+	var heading: String = level[0] if g.mission_sector else g.ENCOUNTERS[sec].name
+	var step_count: int = g.route.targets.size()
+	_rect(0, 0, W, 116, Color("#111e2bed"))
+	_rect(38, 115, 1076, 1, Color("#687984"))
+	_text("HULL", 39, 29, 13, DIM)
 	for i in g.MAX_HP:
-		_rect(42 + i * 22, 100, 17, 13, GREEN if i < g.hp else LINE)
-	_rect(42, 120, 149, 3, LINE)
-	_rect(42, 120, 149 * clampf(1.0 - g.dash_cd / g.DODGE_COOLDOWN, 0.0, 1.0), 3, PAPER)
-	_text("Dodge", 207, 124, 10, DIM)
-	var slot_color: Color = g.RULE_COLORS[g.player_rule]
-	_text("YOUR RULE", 315, 91, 12, DIM)
-	Icons.paint_rule(g, Vector2(325, 114), 0.85, slot_color, g.player_rule)
-	_text(g.RULE_NAMES[g.player_rule], 344, 123, 26, slot_color, true, HORIZONTAL_ALIGNMENT_LEFT, 105, 28)
-	var charge_label := "Y" if g.last_device == "pad" else "E"
-	if g.player_rule != g.Rule.EMPTY:
-		_text(Locale.text("[%s] READY") % charge_label if g.charge else "RECHARGING", 450, 113, 12, slot_color if g.charge else DIM)
-	_text("SHIFT LINK", 692, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
-	var link := "IN RANGE" if g.can_shift() else ("APPROACH" if g.state == "exposed" and g.boss_rule != g.Rule.EMPTY else "WAIT")
-	_text(link, 692, 115, 18, GREEN if g.can_shift() else DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
-	if not g.route.kind.is_empty():
-		var readout := "%d / %d" % [g.route.cursor, g.route.targets.size()]
+		_rect(39 + i * 21, 38, 16, 11, GREEN if i < g.hp else LINE)
+	var dodge: float = clampf(1.0 - g.dash_cd / g.DODGE_COOLDOWN, 0.0, 1.0)
+	_rect(39, 56, 142, 3, LINE)
+	_rect(39, 56, 142 * dodge, 3, PAPER if dodge >= 1.0 else DIM)
+	_text("Dodge", 39, 78, 11, DIM)
+	_text(heading, 576, 45, 29, PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 490, 32)
+
+	if route_run:
+		_text("Checkpoints", 1110, 29, 13, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+		_text("%d / %d" % [g.route.cursor, step_count], 1110, 56, 23, accent, true, HORIZONTAL_ALIGNMENT_RIGHT)
 		if g.route.limit > 0.0:
-			readout = "%s   %0.1fs" % [readout, maxf(0, g.route.limit - g.route.clock)]
-		_text("Checkpoints", 1110, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
-		_text(readout, 1110, 123, 22, accent, true, HORIZONTAL_ALIGNMENT_RIGHT)
+			_text("%.1fs" % maxf(0.0, g.route.limit - g.route.clock), 1110, 83, 16, PAPER, false, HORIZONTAL_ALIGNMENT_RIGHT)
+		var segment := 405.0 / maxi(1, step_count)
+		for i in step_count:
+			_rect(374 + i * segment, 63, segment - 4, 6, accent if i < g.route.cursor else LINE)
 	else:
-		_text("BOSS RULE", 1110, 91, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+		_text("BOSS RULE", 1110, 29, 13, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
 		var tint: Color = g.RULE_COLORS[g.boss_rule]
-		Icons.paint_rule(g, Vector2(1100, 113), 0.85, tint, g.boss_rule)
-		_text(g.RULE_NAMES[g.boss_rule], 1082, 123, 26, tint, true, HORIZONTAL_ALIGNMENT_RIGHT, 234, 28)
-	_rect(0, 568, W, 80, Color("#141f2d"))
-	_rect(0, 569, 6, 79, accent)
-	_line(Vector2(0, 568), Vector2(W, 568), LINE)
-	var sub := Locale.text(_instruction())
+		Icons.paint_rule(g, Vector2(1100, 52), 0.86, tint, g.boss_rule)
+		_text(g.RULE_NAMES[g.boss_rule], 1081, 59, 24, tint, true, HORIZONTAL_ALIGNMENT_RIGHT, 224, 29)
+		_rect(374, 63, 405, 6, LINE)
+		_rect(374, 63, 405.0 * g.boss_hp / g.boss_max_hp, 6, accent)
+
+	var slot_color: Color = g.RULE_COLORS[g.player_rule]
+	if not route_run or g.player_rule != g.Rule.EMPTY:
+		Icons.paint_rule(g, Vector2(51, 98), 0.75, slot_color, g.player_rule)
+		_text(g.RULE_NAMES[g.player_rule], 68, 103, 14, slot_color, false, HORIZONTAL_ALIGNMENT_LEFT, 115)
+		var charge_label := "Y" if g.last_device == "pad" else "E"
+		if g.player_rule != g.Rule.EMPTY:
+			_text(Locale.text("[%s] READY") % charge_label if g.charge else "RECHARGING", 177, 103, 11, slot_color if g.charge else DIM)
+
+	if g.practice >= 0:
+		_text("Practice", 576, 97, 13, GREEN, true, HORIZONTAL_ALIGNMENT_CENTER)
+	else:
+		_text(g.timecode(g.run_time), 576, 96, 14, DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
+
+	var prompt := Locale.text(_instruction())
 	if g.last_device == "pad":
-		sub = sub.replace(" / E", " / Y")
-	_text(sub, 42, 596, 16, TEXT)
-	var inputs := "STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE" if g.last_device == "pad" else "A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE"
-	_text(inputs, 42, 627, 12, DIM, false, HORIZONTAL_ALIGNMENT_LEFT, 751)
-	_text("M AUDIO  /  V MOTION  /  ESC PAUSE", 1110, 627, 11, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT, 300)
+		prompt = prompt.replace(" / E", " / Y")
+	_rect(27, 582, 1098, 43, Color("#111e2be8"))
+	_rect(27, 582, 3, 43, accent)
+	_text(prompt, 45, 609, 17, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 925)
+	_text("ESC" if g.last_device != "pad" else "START", 1105, 609, 13, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
 	var n := 0
 	for id in g.effects:
 		var x := 1108.0 - n * 85.0
 		var tint: Color = g.equipment_color(id)
-		_rect(x - 81, 541, 81, 24, _soft(INK, 0.93))
-		_rect(x - 81, 563, clampf(g.effects[id] / Gear.ITEMS[id][2], 0.0, 1.0) * 81, 2, tint)
-		Icons.paint(g, Vector2(x - 66, 553), 0.63, tint, id)
-		_text("%.1fs" % g.effects[id], x - 32, 558, 12, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
+		_rect(x - 81, 545, 81, 24, _soft(INK, 0.93))
+		_rect(x - 81, 567, clampf(g.effects[id] / Gear.ITEMS[id][2], 0.0, 1.0) * 81, 2, tint)
+		Icons.paint(g, Vector2(x - 66, 557), 0.63, tint, id)
+		_text("%.1fs" % g.effects[id], x - 32, 562, 12, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
 		n += 1
-	if g.practice >= 0:
-		_text("Practice", 576, 175, 22, GREEN, true, HORIZONTAL_ALIGNMENT_CENTER)
-	elif g.state == "windup":
+	_combat_hint(route_run)
+	if g.hit_flash > 0.0 and not g.reduced_motion:
+		_rect(4, 119, W - 8, 452, _soft(RED, g.hit_flash * 0.9), false, 4.0)
+
+func _combat_hint(route_run: bool) -> void:
+	if not route_run and g.state == "exposed" and g.boss_rule != g.Rule.EMPTY:
+		var next_rule := Locale.text(g.RULE_NAMES[g.boss_rule])
+		var old_rule := Locale.text(g.RULE_NAMES[g.player_rule])
+		var swap := Locale.text("You gain %s   /   Boss gains %s") % [next_rule, old_rule]
+		var ready := GREEN if g.can_shift() else DIM
+		_rect(323, 132, 506, 34, _soft(INK, 0.91))
+		_text(swap, 576, 155, 15, ready, false, HORIZONTAL_ALIGNMENT_CENTER, 466)
+		if g.can_shift():
+			var core: Vector2 = g.core_pos()
+			var x := clampf(core.x, 77.0, 1074.0)
+			var y := maxf(184.0, core.y - 75.0)
+			_rect(x - 33, y - 19, 66, 27, GREEN)
+			_text("RB" if g.last_device == "pad" else "SHIFT", x, y, 13, INK, true, HORIZONTAL_ALIGNMENT_CENTER)
+		return
+	if g.state == "windup" and not route_run:
 		var move_label: String = g.move_name
 		if g.rail_return:
 			move_label = "RETURN SWEEP"
 		elif g.overclock_attack:
 			move_label = Locale.text("OVERCLOCK") + " / " + Locale.text(move_label)
-		_text(move_label, 576, 176, 25, RED, true, HORIZONTAL_ALIGNMENT_CENTER, 655)
+		_text(move_label, 576, 153, 24, RED, true, HORIZONTAL_ALIGNMENT_CENTER, 655)
 	elif g.notice_time > 0.0:
-		_text(g.notice, 576, 179, 35, g.wire_color if g.wire_time > 0.0 else PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 990, 38)
-		_text(g.notice_sub, 576, 201, 13, TEXT, false, HORIZONTAL_ALIGNMENT_CENTER)
-	elif g.state == "exposed" and g.boss_rule != g.Rule.EMPTY:
-		var near_core := Locale.text("You gain %s   /   Boss gains %s") % [Locale.text(g.RULE_NAMES[g.boss_rule]), Locale.text(g.RULE_NAMES[g.player_rule])]
-		_rect(288, 141, 576, 44, _soft(INK, 0.91))
-		var ready := GREEN if g.can_shift() else DIM
-		_rect(288, 182, 576, 2, ready)
-		_text(near_core, 576, 170, 16, ready, false, HORIZONTAL_ALIGNMENT_CENTER, 552)
-	if g.hit_flash > 0.0 and not g.reduced_motion:
-		_rect(4, 139, W - 8, 424, _soft(RED, g.hit_flash * 0.9), false, 4.0)
+		_text(g.notice, 576, 154, 26, g.wire_color if g.wire_time > 0.0 else PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, 890)
+		_text(g.notice_sub, 576, 176, 13, TEXT, false, HORIZONTAL_ALIGNMENT_CENTER, 840)
 
 func _instruction() -> String:
-	if g.route.active():
-		return Levels.GOALS[g.route.kind]
+	var route: RefCounted = g.route
+	if route.active():
+		match route.kind:
+			"cross", "chase", "sensor":
+				if route.target().y < g.p.y - 22.0:
+					return "Jump to the next beacon."
+			"timer":
+				if route.cursor == 0 and route.timing <= 0.0:
+					return "Step on the plate to open the latch."
+			"cargo":
+				return "Carry the linked cargo to the next beacon." if route.attached else "Strike near the cargo to connect it."
+			"lift":
+				if g.player_rule != g.Rule.LIFT:
+					return "Take LIFT from the lit socket."
+			"ferry":
+				if not route.ridden:
+					return "Board the ferry at its low point."
+			"hold":
+				if not route.echo.is_zero_approx():
+					return "Step outside the strike marker, then return."
+			"evade":
+				if route.pulse_phase() >= 1.84:
+					return "Dodge just before the ring discharges."
+		return Levels.GOALS[route.kind]
 	if not g.boss_locks.is_empty():
 		return "Lure the recorded strike onto each lock."
 	if g.mission_sector and sec == 2 and g.state == "idle":
@@ -628,6 +712,8 @@ func _briefing() -> void:
 
 func _title() -> void:
 	g.draw_texture_rect(OVERLOOK, Rect2(0, 0, W, H), false)
+	if g.title_menu != null and not g.title_menu.page.is_empty():
+		return
 	_rect(0, 0, W, H, Color("#0a142c25"))
 	for i in 22:
 		var t := float(i) / 21.0
@@ -642,9 +728,11 @@ func _title() -> void:
 	_rect(0, 565, W, 83, Color("#101a2bc9"))
 	_line(Vector2(66, 566), Vector2(1096, 566), Color("#edd6ac47"))
 	_text(_tally(), 68, 608, 17, PAPER, false)
-	var count: float = float(g.campaign.records.size()) / Levels.TABLE.size()
-	_rect(343, 601, 232, 4, Color("#657386"))
-	_rect(343, 601, 232 * count, 4, Color("#f5c58d"))
+	var progress: float = g.campaign.records.size() / 6.0
+	for region in Levels.REGIONS.size():
+		var x := 349.0 + region * 33.0
+		_rect(x, 600, 28, 6, Color("#657386"))
+		_rect(x, 600, 28 * clampf(progress - region, 0.0, 1.0), 6, Levels.TINTS[region])
 	_text("v" + str(ProjectSettings.get_setting("application/config/version")), 1094, 608, 13, PAPER, false, HORIZONTAL_ALIGNMENT_RIGHT)
 
 func _tally() -> String:

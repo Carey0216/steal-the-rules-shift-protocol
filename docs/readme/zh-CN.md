@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/Versions-v1.4.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下载 Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下载 Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#行动指南"><img alt="行动指南" src="https://img.shields.io/badge/Guide-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
@@ -56,7 +56,7 @@
 5. **金币和结算。** 通关先得一星，再按本关的用时、受击上限分别加星。每颗星 1000 金币，重玩也照当次成绩发放。商城 6000 金币起，从大厅购物车或入场前打开。每种装备限一件，下一次出战开始时装备才计时，详见 **？→ 装备图鉴**。
 6. **重玩和存档。** 结算可重试、回大厅或进入下一关。齿轮菜单确认清档会清除关卡、星级、金币和已购装备，保留语言、显示和无障碍设置。
 
-录像可以半速播放、暂停、前进或后退一秒。商店明确显示每件装备的效果持续多久，以及何时开始计时。
+引导自动播放完整的实机战场，可暂停和重播。基础课点「亲手练习」即可试做。任务简报有检查点路线，商城逐件标明装备何时开始生效、持续多久。
 
 ## 运行与构建
 

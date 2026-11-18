@@ -35,8 +35,8 @@ func _ready() -> void:
 		"rule": [350.0, 184.0, 0.23, 0.09, 0.30],
 		"win": [220.0, 665.0, 0.64, 0.04, 0.34],
 		"start": [110.0, 220.0, 0.37, 0.13, 0.37],
-		"ui_focus": [520.0, 470.0, 0.055, 0.014, 0.085],
-		"ui_confirm": [393.0, 590.0, 0.16, 0.028, 0.19],
+		"ui_focus": [410.0, 330.0, 0.043, 0.013, 0.052],
+		"ui_confirm": [329.6, 493.8, 0.15, 0.026, 0.17],
 		"objective": [329.6, 493.8, 0.30, 0.018, 0.21],
 		"pickup": [523.3, 784.0, 0.26, 0.022, 0.24],
 		"penalty": [286.0, 133.0, 0.25, 0.07, 0.20]
@@ -121,7 +121,7 @@ func set_mute(value: bool) -> void:
 
 func set_stage(stage: int, in_combat: bool) -> void:
 	live = in_combat
-	stage_pitch = 0.88 if stage < 0 else [0.97, 1.03, 1.0, 0.94, 0.91, 1.05][stage % 6]
+	stage_pitch = 0.88 if stage < 0 else [0.97, 1.03, 1.0, 0.94, 0.91, 0.90, 1.05, 0.86][stage % 8]
 	if music.playing or muted or (stage < 0 and not menu_active):
 		return
 	if score == null:

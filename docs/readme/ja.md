@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="バージョンと更新履歴" src="https://img.shields.io/badge/Versions-v1.4.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="バージョンと更新履歴" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP をダウンロード" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP をダウンロード" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#攻略ガイド"><img alt="攻略ガイド" src="https://img.shields.io/badge/Guide-%E6%97%A5%E6%9C%AC%E8%AA%9E-795c35?style=for-the-badge"></a>
@@ -56,7 +56,7 @@
 5. **コインと評価。** クリアで星 1 つ、区画ごとの時間と被弾回数の条件でさらに 1 つずつ。再挑戦でも星 1 つにつき 1000 コイン。価格は 6000 から。ロビーのカートか出撃前画面を開き、各装備を 1 個まで購入できます。効果時間は出撃から数えます。
 6. **再挑戦と保存。** 結果から再挑戦、ロビー、次の区画を選べます。歯車から進行を消去すると、区画記録、星、コイン、購入済み装備が消去されます。言語、表示、アクセシビリティ設定は保持されます。
 
-映像は半速再生、一時停止、1 秒ずつ前後に移動できます。ショップには各装備の効果時間と計時開始条件が表示されます。
+ガイドは戦場全体の映像を自動再生します。一時停止と再視聴ができ、基本操作は「実際に試す」で練習できます。作戦説明にはチェックポイントの配置、ショップには装備の効果時間と発動条件が表示されます。
 
 ## 起動とビルド
 

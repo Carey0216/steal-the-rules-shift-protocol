@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.4.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Download Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Download Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#field-guide"><img alt="Field guide" src="https://img.shields.io/badge/Read-Field%20guide-795c35?style=for-the-badge"></a>
@@ -56,7 +56,7 @@ A 2D boss rush about stealing the rules of a fight. Built with Godot and GDScrip
 5. **Earn and spend coins.** A clear earns one star, with bonus stars for the listed time and hit thresholds. Each star pays 1,000 coins, including replays. Shop prices start at 6,000. Bought equipment is reserved for the next sector entry, and its timer starts when play begins. Use the cart in the lobby or shop during the pre-entry prompt. The equipment index lists effects, duration and price as they unlock.
 6. **Resume or replay.** Clear results offer Retry, Lobby and Next sector. Esc pauses the run. Settings can erase progression and coins after confirmation, while keeping display, language and accessibility settings.
 
-Replay lessons at half speed, pause, or step one second at a time. The shop spells out each item's effect duration and when its timer starts.
+The guide plays a full-arena recording automatically. Pause or replay it, then use Try it to practice a basic move. Check the mission briefing for the checkpoint layout and the shop for the duration of each item.
 
 ## Play and build
 

@@ -9,11 +9,13 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "builds" / "recordings"
 DEST = ROOT / "assets" / "demos"
-FRAME_SIZE = (576, 258)
+FRAME_SIZE = (640, 360)
 SHEET_SIZE = (FRAME_SIZE[0] * 3, FRAME_SIZE[1] * 5)
 RECORDINGS = ("move", "strike", "dodge", "steal", "rule")
 if "--context" in sys.argv:
     RECORDINGS = tuple(f"context-{index:02d}" for index in range(20))
+if "--all" in sys.argv:
+    RECORDINGS += tuple(f"context-{index:02d}" for index in range(20))
 if "--supply" in sys.argv:
     RECORDINGS = ("context-12", "context-13")
 for option in sys.argv[1:]:

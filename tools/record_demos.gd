@@ -5,21 +5,29 @@ extends SceneTree
 const GAME := preload("res://main.tscn")
 const RECORDINGS := ["move", "strike", "dodge", "steal", "rule"]
 const STEP := 1.0 / 120.0
+const FRAME_SIZE := Vector2i(640, 360)
+const CONTEXT_KEYS := [
+	[KEY_D, KEY_SPACE], [KEY_D, KEY_J, KEY_K], [KEY_D, KEY_SPACE, KEY_SHIFT, KEY_E],
+	[KEY_SHIFT, KEY_D, KEY_E], [KEY_SHIFT, KEY_D, KEY_E], [KEY_D, KEY_SPACE, KEY_SHIFT],
+	[KEY_D, KEY_SPACE, KEY_K, KEY_SHIFT], [KEY_D, KEY_SPACE, KEY_J], [KEY_D, KEY_SPACE, KEY_J],
+	[KEY_D, KEY_A], [KEY_J, KEY_D, KEY_SPACE], [KEY_D, KEY_J], [KEY_D, KEY_J],
+	[], [KEY_D, KEY_SPACE], [KEY_D, KEY_SPACE, KEY_J], [KEY_D, KEY_SPACE, KEY_SHIFT, KEY_E],
+	[KEY_D, KEY_SPACE, KEY_K], [KEY_D, KEY_A, KEY_SPACE], [KEY_D, KEY_SPACE, KEY_K],
+]
 
 class InputSlate extends Node2D:
 	const LABELS := {KEY_A: "A", KEY_D: "D", KEY_SPACE: "SPACE", KEY_J: "J", KEY_K: "K", KEY_SHIFT: "SHIFT", KEY_E: "E"}
 	var keys: Array = []
 	var active: Dictionary = {}
-	var origin := Vector2.ZERO
 	var dodge_ready := 1.0
 	var rule_status := ""
 
 	func _draw() -> void:
-		var x := origin.x + 20.0
+		var x := 26.0
 		var font := ThemeDB.fallback_font
 		for key in keys:
 			var size := 92.0 if key in [KEY_SHIFT, KEY_SPACE] else 54.0
-			var at := Rect2(x, origin.y + 320.0, size, 36)
+			var at := Rect2(x, 570.0, size, 39)
 			var down: bool = Input.is_physical_key_pressed(key) or active.get(key, 0) > 0
 			var fill := Color("#81fbd2") if down else Color("#18232b")
 			var ink := Color("#0b131b") if down else Color("#f5e9cd")
@@ -30,10 +38,10 @@ class InputSlate extends Node2D:
 			draw_string(font, at.position + Vector2((size - width) * 0.5, 25), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, ink)
 			x += size + 8.0
 		if KEY_K in keys:
-			draw_rect(Rect2(x, origin.y + 334.0, 116, 6), Color("#435561"))
-			draw_rect(Rect2(x, origin.y + 334.0, 116 * dodge_ready, 6), Color("#81fbd2"))
+			draw_rect(Rect2(x, 587.0, 116, 6), Color("#435561"))
+			draw_rect(Rect2(x, 587.0, 116 * dodge_ready, 6), Color("#81fbd2"))
 		if KEY_SHIFT in keys:
-			var badge := Rect2(origin + Vector2(20, 15), Vector2(284, 37))
+			var badge := Rect2(Vector2(845, 570), Vector2(281, 39))
 			draw_rect(badge, Color("#122029"))
 			draw_string(font, badge.position + Vector2(12, 25), rule_status, HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color("#81fbd2"))
 
@@ -77,7 +85,10 @@ func _record() -> void:
 			await _shop_clip()
 		else:
 			await _context_clip(lesson)
-	elif "--context" in requested:
+	elif "--context" in requested or "--all" in requested:
+		if "--all" in requested:
+			for recording in RECORDINGS:
+				await _clip(recording)
 		for lesson in range(game.Levels.LESSONS.size()):
 			if lesson == 13:
 				await _shop_clip()
@@ -101,7 +112,8 @@ func _clip(recording: String) -> void:
 	}
 	slate.keys = clips[recording]
 	slate.active.clear()
-	var camera_x := 160.0
+	game.title_menu.hide()
+	slate.show()
 	_key(KEY_ENTER, true)
 	game._physics_process(STEP)
 	_key(KEY_ENTER, false)
@@ -123,20 +135,10 @@ func _clip(recording: String) -> void:
 		strike_seen = strike_seen or (game.swing > 0.0 and before > game.boss_hp)
 		ability_seen = ability_seen or (game.dash > 0.0 and before > game.boss_hp and not game.charge)
 		if tick % 8 == 0:
-			var destination := clampf((game.p.x + game.b.x) * 0.5 - 410.0, 0.0, 332.0)
-			camera_x = lerpf(camera_x, destination, 0.19)
-			slate.origin = Vector2(roundf(camera_x), 188.0)
 			slate.dodge_ready = clampf(1.0 - game.dash_cd / game.DODGE_COOLDOWN, 0.0, 1.0)
 			slate.rule_status = "YOU: %s   BOSS: %s" % [game.RULE_NAMES[game.player_rule], game.RULE_NAMES[game.boss_rule]]
 			slate.queue_redraw()
-			await RenderingServer.frame_post_draw
-			var frame := root.get_texture().get_image()
-			if frame.get_size() != Vector2i(1152, 648):
-				frame.resize(1152, 648, Image.INTERPOLATE_LANCZOS)
-			var cropped := frame.get_region(Rect2i(int(slate.origin.x), 188, 820, 367))
-			cropped.resize(576, 258, Image.INTERPOLATE_LANCZOS)
-			if cropped.save_png("%s/%03d.png" % [folder, tick / 8]) != OK:
-				failed = true
+			await _save_frame(folder, tick / 8, false)
 	var outcome: bool = {
 		"move": jump_seen and game.p.x > 350.0,
 		"strike": strike_seen and game.boss_hp < game.boss_max_hp,
@@ -152,6 +154,17 @@ func _clip(recording: String) -> void:
 	game.just.clear()
 
 func _context_clip(lesson: int) -> void:
+	# The shop clip explicitly shows this CanvasLayer. Hide it again on every
+	# arena take and suppress sync_mode so neither shop nor results can enter a clip.
+	game.title_menu.hide()
+	game.title_menu.set_process(false)
+	slate.show()
+	game.record_demo = true
+	for key in [KEY_A, KEY_D, KEY_SPACE, KEY_J, KEY_K, KEY_SHIFT, KEY_E]:
+		_key(key, false)
+	for action in [&"left", &"right", &"jump", &"strike", &"dodge", &"steal", &"rule"]:
+		Input.action_release(action)
+	game.just.clear()
 	var training_sector: Array[int] = [0, 1, 3, 4, 6, 7, 9, 10, 14, 18, 23, 1, 1, -1, 24, 25, 27, 30, 29, 34]
 	var index := training_sector[lesson]
 	var folder := "res://builds/recordings/context-%02d" % lesson
@@ -164,13 +177,10 @@ func _context_clip(lesson: int) -> void:
 	game.campaign.reserved.clear()
 	game.begin_sector(index)
 	game.mode = "fight"
-	game.record_demo = false
-	game.title_menu.previous_mode = game.mode
 	game.gear_rng.seed = 1
 	slate.active.clear()
-	slate.keys = [KEY_D, KEY_SPACE, KEY_J, KEY_K, KEY_SHIFT, KEY_E]
+	slate.keys = CONTEXT_KEYS[lesson]
 	var held := {}
-	var focus := Vector2(game.p.x, 400)
 	var success := false
 	# Set a safe practice setup. The demonstration itself uses the shipped keyboard actions.
 	match lesson:
@@ -186,7 +196,7 @@ func _context_clip(lesson: int) -> void:
 	for tick in 960:
 		if game.mode == "fight":
 			var desired := _context_input(lesson, tick)
-			for key in slate.keys + [KEY_A]:
+			for key in [KEY_A, KEY_D, KEY_SPACE, KEY_J, KEY_K, KEY_SHIFT, KEY_E]:
 				var down: bool = desired.has(key)
 				if down != held.has(key):
 					_key(key, down)
@@ -204,28 +214,18 @@ func _context_clip(lesson: int) -> void:
 			else:
 				success = success or game.route.cursor > 0
 		if tick % 16 == 0:
-			focus.x = lerpf(focus.x, game.p.x, 0.32)
-			var camera_x := clampi(int(focus.x) - 410, 0, 332)
-			slate.origin = Vector2(camera_x, 195.0)
 			slate.rule_status = "YOU: %s" % game.RULE_NAMES[game.player_rule]
 			slate.dodge_ready = clampf(1.0 - game.dash_cd / game.DODGE_COOLDOWN, 0.0, 1.0)
 			for key in slate.active:
 				slate.active[key] -= 16
 			slate.queue_redraw()
 			game.queue_redraw()
-			await RenderingServer.frame_post_draw
-			var frame := root.get_texture().get_image()
-			if frame.get_size() != Vector2i(1152, 648):
-				frame.resize(1152, 648, Image.INTERPOLATE_LANCZOS)
-			var cropped := frame.get_region(Rect2i(camera_x, 195, 820, 367))
-			cropped.resize(576, 258, Image.INTERPOLATE_LANCZOS)
-			if cropped.save_png("%s/%03d.png" % [folder, tick / 16]) != OK:
-				failed = true
+			await _save_frame(folder, tick / 16, false)
 	for key in held:
 		_key(key, false)
 	if not success:
 		failed = true
-		push_error("Context %02d failed its gameplay check (x %.0f, y %.0f; cursor %d; clock %.2f)." % [lesson, game.p.x, game.p.y, game.route.cursor, game.route.clock])
+		push_error("Context %02d failed its gameplay check (x %.0f, y %.0f; cursor %d; clock %.2f; combo %d; hull %d)." % [lesson, game.p.x, game.p.y, game.route.cursor, game.route.clock, game.route.combo, game.hp])
 	else:
 		print("Context %02d recorded" % lesson)
 	game.mode = "title"
@@ -342,17 +342,24 @@ func _shop_clip() -> void:
 			40: _mouse(Vector2(950, 207))
 		await process_frame
 		game.queue_redraw()
-		await RenderingServer.frame_post_draw
-		var frame := root.get_texture().get_image()
-		frame.resize(576, 324, Image.INTERPOLATE_LANCZOS)
-		var cropped := frame.get_region(Rect2i(0, 22, 576, 258))
-		if cropped.save_png("%s/%03d.png" % [folder, index]) != OK:
-			failed = true
+		await _save_frame(folder, index, true)
 	if game.campaign.reserved.size() != 2 or game.campaign.coins != 6000:
 		failed = true
 		push_error("Catalog recording did not buy two items through the shop.")
 	else:
 		print("Context 13 recorded")
+
+func _save_frame(folder: String, number: int, capture_menu: bool) -> void:
+	if game.title_menu.visible != capture_menu or slate.visible == capture_menu:
+		if not failed:
+			push_error("Wrong overlays visible during %s frame %d." % [folder, number])
+		failed = true
+		return
+	await RenderingServer.frame_post_draw
+	var frame := root.get_texture().get_image()
+	frame.resize(FRAME_SIZE.x, FRAME_SIZE.y, Image.INTERPOLATE_LANCZOS)
+	if frame.save_png("%s/%03d.png" % [folder, number]) != OK:
+		failed = true
 
 func _mouse(at: Vector2) -> void:
 	for down in [true, false]:

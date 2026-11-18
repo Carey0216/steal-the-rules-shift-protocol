@@ -20,11 +20,15 @@ var combo := 0
 var hold := 0.0
 var required_rule := 0
 var ridden := false
+var last_checkpoint := Vector2.ZERO
+var checkpoint_age := 0.0
+var region := 0
 
 const OFFER := {"lift": 2, "reflect": 3, "chase": 1, "live": 1}
 
 func load_level(level: Array) -> void:
 	kind = "" if level[2] == "boss" else level[2]
+	region = level[1]
 	variant = level[6]
 	targets.clear()
 	ledges.clear()
@@ -38,7 +42,7 @@ func load_level(level: Array) -> void:
 	elif variant > 0 and kind in ["chase", "reflect", "echo", "cargo", "live"]:
 		ledges.append(Rect2(556, 430, 93, 14))
 	if kind == "cross":
-		ledges = [Rect2(369, 440, 119, 18), Rect2(575, 403, 130, 18), Rect2(798, 441, 124, 18)]
+		ledges = [Rect2(348, 440, 163, 18), Rect2(568, 403, 153, 18), Rect2(805, 446, 113, 18)]
 	cursor = 0
 	clock = 0.0
 	timing = 0.0
@@ -52,6 +56,8 @@ func load_level(level: Array) -> void:
 	combo = 0
 	hold = 0.0
 	ridden = false
+	last_checkpoint = Vector2.ZERO
+	checkpoint_age = 0.0
 	ferry = _ferry_at(0.0) if kind == "ferry" else Rect2()
 	_configure_gate()
 
@@ -132,7 +138,7 @@ func strike(g: Node2D) -> void:
 		g.audio_rig.fire("rule")
 	if kind == "combo" and near(g.p, target(), 99.0, 70.0):
 		combo = (combo if timing > 0.0 else 0) + 1
-		timing = 0.91 - variant * 0.07
+		timing = 1.05 - variant * 0.08
 		g.audio_rig.fire("hit")
 		g._roll_drop(target() - Vector2(0, 20))
 		if combo == 3:
@@ -151,6 +157,8 @@ func use_at_gate(g: Node2D) -> bool:
 
 func step(g: Node2D) -> void:
 	var mark := target()
+	last_checkpoint = mark
+	checkpoint_age = 1.0
 	cursor += 1
 	technique += 1
 	combo = 0
@@ -164,16 +172,27 @@ func step(g: Node2D) -> void:
 
 func hazard() -> Rect2:
 	if kind == "sensor":
-		var x := 550.0 + cos(clock * (1.43 + variant * 0.18)) * 304.0
+		var x := 550.0 + cos(clock * (1.32 + variant * 0.16)) * 304.0
 		return Rect2(x - 12.0, 447.0, 24.0, 53.0)
 	if not kind in ["break", "live", "belt", "cargo", "chase"]:
 		return Rect2()
 	var lane := (int(clock / 1.8) + variant) % 3
+	if kind == "break":
+		# The first lock is safe. Teach a single readable sweep on the way to lock two.
+		return Rect2(658.0 + lane * 12.0, 458.0, 93, 42.0)
+	elif region in [2, 6, 7] and kind != "chase":
+		lane = 2 - lane
 	var width := 100.0 + variant * 22.0
 	return Rect2(373.0 + lane * 173.0, 447.0 if kind != "chase" else 462.0, width, 56.0)
 
 func hazard_live() -> bool:
-	return kind == "sensor" or fmod(clock, 1.8) >= 1.18
+	return kind == "sensor" or fmod(clock, 1.8) >= hazard_ignition()
+
+func hazard_ignition() -> float:
+	return 1.36 if kind == "break" else 1.18
+
+func hazard_charge() -> float:
+	return clampf(fmod(clock, 1.8) / hazard_ignition(), 0.0, 1.0)
 
 func pulse_box() -> Rect2:
 	if not active():
@@ -212,12 +231,18 @@ func tick(g: Node2D, dt: float) -> void:
 		return
 	clock += dt
 	timing = maxf(0.0, timing - dt)
+	checkpoint_age = maxf(0.0, checkpoint_age - dt)
 	var point := target()
 	if limit > 0.0 and clock >= limit:
 		g.mode = "lost"
 		g.audio_rig.fire("hurt")
 		return
 	var box := hazard()
+	if box.has_area() and kind != "sensor":
+		var phase := fmod(clock, 1.8)
+		var cue := hazard_ignition() - 0.30
+		if phase >= cue and phase - dt < cue and box.grow(190).has_point(g.p):
+			g.audio_rig.fire("warn")
 	if box.has_area() and hazard_live():
 		var previous: int = g.hp
 		g._check_hurt(box, box.get_center().x, true)

@@ -33,9 +33,7 @@ func _run() -> void:
 	if capture:
 		g.set_fullscreen(false)
 	_check(g.title_menu.page == "language", "A fresh profile must request a language.")
-	for lesson in g.Levels.LESSONS.size():
-		for sheet in 4:
-			_check(ResourceLoader.exists("res://assets/demos/context-%02d-%d.webp" % [lesson, sheet]), "Mechanic lesson %d has all four recorded sheets." % lesson)
+	await _test_recording_assets()
 	for index in Locale.CODES.size():
 		g.set_language(index)
 		_check(Locale.current() == index, "Locale must be selectable: " + Locale.CODES[index])
@@ -58,6 +56,18 @@ func _run() -> void:
 		g.title_menu.demo_time = 2.2
 		g.title_menu._show_frame()
 		await _shot("guide")
+		g.title_menu.onboarding = false
+		g.set_language(1)
+		g.text_size_index = 2
+		g.title_menu.active_lesson = 14
+		g.title_menu._open("new_lesson")
+		await process_frame
+		g.title_menu.set_process(false)
+		g.title_menu.demo_time = 2.5
+		g.title_menu._show_frame()
+		await _shot("ferry-guide-zh-large")
+		g.set_language(0)
+		g.text_size_index = 0
 	g.title_menu._finish_guide()
 	_check(g.guide_seen and g.title_menu.page.is_empty(), "Finishing the guide must unlock the title screen.")
 	g.assist = false
@@ -172,6 +182,8 @@ func _run() -> void:
 		g.return_to_lobby("map")
 		await _shot("map")
 		g.title_menu.prepare_sector(11)
+		await _shot("mission")
+		g.title_menu._open_shop(11)
 		await _shot("equipment")
 		g.set_language(1)
 		g.text_size_index = 1
@@ -182,9 +194,55 @@ func _run() -> void:
 		g.return_to_lobby("map")
 		await _shot("root")
 		g.campaign.records = all_records
+	await _test_menu_flow()
 	print("Attacks: ", seen_attacks.keys(), " | Activated rules: ", used_rules.keys(), " | Returned rules: ", returned_rules.keys())
 	print("Smoke result: ", failed, " failures")
 	quit(1 if failed else 0)
+
+func _test_recording_assets() -> void:
+	var clips := ["move", "strike", "dodge", "steal", "rule"]
+	for lesson in g.Levels.LESSONS.size():
+		clips.append("context-%02d" % lesson)
+	for clip: String in clips:
+		for sheet in 4:
+			var path := "res://assets/demos/%s-%d.webp" % [clip, sheet]
+			var texture := ResourceLoader.load(path) as Texture2D
+			_check(texture != null and texture.get_size() == Vector2(1920, 1800), "Each recording must have four full-frame sheets: " + path)
+		await process_frame
+
+func _test_menu_flow() -> void:
+	g.campaign = Campaign.new()
+	g.return_to_lobby()
+	g.title_menu._prepare_from_lobby(0)
+	_check(g.title_menu.page == "mission", "Starting an operation opens the mission briefing first.")
+	g.title_menu._open_shop(0)
+	g.title_menu.back()
+	_check(g.mode == "title" and g.title_menu.page == "mission", "Leaving the optional shop returns to the selected mission.")
+	g.title_menu._start_selected()
+	_check(g.title_menu.page == "new_lesson" and g.title_menu.active_lesson == 0, "A mechanic is introduced before the first deployment.")
+	_check(g.title_menu.next_step_button.disabled, "Continue waits for the first playback.")
+	_check(g.title_menu.preview.get_rect() == g.title_menu.GUIDE_FRAME, "A full-frame recording must have its own unobstructed 16:9 area.")
+	g.title_menu._process(g.title_menu.demo_duration())
+	_check(not g.title_menu.next_step_button.disabled, "Finishing the demo unlocks deployment.")
+	g.title_menu._acknowledge_lesson()
+	_check(g.mode == "fight" and g.sector_index == 0, "Deploy launches the known sector without a second confirmation.")
+	if capture:
+		g.title_menu.sync_mode()
+		await _shot("combat-ui")
+	_play_route()
+	_check(g.mode == "clear" and g.campaign.records.size() == 1, "The new entry path still records the sector clear.")
+	if capture:
+		g.title_menu.sync_mode()
+		await _shot("debrief-ui")
+	g.title_menu._retry_from_results()
+	_check(g.mode == "fight" and g.sector_index == 0 and g.replay, "Retry launches a replay directly.")
+	_play_route()
+	g.continue_after_clear()
+	_check(g.mode == "title" and g.title_menu.page == "mission" and g.title_menu.sector_pending == 1, "Next links straight to the new mission briefing.")
+	g.return_to_lobby("map")
+	g.title_menu.map_focus = 1
+	g.title_menu._focus_sector(1)
+	_check(g.title_menu.page == "map", "Clicking the selected map node does not deploy the mission.")
 
 func _test_save() -> void:
 	var reached: int = g.campaign.records.size()

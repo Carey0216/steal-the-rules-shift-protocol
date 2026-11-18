@@ -17,7 +17,7 @@ const BASE = 488.0
 const STEAL_RANGE = 186.0
 const MAX_HP = 7
 const DODGE_TIME := 0.23
-const DODGE_PROTECTION := 0.27
+const DODGE_PROTECTION := 0.31
 const DODGE_COOLDOWN := 0.59
 const DECK_LEFT := 404.0
 const DECK_RIGHT := 748.0
@@ -210,6 +210,10 @@ func _bind(action: StringName, keys: Array, buttons: Array) -> void:
 		InputMap.action_add_event(action, event)
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventJoypadButton and event.pressed:
+		last_device = "pad"
+	elif event is InputEventKey and event.pressed and not event.echo:
+		last_device = "keyboard"
 	if title_menu != null and not record_demo:
 		if event.is_action_pressed(&"full"):
 			set_fullscreen(not _display_is_fullscreen())
@@ -219,12 +223,13 @@ func _input(event: InputEvent) -> void:
 			return
 		if mode == "title" and not title_menu.page.is_empty():
 			return
+		if mode == "paused" and event.is_action_pressed(&"pause"):
+			just[&"pause"] = true
+			get_viewport().set_input_as_handled()
+			return
 		if event.is_action_pressed(&"confirm") and get_viewport().gui_get_focus_owner() != null:
 			return
-	if event is InputEventJoypadButton and event.pressed:
-		last_device = "pad"
-	elif event is InputEventKey and event.pressed and not event.echo:
-		last_device = "keyboard"
+	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_SHIFT or event.physical_keycode == KEY_SHIFT:
 			just[&"steal"] = true
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -296,16 +301,16 @@ func return_to_lobby(next_page := "") -> void:
 func return_from_practice() -> void:
 	return_to_lobby(practice_return)
 
-func begin_sector(index: int) -> void:
+func begin_sector(index: int) -> bool:
 	if not campaign.selectable(index, Levels.TABLE.size()):
-		return
+		return false
 	starter.assign(campaign.reserved)
 	campaign.reserved.clear()
 	if _save() != OK:
 		campaign.reserved.assign(starter)
 		save_error = true
 		title_menu.show_save_error()
-		return
+		return false
 	save_error = false
 	var entry: Dictionary = campaign.entry(index)
 	sector_index = index
@@ -320,6 +325,15 @@ func begin_sector(index: int) -> void:
 	hits_taken = 0
 	sector_retries = 0
 	_load_arena()
+	return true
+
+func engage_sector() -> void:
+	if mode != "brief":
+		return
+	mode = "fight"
+	audio_rig.fire("start")
+	if title_menu != null and not record_demo:
+		title_menu.play_arena_reveal()
 
 func buy_gear(id: int) -> bool:
 	if id not in Gear.stock(campaign.records.size(), true) or id in campaign.reserved or campaign.reserved.size() >= Gear.MAX_LOADOUT:
@@ -421,10 +435,7 @@ func _physics_process(dt: float) -> void:
 			resume_mode = mode
 			mode = "paused"
 		elif pressed.has("confirm"):
-			mode = "fight"
-			audio_rig.fire("start")
-			if title_menu != null and not record_demo:
-				title_menu.play_arena_reveal()
+			engage_sector()
 	elif mode == "lost":
 		if pressed.has("confirm") or pressed.has("retry"):
 			_retry()
@@ -457,7 +468,8 @@ func _physics_process(dt: float) -> void:
 			_tick_fight(dt, axis, pressed, Input.is_action_pressed("strike"))
 	if mode != "paused":
 		_tick_fx(dt)
-	audio_rig.set_stage(stage if mode != "title" else -1, mode == "fight")
+	var district: int = Levels.TABLE[sector_index][1] if mission_sector else stage
+	audio_rig.set_stage(district if mode != "title" else -1, mode == "fight")
 	if title_menu != null and not record_demo:
 		title_menu.sync_mode()
 	queue_redraw()
@@ -484,8 +496,10 @@ func _advance() -> void:
 func continue_after_clear() -> void:
 	if mission_sector:
 		if sector_index < Levels.TABLE.size() - 1:
-			return_to_lobby("map")
-			title_menu.prepare_sector(sector_index + 1)
+			mode = "title"
+			just.clear()
+			title_menu.previous_mode = mode
+			title_menu._prepare_mission(sector_index + 1, "map")
 		else:
 			return_to_lobby("map")
 	else:
