@@ -36,11 +36,20 @@ func _capture() -> void:
 		await _shot(code, "map")
 		game.title_menu._open_shop(-1)
 		await _shot(code, "equipment")
-		game.title_menu._replay_context(14)
+		game.title_menu._replay_context(20)
 		game.title_menu.set_process(false)
 		game.title_menu.demo_time = 2.5
 		game.title_menu._show_frame()
 		await _shot(code, "guide")
+		for tab in 3:
+			game.title_menu.settings_tab = tab
+			game.title_menu._open("settings")
+			await _shot(code, "settings-%d" % tab)
+		game.text_size_index = 2
+		game.title_menu._replay_context(23)
+		game.title_menu.set_process(false)
+		await _shot(code, "guide-large")
+		game.text_size_index = 0
 	quit(1 if failed else 0)
 
 func _shot(code: String, view: String) -> void:

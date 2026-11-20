@@ -4,27 +4,30 @@ const Locale = preload("res://src/locale.gd")
 const Levels = preload("res://src/levels.gd")
 const Gear = preload("res://src/gear.gd")
 const Icons = preload("res://src/equipment_icons.gd")
-const INK := Color("#12171c")
-const PANEL := Color("#1c2328")
-const LINE := Color("#484f54")
+const MetalSkin = preload("res://src/ui_skin.gd")
+const MotionButton = preload("res://src/motion_button.gd")
+const INK := Color("#0c2028")
+const PANEL := Color("#172e36")
+const LINE := Color("#48646b")
 const PAPER := Color("#f6edda")
 const DIM := Color("#bdc3c5")
-const GREEN := Color("#a7e3c8")
-const AMBER := Color("#f5c184")
+const GREEN := Color("#a2ddd3")
+const AMBER := Color("#dcb777")
 const DANGER := Color("#ffa993")
 const SCALES := [1.0, 1.15, 1.3]
 const SIZES := [Vector2i(1152, 648), Vector2i(1280, 720), Vector2i(1600, 900)]
 const DEMOS := [
 	["move", "Move & jump", "A/D + SPACE", "STICK + A", "Move toward the boss. When a warning hugs the floor, jump as the attack approaches. Land close enough to counter."],
-	["strike", "Strike", "J / Z", "X", "Face the boss and move within blade reach. Hold the strike button to keep swinging. The open core takes more damage."],
-	["dodge", "Dodge", "K / X", "B", "Dodge through the charge as it reaches you. The outline shows protection. Wait for the dodge bar to refill."],
-	["steal", "Steal a rule", "SHIFT / Q", "RB", "Survive the attack and approach the open core. Check what each side gains before pressing Shift."],
-	["rule", "Use your rule", "E / C", "Y", "Face the boss and press E when the rule is ready. RUSH cuts forward, LIFT lifts you, and AEGIS reflects a nearby hit."],
+	["strike", "Strike", "J", "X", "Face the boss and move within blade reach. Hold the strike button to keep swinging. The open core takes more damage."],
+	["dodge", "Dodge", "K", "B", "Dodge through the charge as it reaches you. The outline shows protection. Wait for the dodge bar to refill."],
+	["steal", "Steal a rule", "SHIFT", "RB", "RUSH exchanges positions. LIFT grounds the boss. AEGIS breaks its armor."],
+	["rule", "Use your rule", "E", "Y", "Face the boss and press E when the rule is ready. RUSH cuts forward, LIFT lifts you, and AEGIS reflects a nearby hit."],
 ]
 const LESSON_KEYS := [
 	["A / D", "SPACE"], ["J", "K"], ["A / D", "SPACE"], ["SHIFT", "E"], ["SHIFT", "E"],
 	["SHIFT"], ["K", "SPACE"], ["J"], ["J"], ["A / D"],
 	["J", "SPACE"], [], [], [], ["SPACE"], ["J"], ["SHIFT", "E"], ["K", "SPACE"], ["A / D"], ["K"],
+	["SHIFT", "SPACE"], ["SHIFT"], ["K", "J"], ["K", "SHIFT", "J"],
 ]
 const PAD_KEYS := {"A / D": "STICK", "SPACE": "A", "J": "X", "K": "B", "SHIFT": "RB", "E": "Y"}
 const FRAME_SIZE := Vector2i(640, 360)
@@ -70,6 +73,12 @@ var mission_return := ""
 var shop_return := ""
 var archive_return := ""
 var arena_reveal: CanvasLayer
+var settings_tab := 0
+var binding_index := -1
+var binding_note := ""
+var focus_memory := {}
+var purchased_id := -1
+var page_animation: Tween
 
 func _ready() -> void:
 	layer = 4
@@ -106,6 +115,16 @@ func _ready() -> void:
 		emblem.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		emblem.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_place(emblem, cover, Rect2(526, 156, 100, 100))
+		emblem.pivot_offset = Vector2(50, 50)
+		emblem.rotation = -0.22
+		emblem.scale = Vector2(0.78, 0.78)
+		var stamp := emblem.create_tween().set_parallel()
+		stamp.tween_property(emblem, "rotation", 0.0, 0.49).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		stamp.tween_property(emblem, "scale", Vector2.ONE, 0.49).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		cover.draw.connect(func():
+			for radius in [81, 90, 127]:
+				cover.draw_arc(Vector2(576, 206), radius, -2.8, 2.8, 60, Color(AMBER, 0.22), 1.0, true)
+		)
 		var mark := _label(cover, "SHIFT PROTOCOL", Rect2(216, 274, 720, 78), 48, PAPER, true)
 		mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		mark.modulate.a = 0.0
@@ -136,6 +155,21 @@ func _t(key: String) -> String:
 func _text_size(value: int) -> int:
 	return roundi(value * SCALES[game.text_size_index])
 
+func capture_binding(event: InputEvent) -> bool:
+	if binding_index < 0:
+		return false
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return true
+	var key: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+	if not game.controls.rebind(binding_index, key):
+		binding_note = "This key is reserved. Choose another."
+	else:
+		binding_index = -1
+		binding_note = ""
+		game._save()
+	_draw_page.call_deferred()
+	return true
+
 func _style(fill: Color, border: Color, width := 1) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
 	box.bg_color = fill
@@ -156,6 +190,9 @@ func _label(parent: Control, key: String, at: Rect2, size: int, shade := PAPER, 
 	var font := Locale.face(Locale.current(), large)
 	var scaled_size := _text_size(size)
 	label.add_theme_font_override("font", font)
+	if wrap and at.size.x > 0.0 and at.size.y > 0.0:
+		while scaled_size > 12 and font.get_multiline_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, at.size.x, scaled_size).y > at.size.y:
+			scaled_size -= 1
 	if not wrap and at.size.x > 0:
 		var width := font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, scaled_size).x
 		if width > at.size.x:
@@ -180,7 +217,9 @@ func _panel(parent: Control, at: Rect2, fill: Color, border := LINE) -> Panel:
 	return panel
 
 func _button(parent: Control, key: String, at: Rect2, callback: Callable, primary := false, selected := false, danger := false) -> Button:
-	var button := Button.new()
+	var button := MotionButton.new()
+	button.motion = not game.reduced_motion
+	button.gold = primary
 	button.text = _t(key)
 	button.clip_text = true
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -197,19 +236,17 @@ func _button(parent: Control, key: String, at: Rect2, callback: Callable, primar
 	button.add_theme_color_override("font_pressed_color", text_color)
 	button.add_theme_color_override("font_focus_color", text_color)
 	button.add_theme_color_override("font_disabled_color", Color("#8d969b"))
-	var surface := AMBER if primary else (Color("#3a3228") if selected else Color("#242c31"))
+	var surface := AMBER if primary else (Color("#31515a") if selected else Color("#1b3540"))
 	var edge := AMBER if selected or primary else (DANGER.darkened(0.44) if danger else LINE)
-	var normal := _style(surface, edge)
-	if primary:
-		normal.border_width_bottom = 3
-		normal.border_color = Color("#ae744a")
+	var normal := _button_skin(surface, edge, primary)
 	button.add_theme_stylebox_override("normal", normal)
-	button.add_theme_stylebox_override("hover", _style(surface.lightened(0.13), AMBER))
-	button.add_theme_stylebox_override("pressed", _style(surface.darkened(0.13), AMBER))
-	button.add_theme_stylebox_override("disabled", _style(INK, LINE.darkened(0.4)))
-	var focus := _style(Color.TRANSPARENT, PAPER, 2)
-	focus.draw_center = false
-	focus.set_expand_margin_all(3)
+	button.add_theme_stylebox_override("hover", _button_skin(surface.lightened(0.09), AMBER, primary, true))
+	button.add_theme_stylebox_override("pressed", _button_skin(surface.darkened(0.12), PAPER, primary, true))
+	var disabled_skin := _button_skin(INK, LINE.darkened(0.25))
+	disabled_skin.disabled = true
+	button.add_theme_stylebox_override("disabled", disabled_skin)
+	var focus := _button_skin(Color.TRANSPARENT, PAPER, false, true)
+	focus.focus_only = true
 	button.add_theme_stylebox_override("focus", focus)
 	button.pressed.connect(func():
 		game.audio_rig.fire("ui_confirm")
@@ -218,6 +255,16 @@ func _button(parent: Control, key: String, at: Rect2, callback: Callable, primar
 	button.focus_entered.connect(func(): game.audio_rig.fire("ui_focus"))
 	_place(button, parent, at)
 	return button
+
+func _button_skin(fill: Color, border: Color, primary := false, lit := false) -> StyleBox:
+	var skin := MetalSkin.new()
+	skin.fill = fill
+	skin.edge = border
+	skin.primary = primary
+	skin.lit = lit
+	skin.content_margin_left = 15
+	skin.content_margin_right = 26 if primary else 15
+	return skin
 
 func _option(parent: Control, items: Array, chosen: int, at: Rect2, callback: Callable) -> OptionButton:
 	var option := OptionButton.new()
@@ -258,12 +305,8 @@ func _modal(title: String, at: Rect2) -> Panel:
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_place(dim, ui, Rect2(0, 0, 1152, 648))
 	var panel := _panel(ui, at, PANEL, LINE)
-	var skin := panel.get_theme_stylebox("panel") as StyleBoxFlat
-	skin.set_corner_radius_all(4)
-	skin.shadow_color = Color("#03061198")
-	skin.shadow_size = 18
-	skin.shadow_offset = Vector2(0, 8)
-	_label(panel, title, Rect2(28, 19, at.size.x - 104, 52), 33, PAPER, true)
+	panel.add_theme_stylebox_override("panel", _button_skin(PANEL, LINE))
+	_label(panel, title, Rect2(28, 19, at.size.x - 104, 52), 33, AMBER, true)
 	_panel(panel, Rect2(28, 72, at.size.x - 56, 1), LINE, LINE)
 	if opening_page and not game.reduced_motion and not game.save_path.is_empty():
 		dim.modulate.a = 0.0
@@ -281,21 +324,33 @@ func _screen(heading: String, tone := AMBER, shade := 0.86) -> Control:
 	_place(screen, ui, Rect2(0, 0, 1152, 648))
 	screen.mouse_filter = Control.MOUSE_FILTER_STOP
 	var cover := ColorRect.new()
-	cover.color = Color(Color("#11171c"), shade)
+	cover.color = Color(Color("#0c2029"), maxf(0.96, shade))
 	cover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_place(cover, screen, Rect2(0, 0, 1152, 648))
+	var crown := ColorRect.new()
+	crown.color = Color("#081a24")
+	crown.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(crown, screen, Rect2(0, 0, 1152, 104))
+	screen.draw.connect(func():
+		var center := Vector2(1044, 354)
+		for radius in [150, 177, 235, 280, 305]:
+			screen.draw_arc(center, radius, -2.8, 1.2, 60, Color(tone, 0.045), 1.0, true)
+		for ray in 18:
+			var direction := Vector2.from_angle(ray * TAU / 18)
+			screen.draw_line(center + direction * 272, center + direction * 280, Color(tone, 0.09), 1.0, true)
+	)
 	var line := ColorRect.new()
 	line.color = Color(tone, 0.46)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_place(line, screen, Rect2(48, 103, 1056, 1))
 	_panel(screen, Rect2(48, 103, 80, 2), tone, tone)
-	_label(screen, heading, Rect2(113, 28, 655, 62), 35, PAPER, true)
+	_label(screen, heading, Rect2(113, 28, 655, 62), 35, AMBER, true)
 	if opening_page and not game.reduced_motion and not game.save_path.is_empty():
 		screen.modulate.a = 0.68
-		screen.position.y = 5.0
+		screen.position.x = 13.0
 		var enter := screen.create_tween().set_parallel()
 		enter.tween_property(screen, "modulate:a", 1.0, 0.17)
-		enter.tween_property(screen, "position:y", 0.0, 0.19).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		enter.tween_property(screen, "position:x", 0.0, 0.27).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	return screen
 
 func _text_action(parent: Control, text: String, at: Rect2, action: Callable, enabled := true) -> Button:
@@ -307,7 +362,15 @@ func _text_action(parent: Control, text: String, at: Rect2, action: Callable, en
 
 func _draw_page() -> void:
 	set_process(false)
+	if is_instance_valid(page_animation):
+		page_animation.kill()
+		page_animation = null
+	ui.modulate = Color.WHITE
+	ui.position = Vector2.ZERO
 	var view: String = game.mode + ":" + page
+	var focused := get_viewport().gui_get_focus_owner()
+	if focused != null and focused is Button and is_ancestor_of(focused):
+		focus_memory[last_view] = focused.text
 	opening_page = view != last_view
 	last_view = view
 	display_picker = null
@@ -336,6 +399,17 @@ func _draw_page() -> void:
 		"reset": _reset()
 		"money": _money()
 		_: _title_controls()
+	if page != "money" and focus_memory.has(view):
+		_restore_focus.call_deferred(ui, focus_memory[view])
+
+func _restore_focus(parent: Node, text: String) -> void:
+	if not is_instance_valid(parent):
+		return
+	for child in parent.get_children():
+		if child is Button and child.text == text and not child.disabled and not text.is_empty():
+			child.grab_focus()
+			return
+		_restore_focus(child, text)
 
 func _title_controls() -> void:
 	var cleared: int = game.campaign.records.size()
@@ -343,10 +417,17 @@ func _title_controls() -> void:
 	var level: Array = Levels.TABLE[frontier]
 	var in_campaign := cleared < Levels.TABLE.size()
 	var action := "Start operation" if cleared == 0 else "Continue operation"
-	var play := _button(ui, action if in_campaign else "Sector map", Rect2(66, 479, 256, 58), _prepare_from_lobby.bind(frontier) if in_campaign else _open_map, true)
+	var play := _button(ui, action if in_campaign else "Sector map", Rect2(64, 272, 264, 58), _prepare_from_lobby.bind(frontier) if in_campaign else _open_map, true)
 	if in_campaign:
-		_label(ui, "%02d  /  %s" % [frontier + 1, _t(level[0])], Rect2(66, 425, 520, 40), 23, PAPER, true)
-		_button(ui, "Sector map", Rect2(338, 479, 174, 58), _open_map)
+		_button(ui, "Sector map", Rect2(64, 345, 264, 53), _open_map)
+	_button(ui, "Equipment shop", Rect2(64, 413, 264, 53), _open_shop.bind(-1))
+	_button(ui, "Field archive", Rect2(64, 481, 264, 53), _open_archive.bind(0))
+	var dispatch := _panel(ui, Rect2(858, 227, 244, 309), Color("#0b202bea"), Color("#526c6e"))
+	_label(dispatch, "Next sector", Rect2(19, 13, 206, 31), 14, AMBER)
+	_label(dispatch, "%02d" % (frontier + 1), Rect2(19, 51, 206, 54), 40, GREEN, true)
+	_label(dispatch, level[0], Rect2(19, 112, 206, 67), 25, PAPER, true, true)
+	_label(dispatch, Levels.REGIONS[level[1]], Rect2(19, 197, 206, 43), 15, DIM, false, true)
+	_label(dispatch, "Guardian intercept" if Levels.has_guardian(frontier) else ("Boss encounter" if level[2] == "boss" else "Checkpoint route"), Rect2(19, 250, 206, 46), 14, AMBER, false, true)
 	play.grab_focus()
 	var gear := _button(ui, "", Rect2(987, 25, 48, 44), _open.bind("settings"))
 	gear.tooltip_text = _t("Settings")
@@ -444,8 +525,22 @@ func _draw_gear(gear: Button) -> void:
 func _open(next: String) -> void:
 	if next != "money":
 		money_clicks = 0
+	var previous := page
 	page = next
-	_draw_page()
+	if game.save_path.is_empty() or game.reduced_motion or next == previous or game.mode != "title":
+		_draw_page()
+		return
+	if is_instance_valid(page_animation):
+		page_animation.kill()
+	var blocker := Control.new()
+	_place(blocker, ui, Rect2(0, 0, 1152, 648))
+	blocker.mouse_filter = Control.MOUSE_FILTER_STOP
+	page_animation = create_tween()
+	page_animation.tween_property(ui, "modulate:a", 0.0, 0.085).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	page_animation.tween_callback(func():
+		page_animation = null
+		_draw_page()
+	)
 
 func _language() -> void:
 	var panel := _modal("Select a language", Rect2(303, 63, 546, 522))
@@ -470,44 +565,74 @@ func _confirm_language() -> void:
 	_open("guide")
 
 func _settings() -> void:
-	var panel := _modal("Settings", Rect2(178, 44, 796, 560))
-	_back_arrow(panel, Rect2(720, 22, 48, 44), back, "Back")
-	var names := ["Language", "Display mode", "Window size", "Text size", "Audio", "Reduced motion", "Assist mode"]
-	var selected_language: OptionButton
-	var is_web := OS.has_feature("web")
-	var fills_screen: bool = game._display_is_fullscreen()
-	for i in names.size():
-		var y := 84 + i * 50
-		if i > 0:
-			_panel(panel, Rect2(28, y - 6, 740, 1), LINE, LINE)
-		_label(panel, names[i], Rect2(28, y + 2, 340, 37), 17)
-		var row := Rect2(438, y, 330, 39)
-		match names[i]:
-			"Language":
-				selected_language = _option(panel, Locale.NAMES, Locale.current(), row, _change_language)
-			"Display mode":
-				display_picker = _option(panel, ["Windowed", "Fullscreen"], int(fills_screen), row, _change_display)
-				if is_web:
-					display_picker.disabled = not web_document.fullscreenEnabled
-			"Window size":
-				var choice := _option(panel, ["1152 × 648", "1280 × 720", "1600 × 900"], game.window_size_index, row, _change_window_size)
-				choice.disabled = is_web or fills_screen
-			"Text size":
-				_option(panel, ["100%", "115%", "130%"], game.text_size_index, row, _change_text_size)
-			"Audio":
-				_option(panel, ["Off", "On"], int(not game.muted), row, _change_audio)
-			"Reduced motion":
-				_option(panel, ["Off", "On"], int(game.reduced_motion), row, _change_motion)
-			"Assist mode":
-				var assist_option := _option(panel, ["Off", "On"], int(game.assist), row, _change_assist)
-				assist_option.tooltip_text = _t("Larger timing windows for steals and dodges.")
-	var exit_label := "Save and return" if is_web else "Save and quit"
-	_panel(panel, Rect2(28, 455, 740, 1), LINE, LINE)
-	_button(panel, exit_label, Rect2(28, 479, 218, 48), game.save_and_quit)
-	_button(panel, "Clear save", Rect2(262, 479, 186, 48), _open.bind("reset"), false, false, true)
-	_button(panel, "Done", Rect2(548, 479, 220, 48), back, true)
-	_show_save_notice(panel, Rect2(28, 418, 740, 34))
-	selected_language.grab_focus()
+	var screen := _screen("Settings", AMBER, 0.98)
+	_back_arrow(screen, Rect2(48, 35, 44, 43), back, "Back")
+	var tabs := ["Display and access", "Sound and feedback", "Keyboard controls"]
+	for i in tabs.size():
+		_button(screen, tabs[i], Rect2(48, 137 + i * 67, 252, 51), func(): settings_tab = i; binding_index = -1; _draw_page.call_deferred(), false, settings_tab == i)
+	_panel(screen, Rect2(326, 135, 1, 384), LINE, LINE)
+	if settings_tab == 0:
+		var labels := ["Language", "Display mode", "Window size", "Text size", "Reduced motion", "Assist mode"]
+		for i in labels.size():
+			var y := 137.0 + i * 59
+			_label(screen, labels[i], Rect2(354, y, 326, 43), 17)
+			var at := Rect2(751, y, 353, 43)
+			match i:
+				0: _option(screen, Locale.NAMES, Locale.current(), at, _change_language)
+				1:
+					display_picker = _option(screen, ["Windowed", "Fullscreen"], int(game._display_is_fullscreen()), at, _change_display)
+				2:
+					_option(screen, ["1152 × 648", "1280 × 720", "1600 × 900"], game.window_size_index, at, _change_window_size).disabled = OS.has_feature("web") or game._display_is_fullscreen()
+				3: _option(screen, ["100%", "115%", "130%"], game.text_size_index, at, _change_text_size)
+				4: _option(screen, ["Off", "On"], int(game.reduced_motion), at, _change_motion)
+				5: _option(screen, ["Off", "On"], int(game.assist), at, _change_assist)
+	elif settings_tab == 1:
+		var labels := ["Master volume", "Music volume", "Effects volume", "Screen shake"]
+		var values := [game.master_volume, game.music_volume, game.effects_volume, game.shake_strength]
+		for i in labels.size():
+			var y := 145.0 + i * 83
+			_label(screen, labels[i], Rect2(354, y, 314, 43), 18)
+			var slider := HSlider.new()
+			slider.min_value = 0.0
+			slider.max_value = 100.0
+			slider.step = 5
+			slider.value = values[i] * 100
+			slider.custom_minimum_size = Vector2(282, 30)
+			var track := _style(LINE.darkened(0.35), LINE, 0)
+			track.content_margin_top = 3
+			track.content_margin_bottom = 3
+			var fill := _style(GREEN, GREEN, 0)
+			fill.content_margin_top = 3
+			fill.content_margin_bottom = 3
+			slider.add_theme_stylebox_override("slider", track)
+			slider.add_theme_stylebox_override("grabber_area", fill)
+			slider.add_theme_stylebox_override("grabber_area_highlight", fill)
+			slider.add_theme_icon_override("grabber", preload("res://assets/slider-thumb.svg"))
+			slider.add_theme_icon_override("grabber_highlight", preload("res://assets/slider-thumb.svg"))
+			_place(slider, screen, Rect2(747, y + 9, 282, 30))
+			var number := _label(screen, "%d%%" % int(values[i] * 100), Rect2(1043, y, 61, 43), 16, AMBER)
+			number.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			slider.value_changed.connect(func(value: float):
+				number.text = "%d%%" % int(value)
+				game.set(["master_volume", "music_volume", "effects_volume", "shake_strength"][i], value / 100.0)
+				game.audio_rig.set_levels(game.master_volume, game.music_volume, game.effects_volume)
+			)
+			slider.drag_ended.connect(func(_changed: bool): game._save())
+			slider.focus_exited.connect(func(): game._save())
+	else:
+		var entries: Array = game.Controls.ACTIONS
+		for i in entries.size():
+			var x := 354.0 + (i / 5) * 385
+			var y := 135.0 + (i % 5) * 63
+			_label(screen, game.Controls.TITLES[i], Rect2(x, y, 205, 44), 16)
+			_button(screen, "Press a key" if binding_index == i else game.controls.label(entries[i]), Rect2(x + 207, y, 150, 44), func(): binding_index = i; _draw_page.call_deferred(), false, binding_index == i)
+		_label(screen, binding_note if not binding_note.is_empty() else "One key per action. Assigning an occupied key swaps the bindings.", Rect2(354, 456, 360, 71), 13, DIM, false, true)
+		_button(screen, "Restore controls", Rect2(739, 471, 365, 43), func(): game.controls.defaults(); game._save(); _draw_page.call_deferred())
+	_panel(screen, Rect2(48, 544, 1056, 1), LINE, LINE)
+	_button(screen, "Save and return" if OS.has_feature("web") else "Save and quit", Rect2(48, 566, 242, 49), game.save_and_quit)
+	_button(screen, "Clear save", Rect2(354, 566, 212, 49), _open.bind("reset"), false, false, true)
+	_button(screen, "Done", Rect2(860, 566, 244, 49), back, true)
+	_show_save_notice(screen, Rect2(48, 510, 1056, 30))
 
 func _reset() -> void:
 	var panel := _modal("Clear save", Rect2(248, 201, 656, 246))
@@ -717,67 +842,65 @@ func _mission_diagram(parent: Control, level: Array, tint: Color) -> void:
 	)
 
 func _shop() -> void:
-	var panel := _modal("Equipment shop", Rect2(91, 40, 970, 568))
-	var reserved: Array = game.campaign.reserved
+	var screen := _screen("Equipment shop", AMBER, 0.98)
+	_back_arrow(screen, Rect2(48, 35, 44, 43), back, "Back")
+	var wallet := _label(screen, _t("%d coins") % game.campaign.coins, Rect2(820, 34, 284, 45), 22, AMBER, true)
+	wallet.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var stock := Gear.stock(game.campaign.records.size(), true)
-	var count := ceili(stock.size() / 6.0)
-	var heading := _t("Equip up to 3 items for the next attempt.")
-	if sector_pending >= 0:
-		heading = "%02d / %s   ·   %s" % [sector_pending + 1, _t(Levels.TABLE[sector_pending][0]), _t("Equip up to 3 items for the next attempt.")]
-	_label(panel, heading, Rect2(28, 78, 914, 42), 15, DIM, false, true)
-	var balance := _label(panel, _t("%d coins  ·  %d / 3 equipped") % [game.campaign.coins, reserved.size()], Rect2(474, 21, 315, 44), 15, AMBER)
-	balance.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	for i in Gear.MAX_LOADOUT:
-		var at := Rect2(807 + i * 45, 21, 40, 43)
-		if i < reserved.size():
-			_gear_badge(panel, at, reserved[i], true)
-		else:
-			var empty := _panel(panel, at, INK)
-			_label(empty, "+", Rect2(14, 7, 14, 27), 15, DIM)
-	for i in range(gear_page * 6, mini(gear_page * 6 + 6, stock.size())):
-		var id := stock[i]
+	var pages := ceili(stock.size() / 4.0)
+	gear_page = clampi(gear_page, 0, maxi(0, pages - 1))
+	var reserved: Array = game.campaign.reserved
+	for i in range(gear_page * 4, mini(stock.size(), gear_page * 4 + 4)):
+		var id: int = stock[i]
 		var item: Array = Gear.ITEMS[id]
-		var slot := i % 6
-		var at := Rect2(28 + slot % 2 * 464, 126 + (slot / 2) * 109, 450, 101)
-		var card := _panel(panel, at, INK, GREEN.darkened(0.45) if id in reserved else LINE)
-		_gear_badge(card, Rect2(12, 24, 50, 50), id)
-		_label(card, item[0], Rect2(73, 6, 211, 31), 18, PAPER, true)
-		_label(card, item[1], Rect2(73, 37, 211, 35), 12, DIM, false, true)
-		_label(card, _t("Effect lasts %d seconds") % int(item[2]), Rect2(73, 73, 215, 22), 12, game.equipment_color(id))
-		var buy := _button(card, "Equipped" if id in reserved else str(item[3]), Rect2(297, 26, 136, 47), _buy.bind(id))
-		var deficit: int = item[3] - game.campaign.coins
-		var full := reserved.size() >= Gear.MAX_LOADOUT
-		buy.disabled = id in reserved or full or deficit > 0
-		var feedback := _t("Buy for next attempt")
-		if id not in reserved and full:
-			feedback = _t("Loadout full")
-		elif id not in reserved and deficit > 0:
-			feedback = _t("%d coins short") % deficit
-		buy.tooltip_text = _t(item[0]) + "\n" + _t(item[1]) + "\n" + (_t("Effect lasts %d seconds") % int(item[2])) + "\n" + feedback
-		if buy.disabled and id not in reserved:
-			var reason := _label(card, feedback, Rect2(281, 75, 156, 23), 11, AMBER)
-			reason.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	if count > 1:
-		var prior := _back_arrow(panel, Rect2(295, 475, 44, 45), _shop_page.bind(-1), "Previous")
-		var more := _back_arrow(panel, Rect2(398, 475, 44, 45), _shop_page.bind(1), "Next", true)
-		prior.disabled = gear_page == 0
-		more.disabled = gear_page >= count - 1
-		var pager := _label(panel, "%d / %d" % [gear_page + 1, count], Rect2(340, 475, 57, 45), 13, DIM)
-		pager.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		pager.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_back_arrow(panel, Rect2(28, 475, 51, 45), back, "Back")
-	if sector_pending >= 0:
-		var start := _button(panel, "Return to briefing", Rect2(592, 474, 350, 48), back, true)
-		start.grab_focus()
-	else:
-		_button(panel, "Equipment index", Rect2(642, 474, 300, 48), _open_archive.bind(1), true)
-	if game.save_error:
-		_show_save_notice(panel, Rect2(28, 525, 910, 28))
-	else:
-		_label(panel, "Equipment timers start when the fight begins.", Rect2(29, 521, 610, 26), 13, DIM)
-		if sector_pending >= 0:
-			var level: Array = Levels.TABLE[sector_pending]
-			_label(panel, "%s   /   %s" % [_t("Time ≤ %ds") % int(level[5]), _t("Hits ≤ %d") % (1 if level[2] == "boss" else 0)], Rect2(660, 521, 283, 29), 13, AMBER)
+		var slot := i % 4
+		var selected: bool = id in reserved
+		var card := _panel(screen, Rect2(48 + (slot % 2) * 386, 135 + (slot / 2) * 202, 368, 184), Color("#17333e"), AMBER if selected else LINE)
+		_panel(card, Rect2(0, 0, 368, 3), AMBER if selected else GREEN.darkened(0.4), LINE)
+		_gear_badge(card, Rect2(16, 22, 58, 58), id)
+		_label(card, item[0], Rect2(91, 15, 258, 44), 24, PAPER, true)
+		_label(card, item[1], Rect2(91, 62, 258, 45), 14, DIM, false, true)
+		_label(card, _t("Effect lasts %d seconds") % int(item[2]), Rect2(16, 104, 333, 29), 13, GREEN)
+		var button := _button(card, (_t("Remove · %d coins") % int(item[3])) if selected else (_t("Buy · %d coins") % int(item[3])), Rect2(16, 135, 333, 35), _refund.bind(id) if selected else _buy.bind(id), not selected)
+		button.disabled = not selected and (reserved.size() >= Gear.MAX_LOADOUT or item[3] > game.campaign.coins)
+		if button.disabled:
+			button.text = _t("Loadout full") if reserved.size() >= Gear.MAX_LOADOUT else (_t("%d coins short") % (item[3] - game.campaign.coins))
+		if purchased_id == id and selected:
+			_animate_purchase(card)
+	var loadout := _panel(screen, Rect2(842, 135, 262, 386), Color("#0d2530"), Color("#637b76"))
+	_label(loadout, "Starting loadout", Rect2(18, 13, 227, 45), 22, AMBER, true)
+	for i in Gear.MAX_LOADOUT:
+		var y := 70.0 + i * 80.0
+		if i < reserved.size():
+			var id: int = reserved[i]
+			var remove := _button(loadout, "", Rect2(17, y, 228, 67), _refund.bind(id))
+			_gear_badge(remove, Rect2(10, 10, 47, 47), id)
+			_label(remove, Gear.ITEMS[id][0], Rect2(67, 5, 149, 31), 16, PAPER, true)
+			_label(remove, "Click to refund", Rect2(67, 34, 149, 27), 12, AMBER)
+		else:
+			var empty := _panel(loadout, Rect2(17, y, 228, 67), Color("#10212b"), LINE.darkened(0.2))
+			_label(empty, "%02d" % (i + 1), Rect2(14, 8, 44, 48), 22, DIM, true)
+			_label(empty, "Empty slot", Rect2(67, 8, 149, 48), 15, DIM)
+	_label(loadout, "Cancel freely before deployment. Full refund.", Rect2(18, 318, 227, 57), 14, DIM, false, true)
+	_panel(screen, Rect2(48, 547, 1056, 1), LINE, LINE)
+	_back_arrow(screen, Rect2(48, 568, 44, 46), _shop_page.bind(-1), "Previous").disabled = gear_page == 0
+	_back_arrow(screen, Rect2(159, 568, 44, 46), _shop_page.bind(1), "Next", true).disabled = gear_page >= pages - 1
+	var pager := _label(screen, "%d / %d" % [gear_page + 1, pages], Rect2(96, 568, 60, 46), 14, DIM)
+	pager.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_label(screen, "Equipment timers start when the fight begins.", Rect2(226, 565, 495, 52), 13, DIM, false, true)
+	_button(screen, "Return to briefing" if sector_pending >= 0 else "Equipment index", Rect2(805, 568, 299, 46), back if sector_pending >= 0 else _open_archive.bind(1), true)
+	_show_save_notice(screen, Rect2(48, 517, 1000, 28))
+	purchased_id = -1
+
+func _animate_purchase(card: Control) -> void:
+	if game.reduced_motion or game.save_path.is_empty():
+		return
+	card.modulate = Color("#bbffe8")
+	card.create_tween().tween_property(card, "modulate", Color.WHITE, 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
+func _refund(id: int) -> void:
+	game.refund_gear(id)
+	_draw_page.call_deferred()
 
 func _gear_badge(parent: Control, at: Rect2, id: int, interactive := false) -> void:
 	var tint: Color = game.equipment_color(id)
@@ -801,7 +924,8 @@ func _shop_page(direction: int) -> void:
 	_draw_page.call_deferred()
 
 func _buy(id: int) -> void:
-	game.buy_gear(id)
+	if game.buy_gear(id):
+		purchased_id = id
 	_draw_page.call_deferred()
 
 func _start_selected() -> void:
@@ -884,6 +1008,8 @@ func _new_lesson() -> void:
 	var context := _label(screen, "%02d / %s" % [sector_pending + 1, _t(Levels.TABLE[sector_pending][0])] if sector_pending >= 0 else _t("Field archive"), Rect2(772, 39, 332, 37), 16, tone)
 	context.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	next_step_button = _button(screen, "Continue" if sector_pending >= 0 else "Done", Rect2(780, 572, 324, 48), _acknowledge_lesson, true)
+	if active_lesson >= 20:
+		_button(screen, "Try it", Rect2(780, 490, 324, 45), game.begin_context_practice.bind(active_lesson))
 	next_step_button.disabled = sector_pending >= 0 and not game.reduced_motion
 	_prepare_preview("context-%02d" % active_lesson, screen)
 	_focus_guide_action()
@@ -928,6 +1054,8 @@ func _result() -> void:
 	var text_line := "You can try another action from the guide."
 	var action := "Return to guide"
 	var callback: Callable = game.return_from_practice
+	if game.mode == "practice_done" and game.context_practice >= 0:
+		callback = game.return_to_lobby
 	if game.mode == "practice_done" and onboarding:
 		var practice_chapter: int = game.practice
 		action = "Enter lobby" if practice_chapter == DEMOS.size() - 1 else "Next lesson"
@@ -938,7 +1066,7 @@ func _result() -> void:
 		action = "Sector map"
 		callback = game.return_to_lobby.bind("map")
 	elif game.mode == "lost":
-		text_line = "Time ran out. Retry from the start of this sector." if timed_out else "Reboot from this sector with your entry loadout."
+		text_line = game.last_failure if not game.last_failure.is_empty() else ("Time ran out. Retry from the start of this sector." if timed_out else "Reboot from this sector with your entry loadout.")
 		action = "REBOOT"
 		callback = game._retry
 	_label(panel, text_line, Rect2(29, 83, 590, 75), 17, DIM, false, true)
@@ -982,6 +1110,7 @@ func _campaign_result(title: String, score: Dictionary) -> void:
 			award.tween_property(rank, "modulate:a", 1.0, 0.20).set_delay(0.17 + i * 0.09)
 			award.tween_property(rank, "scale", Vector2.ONE, 0.25).set_delay(0.17 + i * 0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_label(screen, _t("+%d coins") % score.get("coins", 0), Rect2(57, 384, 458, 72), 37, AMBER, true)
+	_label(screen, _t("%d perfect shifts  /  %d exchanges") % [score.get("perfect", 0), score.get("shifts", 0)], Rect2(57, 463, 453, 43), 15, DIM)
 	var details := _panel(screen, Rect2(543, 135, 561, 359), PANEL, LINE)
 	_label(details, "Bonus star targets", Rect2(22, 21, 486, 51), 26, PAPER, true)
 	_score_row(details, 89, _t("Time ≤ %ds") % int(level[5]), game.timecode(score.get("seconds", 0.0)), score.get("fast", false))
@@ -1053,7 +1182,7 @@ func _guide() -> void:
 		tab.add_theme_font_size_override("font_size", 13)
 		tab.tooltip_text = _t(DEMOS[index][1])
 		tab.disabled = onboarding and index > chapter and not lesson_watched.has(index - 1)
-	_button(screen, "Try it", Rect2(780, 467, 324, 49), _try_lesson)
+	_button(screen, "Try it", Rect2(780, 490, 324, 45), _try_lesson)
 	var last := chapter == DEMOS.size() - 1
 	next_step_button = _button(screen, ("Enter lobby" if onboarding else "Done") if last else "Next lesson", Rect2(780, 572, 324, 48), _next_lesson, true)
 	next_step_button.disabled = onboarding and not lesson_watched.has(chapter) and not game.reduced_motion
@@ -1078,9 +1207,9 @@ func _guide_screen(heading: String, title: String, instructions: String, keys: A
 	_place(preview, screen, GUIDE_FRAME)
 	_panel(screen, Rect2(780, 135, 324, 3), tone, tone)
 	_label(screen, title, Rect2(780, 153, 324, 91), 34, PAPER, true, true)
-	_label(screen, instructions, Rect2(780, 251, 324, 143), 17, PAPER, false, true)
+	_label(screen, instructions, Rect2(780, 251, 324, 179), 17, PAPER, false, true)
 	if not keys.is_empty():
-		_draw_keycaps(screen, keys, 405)
+		_draw_keycaps(screen, keys, 440)
 	_panel(screen, Rect2(48, 553, 1056, 1), LINE, LINE)
 	demo_toggle = _button(screen, "Pause demo", Rect2(48, 572, 186, 48), _toggle_demo)
 	_label(screen, "Gameplay recording", Rect2(253, 572, 340, 48), 14, DIM)
@@ -1089,7 +1218,8 @@ func _guide_screen(heading: String, title: String, instructions: String, keys: A
 func _draw_keycaps(parent: Control, keys: Array, y: float) -> void:
 	var x := 780.0
 	for key: String in keys:
-		var label: String = PAD_KEYS[key] if game.last_device == "pad" else key
+		var action_map := {"J": "strike", "K": "dodge", "SHIFT": "steal", "E": "rule", "SPACE": "jump"}
+		var label: String = game.key_label(action_map[key]) if action_map.has(key) else game.key_label("left") + " / " + game.key_label("right")
 		var wide := 77.0 if label.length() > 2 else 48.0
 		var cap := _panel(parent, Rect2(x, y, wide, 37), INK, LINE)
 		var text := _label(cap, label, Rect2(0, 0, wide, 36), 14, GREEN)
@@ -1199,7 +1329,7 @@ func _show_frame() -> void:
 	demo_progress.value = frame
 
 func demo_duration() -> float:
-	return 10.0 if page == "new_lesson" else 7.0
+	return (17.0 if active_lesson == 23 else 10.0) if page == "new_lesson" else 7.0
 
 func play_arena_reveal() -> void:
 	if game.reduced_motion or game.save_path.is_empty():
@@ -1210,20 +1340,17 @@ func play_arena_reveal() -> void:
 	arena_reveal = screen
 	screen.layer = 6
 	add_child(screen)
-	for direction in [-1, 1]:
-		var shutter := Polygon2D.new()
-		shutter.color = Color("#132332dc")
-		shutter.position.x = 576
-		shutter.polygon = PackedVector2Array([Vector2.ZERO, Vector2(625 * direction, 0), Vector2(625 * direction, 648), Vector2(-49 * direction, 648)])
-		screen.add_child(shutter)
-		var reveal := shutter.create_tween().set_parallel()
-		reveal.tween_property(shutter, "position:x", 576 + 653 * direction, 0.31).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-		reveal.tween_property(shutter, "modulate:a", 0.0, 0.29)
-	var lifetime := screen.create_tween()
-	lifetime.tween_interval(0.32)
-	lifetime.tween_callback(screen.queue_free)
+	var transition := preload("res://src/deployment_transition.gd").new()
+	transition.heading = _t("Entering sector")
+	transition.title = _t(Levels.TABLE[game.sector_index][0]) if game.mission_sector else _t(game.ENCOUNTERS[game.stage].name)
+	transition.tone = Levels.TINTS[Levels.TABLE[game.sector_index][1]]
+	transition.font = Locale.face(Locale.current())
+	transition.face = Locale.face(Locale.current(), true)
+	screen.add_child(transition)
 
 func back() -> void:
+	binding_index = -1
+	game._save()
 	if page == "language":
 		return
 	if onboarding and page == "guide":

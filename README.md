@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.5.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.6.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Download Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Download Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#field-guide"><img alt="Field guide" src="https://img.shields.io/badge/Read-Field%20guide-795c35?style=for-the-badge"></a>
@@ -12,70 +12,75 @@
 
 A 2D boss rush about stealing the rules of a fight. Built with Godot and GDScript for GitHub Game Off 2026.
 
+
+
 ## Features
 
-| Feature | In the game |
+| | |
 | --- | --- |
-| Shift exchange | Dodge an attack, approach the exposed core and press **Shift**. You gain the boss’s ability and hand it your previous rule. |
-| 48 sectors in eight regions | Ride moving ferries, break relays with combos, rewire gates, cross moving sensors, hold beacons and dodge to charge capacitors. Route layouts and five new boss encounters build on the original campaign. |
-| Sector map and saves | A clear lights up the map and unlocks the next sector. Replay any cleared stage for a new rating and reward. Esc pauses. The gear menu offers save and quit or a confirmed progress reset. |
-| Gameplay recordings | Five introductory clips have hands-on drills. When a mechanic first appears, the game plays its clip before entry. Open **?** for the archive and equipment index. |
-| Equipment and coin shop | 20 temporary items with distinct icons. Earn 1,000–3,000 coins per clear and buy up to three distinct items before entry. Weakening items only drop in combat. |
-| Settings | Choose a language, display mode, window size and text size. Toggle audio, reduced motion or assist mode. Windows opens fullscreen on first launch and remembers your choice. The Web version opens inside its page and can enter fullscreen from Settings. |
+| 48 sectors, 8 regions | 19 route types, 14 boss encounter sectors and 13 routes with a guardian interception. Every region ends in a boss. |
+| Three meanings of Shift | Trade your rule with the enemy, exchange positions with anchors and switch the solid platforms between two world phases. |
+| Perfect dodge | Dodge just before impact to prime one strike with +4 damage. Use it within two seconds. Ordinary dodges keep their normal protection. |
+| Reversible loadouts | 23 short-lived items. Buy up to three different items. Click a reserved item or its Remove button for a full refund before deployment. Penalties only drop in combat. |
+| Guides and settings | 29 real gameplay clips, drills, persistent remapping, separate master/music/effects levels and screen shake strength. The lower-left HUD lists every action and its current key. |
 
-![The lobby on the overlook](docs/lobby.png)
+![Continue the next operation or open the map, shop, archive and settings.](docs/lobby.png)
 
-The lobby resumes the next available sector. Open Settings with the gear icon, or the guide with **?**.
+Continue the next operation or open the map, shop, archive and settings.
 
-![The eight-region sector map](docs/map.png)
+![Pick a region, then a sector. Read the goal before deployment.](docs/map.png)
 
-Choose a region on the left. Select a sector to read its goal before you deploy.
+Pick a region, then a sector. Read the goal before deployment.
 
-![The shop with six unlocked items](docs/equipment.png)
+![Every item has a visible effect duration. Reserved slots on the right can be clicked to refund.](docs/equipment.png)
 
-Each item states what it does, how long it lasts and what it costs.
+Every item has a visible effect duration. Reserved slots on the right can be clicked to refund.
 
-![The moving ferry lesson with a full arena recording and its controls](docs/guide.png)
+![World-phase lesson: watch the real gameplay on the left, read the instruction and key on the right.](docs/guide.png)
 
-The left side shows the move in play. The right side explains the move and lists the key.
+World-phase lesson: watch the real gameplay on the left, read the instruction and key on the right.
 
 ## Controls
 
-| Action | Keyboard | Controller |
+| Action | Default keyboard key | Controller |
 | --- | --- | --- |
-| Start / continue | Enter | Start / A |
-| Move | A/D or arrow keys | Left stick / D-pad |
-| Jump | Space, W or ↑ | A |
-| Strike (hold to repeat) | J or Z | X |
-| Dodge | K or X | B |
-| Steal / exchange | Shift or Q | Right bumper |
-| Use the current rule | E or C | Y |
-| Pause | Esc or P | Start |
-| Retry current sector | R | Back / Select |
+| Menu confirmation | Enter | A |
+| Move left | A | ← Stick |
+| Move right | D | Stick → |
+| Jump | Space | A |
+| Strike (hold to repeat) | J | X |
+| Dodge | K | B |
+| Shift / exchange | Shift | RB |
+| Use the current rule | E | Y |
+| Pause | Esc | Start |
+| Retry | R | Back |
 
-## Rules and recovery
+## Shift changes the fight
 
-**RUSH** delivers a forward dash strike. **LIFT** launches you into the air so you can pierce armor with a strike. **AEGIS** catches a hit and reflects damage if the boss is close. The rule recharges after the next boss attack or a successful transfer. Entering a sector restores up to three hull points. Retrying restores that sector’s starting state.
+Taking **RUSH** exchanges the player and boss positions and turns you to face the enemy. Taking **LIFT** grounds the boss; the Lattice deck breaks open. Taking **AEGIS** strips armor for a short damage window. The enemy receives your old rule and uses it for its next attack. Preview both rule icons before you swap.
 
 ## Field guide
 
-1. **Get into the game.** Extract the Windows x64 download and launch `ShiftProtocol.exe`. For Web HTML5, unzip to a web server and open `index.html`, or upload the ZIP to itch.io as a browser game. In the browser, click the game to give it keyboard focus.
-2. **Make the first transfer.** Watch the warning, then press K to dodge as the attack arrives. Run toward the opened core until the HUD says it is in range. Press Shift, Q or the right bumper. The HUD shows both exchanged rules. Press E or Y to use yours and J or X to strike. If the transfer fails, wait for the next opening and get closer.
-3. **Read the field.** Stand on the reflected-pulse marker and use AEGIS as the warning ends. For echo locks, stay by the lock until the target stops tracking, then leave. For cargo, press J near it and bring it through the checkpoints. The **?** archive replays each unlocked demonstration.
-4. **Read equipment bubbles.** Eligible hits roll a 38% chance while no capsule is on the field and the short drop cooldown has passed. The ring lasts 6 seconds. Walk into mint bubbles for a bonus or avoid coral bubbles, which weaken a stat for 5 seconds. Equipped effects last 5–9 seconds. The combat HUD shows remaining time.
-5. **Earn and spend coins.** A clear earns one star, with bonus stars for the listed time and hit thresholds. Each star pays 1,000 coins, including replays. Shop prices start at 6,000. Bought equipment is reserved for the next sector entry, and its timer starts when play begins. Use the cart in the lobby or shop during the pre-entry prompt. The equipment index lists effects, duration and price as they unlock.
-6. **Resume or replay.** Clear results offer Retry, Lobby and Next sector. Esc pauses the run. Settings can erase progression and coins after confirmation, while keeping display, language and accessibility settings.
+1. Extract the Windows ZIP and launch **ShiftProtocol.exe**, leaving its runtime folder in place. First launch is fullscreen. Choose your language, watch the five basic lessons and use **Try it** to practice.
 
-The guide plays a full-arena recording automatically. Pause or replay it, then use Try it to practice a basic move. Check the mission briefing for the checkpoint layout and the shop for the duration of each item.
+2. Watch the red windup. Dodge or leave its marked zone, approach the opened core, then press **Shift**. Press **E** to use the stolen rule. The bar shows when dodge is ready.
+
+3. For a perfect dodge, press **K** just before contact. The gold ring and cue confirm a counter. Your next successful strike receives the bonus once, for two seconds.
+
+4. Phase routes show **I / II**. Shift activates the matching platforms. Anchor routes show a large range ring: enter it and Shift to trade places with the anchor. New mechanics play their lesson automatically and remain in **?**.
+
+5. A route can end with a guardian. Finish the checkpoints, then defeat it to clear. A replay pays 1,000 coins per star. Buy gear from the cart; click any reserved slot to return its full price before entry. Purchased effects last 7–9 seconds and start with combat.
+
+6. Open the gear icon for settings. Keyboard has one key per action; choosing an occupied key swaps the two bindings. The HUD follows your choice. Adjust audio channels and screen shake separately. Esc pauses; Save and quit writes local progress.
 
 ## Play and build
 
-On Windows, extract the full archive and double-click `ShiftProtocol.exe`. Keep the `runtime` folder beside the launcher. In a desktop browser, click the game to focus it. To build from source, open `project.godot` in standard Godot 4.7.2 and press F5. The build instructions cover export templates, tests and the Web and Windows ZIPs.
+Web HTML5 is a desktop browser build: serve index.html over HTTP, or upload the Web ZIP to itch.io. Source builds use standard Godot 4.7.2. See the build instructions for exports and tests.
 
-[Download a tagged release](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [Build instructions](docs/BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
+[Download a tagged release](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [Build instructions](docs/BUILD.md)
 
 ## Credits and license
 
-Created by Carey for GitHub Game Off 2026. OpenAI Codex assisted with design, GDScript, procedural visuals and sound, testing, and documentation. The game uses no runtime AI. Original project files use the MIT license. Barlow Condensed, Space Mono and the Shift Sans subsets of Noto Sans ship with their SIL Open Font License notices. Godot and its dependencies have separate notices.
+Created by Carey. Codex assisted with code, testing, documentation, generated character artwork and animation poses. No runtime AI is used. Original project files use MIT. Fonts retain their SIL OFL notices; Godot and dependencies retain their notices. Interface study references: Hell759735653’s Ember Veil and FunX’s Foundation UI. Their images are not distributed with the game.
 
-[MIT](LICENSE) · [SIL OFL](assets/) · [Godot](docs/GODOT_COPYRIGHT.txt)
+[Art and reference notes](assets/ART-NOTES.txt)

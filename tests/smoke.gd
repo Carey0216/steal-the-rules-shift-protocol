@@ -174,6 +174,7 @@ func _run() -> void:
 	_test_routes_and_overclock()
 	_test_operation()
 	_test_save()
+	_test_v16_features()
 	if capture:
 		var all_records: Array[Dictionary] = g.campaign.records.duplicate(true)
 		g.campaign.records.resize(11)
@@ -308,7 +309,7 @@ func _test_operation() -> void:
 		if not g.mode in ["clear", "win"]:
 			break
 		_check(g.sector_result.coins == g.sector_result.stars * 1000, "Stars pay their actual run value.")
-	_check(route_types.size() == 17 and g.Levels.TABLE.size() == 48, "All 17 route types and 48 sectors are exercised.")
+	_check(route_types.size() == 19 and g.Levels.TABLE.size() == 48, "All 19 route types and 48 sectors are exercised.")
 	if g.campaign.records.is_empty():
 		return
 	g.begin_sector(0)
@@ -347,10 +348,18 @@ func _play_route() -> void:
 	for tick in 120 * 80:
 		if g.mode != "fight":
 			break
+		if g.guardian:
+			var pilot := _pilot()
+			g._tick_fight(DT, pilot.axis, pilot.pressed, pilot.strike)
+			continue
 		var target: Vector2 = route.target()
 		var aim := target
 		var presses := {}
 		var strike: bool = route.kind in ["break", "belt", "timer", "cargo", "combo"]
+		if route.kind == "phase" and route.phase != route.cursor % 2 and route.shift_cd <= 0.0:
+			presses.steal = true
+		if route.kind == "blink" and route.near(g.p, target, 309, 191) and route.shift_cd <= 0.0:
+			presses.steal = true
 		if route.kind == "ferry" and not route.ridden:
 			aim = Vector2(route.ferry.get_center().x, route.ferry.position.y)
 		if route.kind == "key":
@@ -392,6 +401,80 @@ func _play_route() -> void:
 		var diff: float = aim.x - g.p.x
 		var axis := signf(diff) if absf(diff) > 17 else 0.0
 		g._tick_fight(DT, axis, presses, strike)
+
+func _test_v16_features() -> void:
+	g.return_to_lobby()
+	g.campaign.coins = 20000
+	g.campaign.reserved.clear()
+	_check(g.buy_gear(0), "Gear can be reserved.")
+	_check(g.refund_gear(0) and g.campaign.coins == 20000 and g.campaign.reserved.is_empty(), "Undeployed gear returns its full price and frees the slot.")
+	_check(not g.refund_gear(0) and g.campaign.coins == 20000, "A refunded purchase cannot be refunded twice.")
+	var defaults: Array = g.controls.keys.duplicate()
+	_check(g.controls.rebind(3, KEY_K) and g.controls.keys[3] == KEY_K and g.controls.keys[4] == KEY_J, "Rebinding an occupied key swaps actions.")
+	var seen := {}
+	for action: String in g.Controls.ACTIONS:
+		var keyboard := 0
+		for event in InputMap.action_get_events(action):
+			if event is InputEventKey:
+				keyboard += 1
+				_check(not seen.has(event.physical_keycode), "Physical keys never trigger two game actions.")
+				seen[event.physical_keycode] = true
+		_check(keyboard == 1, "Every game action has exactly one keyboard key.")
+	g.controls.defaults()
+	_check(defaults == g.controls.keys, "Default bindings restore exactly.")
+	g.begin_context_practice(22)
+	g.dodge_protection = 0.25
+	g.dodge_age = 0.18
+	g.hurt_iframes = 0.0
+	var drill_attack := Rect2(g.p - Vector2(13, 37), Vector2(26, 34))
+	g._check_hurt(drill_attack, g.p.x + 20)
+	_check(not g.practice_clear, "The perfect-dodge drill cannot be completed with an ordinary dodge.")
+	g.dodge_age = 0.04
+	g.counter_used = false
+	g._check_hurt(drill_attack, g.p.x + 20)
+	_check(g.practice_clear and g.perfect_dodges == 1, "The perfect-dodge drill accepts a correctly timed dodge.")
+	g.context_practice = -1
+	g.practice = -1
+	g._new_run()
+	g.mode = "fight"
+	g.dodge_protection = 0.30
+	g.dodge_age = 0.035
+	g.counter_used = false
+	var before: int = g.hp
+	var attack := Rect2(g.p - Vector2(13, 37), Vector2(26, 34))
+	g._check_hurt(attack, g.p.x + 20)
+	_check(g.hp == before and g.perfect_dodges == 1 and g.counter_time > 0.0, "A precisely timed dodge primes a counter without damage.")
+	g._check_hurt(attack, g.p.x + 20)
+	_check(g.perfect_dodges == 1, "One dodge cannot farm repeated perfect rewards.")
+	g.p = g.b - Vector2(75, 0)
+	g.facing = 1
+	g._set_state("exposed", 2)
+	var counter_before: int = g.boss_hp
+	g._strike()
+	_check(counter_before - g.boss_hp == 7 and g.counter_time == 0.0, "The next connected strike consumes the perfect reward exactly once.")
+	counter_before = g.boss_hp
+	g._strike()
+	_check(counter_before - g.boss_hp == 3, "Later strikes do not reuse the perfect reward.")
+	g.player_rule = g.Rule.AEGIS
+	g.boss_rule = g.Rule.RUSH
+	g.p.x = g.b.x - 80
+	g.shift_lock = 0
+	g._set_state("exposed", 2)
+	var old_player: float = g.p.x
+	var old_boss: float = g.b.x
+	g._try_shift()
+	_check(g.p.x == old_boss and g.b.x == old_player and g.player_rule == g.Rule.RUSH and g.boss_rule == g.Rule.AEGIS, "Stealing RUSH exchanges actual positions and both rules.")
+	var saved_coins: int = g.campaign.coins
+	var saved_count: int = g.campaign.records.size()
+	g.begin_context_practice(20)
+	_play_route()
+	_check(g.mode == "practice_done" and g.campaign.coins == saved_coins and g.campaign.records.size() == saved_count, "Phase practice finishes without modifying campaign money or records.")
+	g.return_to_lobby()
+	g.master_volume = 0.4
+	g.music_volume = 0.3
+	g.effects_volume = 0.8
+	g._save()
+	_check(g.config.get_value("settings", "master_volume") == 0.4 and g.config.get_value("settings", "music_volume") == 0.3 and g.config.get_value("settings", "effects_volume") == 0.8, "Independent volume settings are persisted.")
 
 func _test_routes_and_overclock() -> void:
 	g._new_run()
@@ -499,6 +582,7 @@ func _escape_columns() -> float:
 func _shot(label: String) -> void:
 	captures[label] = true
 	DirAccess.make_dir_recursive_absolute("res://builds/screens")
+	g.title_menu.sync_mode()
 	g.queue_redraw()
 	await process_frame
 	await RenderingServer.frame_post_draw

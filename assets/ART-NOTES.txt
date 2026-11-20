@@ -1,0 +1,61 @@
+SHIFT PROTOCOL 1.6 — artwork and interface provenance
+
+Original project artwork is distributed under the project's MIT license.
+Font, Godot and other third-party notices remain separate.
+
+Interface research, viewed in Edge on 2026-11-20:
+  Hell759735653 — 烬域 / Ember Veil
+  https://www.zcool.com.cn/work/ZNzQwMzM2Njg=.html
+  Studied its character-led composition, material hierarchy and selected states.
+  FunX — Foundation-基地-Game UI
+  https://www.zcool.com.cn/work/ZNzQzNDM3Njg=.html
+  Studied teal/graphite contrast, cut-corner controls, icons and information tiers.
+These works are references only. Their images, characters and code are not
+included in this repository or either game package.
+
+assets/operative-portrait.png
+  Original character illustration generated with the built-in image tool.
+  Prompt:
+  Create an original production-quality full-body character cutout for a premium
+  2D science-fiction action game's lobby. One adult masked human operative, lean
+  realistic anatomy and elongated athletic proportions, seen from the front in a
+  strong three-quarter view facing slightly right. Beautiful hand-painted graphic
+  illustration, carefully shaded hard-surface armor and cloth, sophisticated art
+  direction like an illustrated space-opera adventure. Ivory ceramic armor over
+  a graphite bodysuit, dark petrol-teal cape/scarf blowing gently to the left,
+  restrained brushed brass trim, thin pale turquoise visor with no visible face.
+  Distinctive asymmetric shoulder armor and compact reactor socket on chest.
+  Carries a single elegant long energy blade angled up to the right, blade brass
+  and ivory with a turquoise cutting edge. Legs fully shown, composed balanced
+  stance. Rich material detail, tailored seams, subtle wear, controlled dramatic
+  rim light, beautiful crafted silhouette, crisp clean alpha edges. Large generous
+  transparent padding all around including blade and scarf. No background, text,
+  UI, logos, letters, montage, cartoon robot, chibi, pixel art, small polygon art,
+  massive guns or copied existing characters. Ready for a dark teal lobby.
+
+assets/operative-poses.png
+  Original game sprite sheet generated with the built-in image tool, using
+  operative-portrait.png as the character reference.
+  Prompt:
+  Use the original ivory-armored teal-scarfed operative as character reference
+  to create a usable transparent 2D action-game sprite sheet. Landscape canvas,
+  exactly four equal columns and two equal rows, eight equal cells, full bodies
+  contained within each cell with generous padding, no grid lines or labels.
+  All characters face right in side view for a side-scrolling game. Fixed camera,
+  identical scale, common ground level near 85% of each cell height. Preserve
+  detailed ivory ceramic armor, graphite under-suit, dark teal scarf, brass trim,
+  thin turquoise visor and slim energy sword. Painterly crisp production sprites,
+  realistic proportions, no chibi. Top row: combat idle; running left leg leading;
+  running right leg leading; rising jump. Bottom row: falling with legs extending;
+  low forward dodge; forward sword slash with turquoise arc; recoil from a hit.
+  Transparent background. No text, panel outlines, perspective grids or objects
+  crossing cell boundaries.
+  The game selects a pose from actual velocity, grounded state, dodge, sword and
+  hurt timers. It uses texture regions and mirrors the pose when facing left.
+
+src/ui_skin.gd, src/motion_button.gd, src/deployment_transition.gd:
+  Original code-drawn UI, active borders and deployment sequence.
+src/equipment_icons.gd:
+  Original vector equipment symbols, including the three new behavior items.
+src/arena_art.gd:
+  Original procedural bosses, region scenery, hazards and real-state effects.

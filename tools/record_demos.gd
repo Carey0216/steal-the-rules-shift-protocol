@@ -13,6 +13,7 @@ const CONTEXT_KEYS := [
 	[KEY_D, KEY_A], [KEY_J, KEY_D, KEY_SPACE], [KEY_D, KEY_J], [KEY_D, KEY_J],
 	[], [KEY_D, KEY_SPACE], [KEY_D, KEY_SPACE, KEY_J], [KEY_D, KEY_SPACE, KEY_SHIFT, KEY_E],
 	[KEY_D, KEY_SPACE, KEY_K], [KEY_D, KEY_A, KEY_SPACE], [KEY_D, KEY_SPACE, KEY_K],
+	[KEY_SHIFT, KEY_SPACE, KEY_D], [KEY_SHIFT, KEY_D], [KEY_K, KEY_J], [KEY_D, KEY_J, KEY_K, KEY_SHIFT, KEY_E],
 ]
 
 class InputSlate extends Node2D:
@@ -79,7 +80,9 @@ func _record() -> void:
 	game.combat_rng.seed = 26
 	TranslationServer.set_locale("en")
 	var requested := OS.get_cmdline_user_args()
-	if requested.size() == 1 and requested[0].begins_with("--lesson="):
+	if requested.size() == 1 and requested[0].begins_with("--intro="):
+		await _clip(requested[0].get_slice("=", 1))
+	elif requested.size() == 1 and requested[0].begins_with("--lesson="):
 		var lesson := int(requested[0].get_slice("=", 1))
 		if lesson == 13:
 			await _shop_clip()
@@ -165,7 +168,7 @@ func _context_clip(lesson: int) -> void:
 	for action in [&"left", &"right", &"jump", &"strike", &"dodge", &"steal", &"rule"]:
 		Input.action_release(action)
 	game.just.clear()
-	var training_sector: Array[int] = [0, 1, 3, 4, 6, 7, 9, 10, 14, 18, 23, 1, 1, -1, 24, 25, 27, 30, 29, 34]
+	var training_sector: Array[int] = [0, 1, 3, 4, 6, 22, 9, 10, 14, 18, 23, 1, 1, -1, 24, 25, 27, 30, 28, 34, 7, 16, 2, 1]
 	var index := training_sector[lesson]
 	var folder := "res://builds/recordings/context-%02d" % lesson
 	DirAccess.make_dir_recursive_absolute(folder)
@@ -177,6 +180,8 @@ func _context_clip(lesson: int) -> void:
 	game.campaign.reserved.clear()
 	game.begin_sector(index)
 	game.mode = "fight"
+	if lesson == 22:
+		game.begin_practice(2)
 	game.gear_rng.seed = 1
 	slate.active.clear()
 	slate.keys = CONTEXT_KEYS[lesson]
@@ -193,7 +198,9 @@ func _context_clip(lesson: int) -> void:
 		11, 12:
 			game.p.x = 389.0
 			game.gear_rng.seed = _drop_seed(lesson == 12)
-	for tick in 960:
+	var ticks := 1680 if lesson == 23 else 960
+	var stride := ticks / 60
+	for tick in ticks:
 		if game.mode == "fight":
 			var desired := _context_input(lesson, tick)
 			for key in [KEY_A, KEY_D, KEY_SPACE, KEY_J, KEY_K, KEY_SHIFT, KEY_E]:
@@ -211,16 +218,20 @@ func _context_clip(lesson: int) -> void:
 				success = success or (game.evacuated and game.route.cursor > 0)
 			elif lesson in [11, 12]:
 				success = success or not game.effects.is_empty()
+			elif lesson == 22:
+				success = success or game.perfect_dodges > 0
+			elif lesson == 23:
+				success = success or game.guardian_defeated
 			else:
 				success = success or game.route.cursor > 0
-		if tick % 16 == 0:
+		if tick % stride == 0:
 			slate.rule_status = "YOU: %s" % game.RULE_NAMES[game.player_rule]
 			slate.dodge_ready = clampf(1.0 - game.dash_cd / game.DODGE_COOLDOWN, 0.0, 1.0)
 			for key in slate.active:
-				slate.active[key] -= 16
+				slate.active[key] -= stride
 			slate.queue_redraw()
 			game.queue_redraw()
-			await _save_frame(folder, tick / 16, false)
+			await _save_frame(folder, tick / stride, false)
 	for key in held:
 		_key(key, false)
 	if not success:
@@ -242,6 +253,24 @@ func _drop_seed(negative: bool) -> int:
 func _context_input(lesson: int, tick: int) -> Array:
 	var route: RefCounted = game.route
 	var keys := []
+	if lesson == 22:
+		if game.state == "active" and absf(game.b.x - game.p.x) < 100.0:
+			return [KEY_K]
+		return []
+	if lesson == 23 and game.guardian:
+		var delta: float = game.b.x - game.p.x
+		if game.can_shift():
+			return [KEY_SHIFT]
+		var buttons := [KEY_J]
+		if absf(delta) > 70:
+			buttons.append(KEY_D if delta > 0 else KEY_A)
+		if game.state == "active" and absf(delta) < 126:
+			buttons.append(KEY_K)
+		if game.charge and game.player_rule == 1 and absf(delta) < 260:
+			buttons.append(KEY_E)
+		if game.grounded and game.state == "windup" and game.state_time < 0.16:
+			buttons.append(KEY_SPACE)
+		return buttons
 	if not route.active():
 		return [KEY_J] if lesson == 10 else keys
 	if lesson >= 14:
@@ -293,7 +322,15 @@ func _extended_input(route: RefCounted, tick: int) -> Array:
 	var keys := []
 	var target: Vector2 = route.target()
 	var aim := target
+	if route.kind in ["break", "belt"]:
+		keys.append(KEY_J)
 	match route.kind:
+		"phase":
+			if route.phase != route.cursor % 2 and route.shift_cd <= 0:
+				keys.append(KEY_SHIFT)
+		"blink":
+			if route.near(game.p, target, 309, 191) and route.shift_cd <= 0:
+				return [KEY_SHIFT]
 		"ferry":
 			if not route.ridden:
 				aim = Vector2(route.ferry.get_center().x, route.ferry.position.y)
@@ -338,8 +375,8 @@ func _shop_clip() -> void:
 	for index in 60:
 		match index:
 			6: _mouse(Vector2(949, 46))
-			24: _mouse(Vector2(486, 201))
-			40: _mouse(Vector2(950, 207))
+			24: _mouse(Vector2(248, 286))
+			40: _mouse(Vector2(634, 286))
 		await process_frame
 		game.queue_redraw()
 		await _save_frame(folder, index, true)

@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本與更新日誌" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.5.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本與更新日誌" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.6.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下載 Windows x64 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下載 Web HTML5 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#行動指南"><img alt="行動指南" src="https://img.shields.io/badge/%E6%8C%87%E5%8D%97-%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
@@ -12,71 +12,75 @@
 
 一款靠偷取規則改變戰局的 2D Boss Rush。為 GitHub Game Off 2026 使用 Godot 與 GDScript 製作。
 
+
+
 ## 遊戲特色
 
-| 功能 | 遊戲中的表現 |
+| | |
 | --- | --- |
-| SHIFT 交換 | 躲過攻擊，靠近開啟的核心並按 **Shift**。你取得 Boss 的能力，並把原有規則交給它。 |
-| 48 關 / 八大區域 | 搭乘移動渡台、連擊破壞中繼器、接線開閘、穿越掃描光束、駐守信標，以閃避為蓄能器充能。原關卡經過調整，另有五場全新 Boss 戰。 |
-| 地圖與存檔 | 通關點亮地圖並開放下一關。已通關的關卡可重玩並重新結算。Esc 暫停，齒輪選單可儲存離開或確認清除進度。 |
-| 實機引導 | 開場五課可以親手練習。新玩法首次出現時，戰前會自動播放示範。大廳的 **？** 可重看，也能查看裝備圖鑑。 |
-| 裝備與商店 | 20 種各有圖示的裝備。通關發 1000–3000 金幣，戰前最多購買三種不同裝備。減益裝備僅在對抗中掉落。 |
-| 設定 | 可變更語言、顯示模式、視窗大小及文字大小，也可切換音效、減少動態效果和輔助模式。Windows 首次啟動預設為全螢幕，之後會記住你的選擇。網頁版在頁面內啟動，可在設定切換全螢幕。 |
+| 48 關 / 八個區域 | 19 種路線機制、14 個 Boss 關卡，以及 13 條終點有守衛截擊的路線。每個區域都以 Boss 戰收尾。 |
+| Shift 的三種意義 | 與敵人交換規則、與錨點交換位置，以及切換世界相位，讓另一組平台實體化。 |
+| 極限閃避 | 攻擊命中前閃避穿過，可強化下一次攻擊，傷害 +4，2 秒內有效。普通閃避仍保留原有保護。 |
+| 可撤銷的出戰配置 | 23 種短時裝備，出戰前最多買三種。點擊已購槽位或撤銷按鈕即可全額退回金幣，再換購。減益僅在對抗中掉落。 |
+| 指南與設定 | 29 段實機示範及練習，支援重設按鍵、獨立調整總音量/音樂/音效與震動畫面強度。左下角常駐顯示動作及按鍵。 |
 
-![繁體中文大廳：繼續作戰、關卡地圖、金幣與設定](../lobby-zh-TW.png)
+![繼續下一關，或開啟地圖、商店、檔案與設定。](../lobby-zh-TW.png)
 
-從大廳繼續下一關；齒輪可開啟設定，**？**可開啟指南。
+繼續下一關，或開啟地圖、商店、檔案與設定。
 
-![繁體中文關卡地圖：左側切換區域，右側顯示關卡目標](../map-zh-TW.png)
+![先選區域，再選關卡，出戰前查看目標。](../map-zh-TW.png)
 
-左側切換區域。選擇關卡後，可先在右側查看目標。
+先選區域，再選關卡，出戰前查看目標。
 
-![繁體中文商店：裝備效果、持續時間、價格和持有金幣](../equipment-zh-TW.png)
+![每件裝備會標明有效時間，點右側已購槽位即可退款。](../equipment-zh-TW.png)
 
-每件裝備下方列出效果、持續時間與售價。
+每件裝備會標明有效時間，點右側已購槽位即可退款。
 
-![繁體中文移動渡台指南：左側播放實機示範，右側列出步驟與跳躍鍵](../guide-zh-TW.png)
+![世界相移教學：左側播放實機示範，右側列出步驟與按鍵。](../guide-zh-TW.png)
 
-左側播放實機操作，右側說明步驟與按鍵。
-
+世界相移教學：左側播放實機示範，右側列出步驟與按鍵。
 
 ## 操作方式
 
-| 操作 | 鍵盤 | 控制器 |
+| 操作 | 預設鍵盤按鍵 | 手把 |
 | --- | --- | --- |
-| 開始 / 繼續 | Enter | Start / A |
-| 移動 | A/D 或方向鍵 | 左搖桿 / 十字鍵 |
-| 跳躍 | 空白鍵、W 或 ↑ | A |
-| 揮刀（可按住） | J 或 Z | X |
-| 閃避 | K 或 X | B |
-| 偷取 / 交換 | Shift 或 Q | 右肩鍵 |
-| 使用目前的能力 | E 或 C | Y |
-| 暫停 | Esc 或 P | Start |
-| 重試目前區域 | R | Back / Select |
+| 選單確認 | Enter | A |
+| 向左移動 | A | ← Stick |
+| 向右移動 | D | Stick → |
+| 跳躍 | Space | A |
+| 揮刀（可按住） | J | X |
+| 閃避 | K | B |
+| 相移 / 交換 | Shift | RB |
+| 使用目前能力 | E | Y |
+| 暫停 | Esc | Start |
+| 重試 | R | Back |
 
-## 規則與修復
+## Shift 如何改變戰局
 
-**RUSH** 向前衝刺斬擊。**LIFT** 向上噴射，上升時揮刀可穿透裝甲。**AEGIS** 擋下一擊，Boss 在附近時會反彈傷害。下一次 Boss 攻擊結束或交換成功後，能力會重新充能。進入新區域最多修復三格耐久，重試會恢復進入該區域時的狀態。
+奪取 **RUSH** 時會與 Boss 交換位置，並自動轉向敵人；奪取 **LIFT** 使 Boss 落地，懸陣機的甲板也會坍塌；奪取 **AEGIS** 剝離裝甲，產生短暫增傷窗口。Boss 會接過你的舊規則，改變下一招。交換前請確認雙方圖示。
 
 ## 行動指南
 
-1. **啟動。** Windows x64 請解壓縮整包，雙擊 `ShiftProtocol.exe`。Web HTML5 可透過本機 HTTP 伺服器開啟 `index.html`，或將 ZIP 作為 itch.io 瀏覽器遊戲上傳。先點畫面取得鍵盤焦點。
-2. **完成第一次交換。** 看預警，攻擊即將到達時按 K。靠近開啟的核心，等介面顯示進入範圍後，按 Shift、Q 或右肩鍵。E 或 Y 使用規則，J 或 X 揮刀。交換失敗時等下一次開啟並再靠近一點。
-3. **利用場地。** 反射關站在標記上，預警即將結束時按 E 用 AEGIS。回聲鎖等準星固定再離開。在貨物旁按 J 接駁，依序運到每個檢查點。
-4. **辨認氣泡。** 場上沒有氣泡且冷卻結束時，有效命中的掉落機率為 38%。氣泡外圈在 6 秒內耗盡，靠近自動生效 5–9 秒。薄荷綠是增益，珊瑚紅是 5 秒減益，可以跳過。裝備圖示旁顯示倒數。
-5. **金幣與評分。** 通關先得一星，再依該關的用時與受擊門檻各加一星。每顆星 1000 金幣，重玩也依當次成績發放。商店 6000 金幣起，可從大廳購物車或入場前開啟。每種限買一件，下一次出戰開始才計時。詳見 **？→ 裝備圖鑑**。
-6. **重玩和存檔。** 結算可重試、回大廳或進入下一關。齒輪選單確認清檔會清除關卡、星級、金幣和已購裝備，保留語言、顯示與無障礙設定。
+1. 解壓縮 Windows 整包，執行 **ShiftProtocol.exe**，保留 runtime 資料夾。首次預設全螢幕。選好語言，依序看五課，或按「親手練習」試做。
 
-指南會自動播放完整的實機戰場，可暫停或重播。基礎課可按「親手練習」試做。任務簡報有檢查點路線，商店會標明裝備的效果時間與計時起點。
+2. 觀察紅色蓄力預警。閃避或離開危險區後，靠近開啟的核心並按 **Shift** 交換。**E** 使用能力，閃避條充滿後才能再次閃避。
+
+3. 攻擊即將碰到你時按 **K** 穿過，觸發極限閃避。金色環與音效代表反擊就緒；2 秒內下一次揮刀命中會消耗一次強化。
+
+4. 相位關查看 **I / II**，按 Shift 啟用對應平台。錨點關先進入大圓環，再按 Shift 交換位置。新機制會自動示範，之後可在 **？** 回看。
+
+5. 部分路線需要在完成檢查點後擊敗守衛。重玩亦按每顆星 1000 金幣發獎。商店已購槽位在出戰前可全額撤銷再換購，購買裝備持續 7–9 秒，開戰才計時。
+
+6. 齒輪開啟設定。每個動作只有一個按鍵，選已佔用的鍵會互換綁定，左下角提示同步更新。可分別調整總音量、音樂、音效與震動畫面。Esc 暫停，「儲存並離開」保留本機進度。
 
 ## 執行與建置
 
-在 Windows 上解壓縮整個檔案，按兩下 `ShiftProtocol.exe`，並保留旁邊的 `runtime` 資料夾。使用桌面瀏覽器時，先點選遊戲畫面讓它取得焦點。從原始碼執行時，使用標準版 Godot 4.7.2 開啟 `project.godot` 再按 F5。建置說明包含匯出範本、測試及 Web、Windows 壓縮檔的製作步驟。
+網頁版適用於桌面瀏覽器。透過 HTTP 開啟 index.html，或將 Web ZIP 上傳至 itch.io。原始碼使用標準版 Godot 4.7.2，建置說明包含匯出與測試步驟。
 
-[下載帶標籤的版本](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [建置說明（英文）](../BUILD.md) · [Game Off 2026](https://itch.io/jam/game-off-2026)
+[下載帶標籤版本](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [建置說明](../BUILD.md)
 
 ## 製作與授權
 
-Carey 為 GitHub Game Off 2026 製作。OpenAI Codex 協助設計、GDScript 程式、程式生成的畫面和音效、測試及文件。遊戲執行時不使用 AI。原創專案檔案採用 MIT 授權。Barlow Condensed、Space Mono 和源自 Noto Sans 的 Shift Sans 字型子集均附有 SIL Open Font License。Godot 和其相依套件附有獨立授權。
+Carey 製作。Codex 協助程式、測試、文件，以及角色原畫和動作姿態生成。遊戲執行時不使用 AI。原創專案檔案採 MIT，字型保留 SIL OFL，Godot 及其相依套件保留各自授權。介面研究參考 Hell759735653《燼域》和 FunX《Foundation-基地-Game UI》，未將其圖片打包。
 
-[MIT](../../LICENSE) · [SIL OFL](../../assets/) · [Godot](../GODOT_COPYRIGHT.txt)
+[美術與參考說明](../../assets/ART-NOTES.txt)

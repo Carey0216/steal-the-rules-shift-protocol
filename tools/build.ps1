@@ -51,7 +51,7 @@ try {
     & $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$launcherOut" $launcherSource
     if ($LASTEXITCODE -ne 0) { throw 'Could not compile the Windows launcher.' }
 
-    $notices = @('LICENSE','docs/GODOT_LICENSE.txt','docs/GODOT_COPYRIGHT.txt')
+    $notices = @('LICENSE','docs/GODOT_LICENSE.txt','docs/GODOT_COPYRIGHT.txt','assets/ART-NOTES.txt')
     $notices += @(Get-ChildItem -Path 'assets/OFL-*.txt' -File | Select-Object -ExpandProperty FullName)
     foreach ($target in @('web','windows')) {
         $noticePath = "$stage/$target/notices"

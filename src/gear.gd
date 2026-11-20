@@ -25,6 +25,9 @@ const ITEMS := [
 	["Grounding Mat", "Blocks live floor and vent damage", 8.0, 10000, 19, "ISO"],
 	["Feedback Loop", "Rule use locked while active", 5.0, 0, 11, "LOCK"],
 	["Brake Teeth", "Dodge distance ×0.7", 5.0, 0, 15, "BRAKE"],
+	["Pursuit Spur", "After dodging, the next strike deals +2 damage", 9.0, 9500, 5, "CHASE"],
+	["Echo Prism", "A close reflection sends a second 5-damage pulse", 9.0, 11000, 10, "ECHO"],
+	["Exchange Drive", "A rule swap primes a counterstrike and cools faster", 8.0, 11500, 16, "SHIFT"],
 ]
 
 static func stock(progress: int, paid: bool) -> Array[int]:

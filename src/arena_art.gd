@@ -5,7 +5,9 @@ const Menu = preload("res://src/title_menu.gd")
 const Levels = preload("res://src/levels.gd")
 const Gear = preload("res://src/gear.gd")
 const Icons = preload("res://src/equipment_icons.gd")
+const Operative = preload("res://src/operative_art.gd")
 const OVERLOOK = preload("res://assets/gate-overlook.webp")
+const PORTRAIT = preload("res://assets/operative-portrait.png")
 
 const INK := Color("#0b131b")
 const PAPER := Color("#f5e9cd")
@@ -29,22 +31,24 @@ func paint(game: Node2D) -> void:
 	if g.mode != "title" and g.mission_sector:
 		district = Levels.TABLE[g.sector_index][1]
 		accent = Levels.TINTS[district]
+	if g.shift_phase > 0:
+		accent = accent.lerp(g.RULE_COLORS[g.player_rule] if g.player_rule > 0 else Color("#dfb97c"), 0.32)
 	if g.mode == "title":
 		_title()
 		return
 	var shift := Vector2.ZERO
 	if not g.reduced_motion:
-		shift = Vector2(sin(g.clock * 142.0), cos(g.clock * 173.0) * 0.58) * g.shake
+		shift = Vector2(sin(g.clock * 142.0), cos(g.clock * 173.0) * 0.58) * g.shake * g.shake_strength
 	_background(g.floor_y, g.clock)
 	g.draw_set_transform(shift)
 	_floor(g.floor_y)
-	if g.route.kind.is_empty():
+	if not g.route.active():
 		_warnings()
 	_world_fx(false)
 	if not g.route.kind.is_empty():
 		_route()
-	else:
-		_boss(g.b, g.b_facing, 1.0, g.boss_rule, false)
+	if g.route.kind.is_empty() or g.guardian:
+		_boss(g.b, g.b_facing, 0.82 if g.guardian else 1.0, g.boss_rule, false)
 		if g.mission_sector and sec == 2:
 			_marker(Vector2(952, g.floor_y - 30), "#", accent)
 		for lock in g.boss_locks:
@@ -69,9 +73,12 @@ func _marker(center: Vector2, glyph: String, tint: Color) -> void:
 
 func _route() -> void:
 	var route: RefCounted = g.route
-	for deck in route.ledges:
-		_rect(deck.position.x, deck.position.y, deck.size.x, deck.size.y, LINE)
-		_rect(deck.position.x, deck.position.y, deck.size.x, 2, accent)
+	for i in route.ledges.size():
+		var deck: Rect2 = route.ledges[i]
+		var lit: bool = route.kind != "phase" or i % 2 == route.phase
+		var tone: Color = [GREEN, Color("#e7be85")][i % 2] if route.kind == "phase" else accent
+		_rect(deck.position.x, deck.position.y, deck.size.x, deck.size.y, LINE if lit else Color("#172631"))
+		_rect(deck.position.x, deck.position.y, deck.size.x, 2, tone if lit else Color(tone, 0.25))
 		for x in range(int(deck.position.x) + 12, int(deck.end.x) - 3, 16):
 			_line(Vector2(x, deck.position.y + 5), Vector2(x - 4, deck.end.y - 2), INK)
 	if not route.active():
@@ -108,6 +115,11 @@ func _route() -> void:
 	var dodge := "B" if pad else "K"
 	var symbols := {"echo": "!", "reflect": rule, "swap": ("RB" if pad else "SHIFT"), "break": strike, "timer": strike, "belt": strike, "combo": strike, "hold": "", "evade": dodge}
 	var target: Vector2 = route.target() - Vector2(0, 34)
+	if route.kind == "phase":
+		_marker(target, "I" if route.cursor % 2 == 0 else "II", GREEN if route.cursor % 2 == 0 else Color("#e7be85"))
+	elif route.kind == "blink":
+		g.draw_circle(target + Vector2(0, 34), 310.0, Color(accent, 0.025), true, -1.0, true)
+		g.draw_arc(target + Vector2(0, 34), 310.0, PI, TAU, 48, Color(accent, 0.24), 1.0, true)
 	_line(target + Vector2(0, 35), target + Vector2(0, 43), accent, 1.4)
 	_marker(target, symbols.get(route.kind, "" if route.kind == "key" else ">"), accent)
 	if route.checkpoint_age > 0.0:
@@ -119,9 +131,10 @@ func _route() -> void:
 		_line(confirmed + Vector2(-2, 6), confirmed + Vector2(9, -6), _soft(GREEN, opacity), 2.5)
 	if route.kind == "key":
 		Icons.paint_rule(g, target, 1.5, g.RULE_COLORS[route.required_rule], route.required_rule)
-	if route.kind == "combo":
-		for i in range(3):
-			_rect(target.x - 18.0 + 13.0 * i, target.y - 37.0, 10.0, 4.0, accent if i < route.combo and route.timing > 0.0 else LINE)
+	if route.kind in ["combo", "break", "belt"]:
+		var required := 2 if route.kind == "belt" else 3
+		for i in range(required):
+			_rect(target.x - 18.0 + 13.0 * i, target.y - 37.0, 10.0, 4.0, accent if i < route.combo and (route.kind != "combo" or route.timing > 0.0) else LINE)
 	if route.kind == "hold" and route.hold > 0.0:
 		g.draw_arc(target, 36.0, -PI / 2.0, -PI / 2.0 + TAU * route.hold / 2.1, 40, GREEN, 3.0, true)
 	if route.kind == "hold":
@@ -367,6 +380,15 @@ func _boss(base: Vector2, face: float, scale: float, rule: int, poster: bool) ->
 		pos.y += 20
 	pos.y += rolling
 	var color: Color = g.RULE_COLORS[rule]
+	if not poster and not g.reduced_motion:
+		var progress: float = clampf(1.0 - g.state_time / maxf(g.state_total, 0.1), 0.0, 1.0)
+		if g.state == "windup":
+			pos.x -= face * sin(progress * PI * 0.5) * 8.0
+			pos.y += sin(progress * PI * 0.5) * 6.0
+		elif g.state == "active":
+			pos.y -= 4.0 * sin(progress * PI)
+		elif g.state == "reboot":
+			pos.x += sin(progress * 17.0) * (1.0 - progress) * 7.0
 	if g.state in ["exposed", "reboot"] and not poster:
 		color = GREEN if g.state == "exposed" else g.wire_color
 	if g.boss_flash > 0.07 and not poster and not g.reduced_motion:
@@ -376,6 +398,18 @@ func _boss(base: Vector2, face: float, scale: float, rule: int, poster: bool) ->
 	var plate := Color("#718087").lerp(accent, 0.35)
 	var edge := plate.lightened(0.24)
 	var core := pos + Vector2(0, -52) * scale
+	if not poster and g.shift_breach > 0:
+		for side in [-1, 1]:
+			var open_plate := pos + Vector2(side * 65.0, -46) * scale
+			_poly([open_plate + Vector2(-10, -20), open_plate + Vector2(8, -13), open_plate + Vector2(17, 16), open_plate + Vector2(-4, 9)], color.darkened(0.35))
+	if sec >= 2:
+		var flex := (sin(g.clock * 8) * 3 if not g.reduced_motion else 0.0)
+		for side in [-1.0, 1.0]:
+			var joint := pos + Vector2(61 * side, -46 + flex) * scale
+			var foot := pos + Vector2(83 * side, -7) * scale
+			_line(joint, foot, Color("#0a1a23"), 17 * scale)
+			_line(joint, foot, Color("#718487"), 9 * scale)
+			g.draw_circle(joint, 9.0 * scale, color.darkened(0.31), true, -1, true)
 	for k in range(5, 0, -1):
 		g.draw_circle(core, (21 + k * 15) * scale, _soft(color, 0.045), true, -1, true)
 	# The Warden has a wedge helmet and counterweight legs; the Lattice uses suspended wings.
@@ -449,43 +483,23 @@ func _boss(base: Vector2, face: float, scale: float, rule: int, poster: bool) ->
 		g.draw_arc(core, radius, -PI * 0.5, -PI * 0.5 + TAU * maxf(0.01, g.state_time / g.state_total), 48, color, 2.0, true)
 		if in_range:
 			_rect(core.x - 55, core.y - 99, 110, 26, GREEN)
-			_text("RB / SHIFT" if g.last_device == "pad" else "SHIFT / Q", core.x, core.y - 81, 13, INK, false, HORIZONTAL_ALIGNMENT_CENTER)
+			_text(g.key_label("steal"), core.x, core.y - 81, 13, INK, false, HORIZONTAL_ALIGNMENT_CENTER)
 	if rule == g.Rule.AEGIS and g.state in ["windup", "active"] and not poster:
 		g.draw_arc(core, 82, -PI, PI, 48, _soft(color, 0.66), 3, true)
 		g.draw_circle(core, 82, _soft(color, 0.10), true, -1, true)
 
 func _player(at: Vector2, face: float, scale: float) -> void:
-	var color: Color = g.RULE_COLORS[g.player_rule] if g.player_rule != g.Rule.EMPTY else GREEN
-	var moving: bool = absf(g.v.x) > 25 and g.grounded
-	var step := sin(g.clock * 30.0) * 5.0 if moving and not g.reduced_motion else 0.0
-	var pose := at + Vector2(0, -absf(step) * 0.43)
-	var metal := PAPER if g.hit_flash < 0.17 else RED
-	_line(at + Vector2(-23, 0) * scale, at + Vector2(23, 0) * scale, _soft(INK, 0.6), 3.0 * scale)
-	_shape(pose, face, scale, [-12,-15,-5,-19,-3,-5,-8+step,0,-16+step,0], Color("#698792"))
-	_shape(pose, face, scale, [4,-17,11,-19,11,-6,17-step,0,5-step,0], metal)
-	_shape(pose, face, scale, [-15,-27,9,-28,13,-20,9,-11,-13,-11,-19,-17], Color("#bcb9a8"))
-	_shape(pose, face, scale, [-13,-49,10,-48,18,-41,16,-29,-13,-26,-20,-34,-20,-42], INK)
-	_shape(pose, face, scale, [-13,-46,9,-46,15,-41,12,-34,-13,-34,-17,-38], metal)
-	_shape(pose, face, scale, [-9,-41,14,-40,15,-35,-9,-36], Color("#22333c"))
-	_shape(pose, face, scale, [1,-40,14,-39,14,-36,1,-37], color)
-	_shape(pose, face, scale, [-13,-48,-15,-54,-12,-55,-8,-47], color)
-	_shape(pose, face, scale, [-13,-26,-5,-25,-6,-18,-15,-17], color)
-	_shape(pose, face, scale, [10,-25,18,-23,20,-17,13,-16,7,-20], metal)
+	var tint: Color = g.RULE_COLORS[g.player_rule] if g.player_rule != g.Rule.EMPTY else GREEN
+	_line(at + Vector2(-23, 0), at + Vector2(23, 0), Color("#06121e90"), 4)
+	Operative.paint(g, at, scale, face, g.clock, g.v, g.grounded, g.swing, g.hit_flash, float(g.dash > 0), tint, g.reduced_motion)
 	if g.lift > 0.0:
-		var length := (31 + (10.0 * sin(g.clock * 31) if not g.reduced_motion else 0.0)) * scale
-		_poly([at - Vector2(12, 4), at + Vector2(11, -4), at + Vector2(-1, length)], _soft(color, 0.40))
-	if g.guard > 0.0:
-		g.draw_arc(at + Vector2(0, -25), 38, -PI, PI, 38, color, 3, true)
-		g.draw_circle(at + Vector2(0, -25), 38, _soft(color, 0.18), true, -1, true)
-	if g.dodge_protection > 0.0:
-		g.draw_arc(at + Vector2(0, -25), 28, 0.08, TAU - 0.08, 28, _soft(PAPER, 0.85), 1.5, true)
-	if g.swing > 0:
-		var hand := at + Vector2(9 * face, -24) * scale
-		var end := hand + Vector2(face * (62 + g.swing * 85), -14 - g.swing * 60) * scale
-		_line(hand, end, _soft(color, 0.33), 14.0 * scale)
-		_line(hand, end, color, 3.0 * scale)
-		var angle := 0.0 if face > 0 else PI
-		g.draw_arc(hand, 66 * scale, angle - 0.63, angle + 0.49, 32, _soft(color, g.swing * 3.5), 2.0, true)
+		var length := 28.0 + (8.0 * sin(g.clock * 28) if not g.reduced_motion else 0.0)
+		_poly([at + Vector2(-9, -7), at + Vector2(8, -7), at + Vector2(0, length)], Color(tint, 0.6))
+	if g.guard > 0.0 or g.dodge_protection > 0.0:
+		var radius := 37.0 if g.guard > 0.0 else 32.0
+		g.draw_arc(at + Vector2(0, -27), radius, -PI + 0.2, PI - 0.2, 36, Color(tint if g.guard > 0 else PAPER, 0.88), 2, true)
+	if g.counter_time > 0.0:
+		g.draw_arc(at + Vector2(0, -26), 40, -PI / 2, -PI / 2 + TAU * g.counter_time / 2.0, 32, Color("#ffe1a1"), 2.0, true)
 
 func _warnings() -> void:
 	for hazard in g.environmental_zones():
@@ -544,9 +558,9 @@ func _world_fx(foreground: bool) -> void:
 		g.draw_polyline(points, _soft(PAPER, g.wire_time * 1.45), 1, true)
 
 func _hud() -> void:
-	var route_run: bool = not g.route.kind.is_empty()
+	var route_run: bool = g.route.active()
 	var level: Array = Levels.TABLE[g.sector_index]
-	var heading: String = level[0] if g.mission_sector else g.ENCOUNTERS[sec].name
+	var heading: String = "Guardian intercept" if g.guardian else (level[0] if g.mission_sector else g.ENCOUNTERS[sec].name)
 	var step_count: int = g.route.targets.size()
 	_rect(0, 0, W, 116, Color("#111e2bed"))
 	_rect(38, 115, 1076, 1, Color("#687984"))
@@ -579,7 +593,7 @@ func _hud() -> void:
 	if not route_run or g.player_rule != g.Rule.EMPTY:
 		Icons.paint_rule(g, Vector2(51, 98), 0.75, slot_color, g.player_rule)
 		_text(g.RULE_NAMES[g.player_rule], 68, 103, 14, slot_color, false, HORIZONTAL_ALIGNMENT_LEFT, 115)
-		var charge_label := "Y" if g.last_device == "pad" else "E"
+		var charge_label: String = g.key_label("rule")
 		if g.player_rule != g.Rule.EMPTY:
 			_text(Locale.text("[%s] READY") % charge_label if g.charge else "RECHARGING", 177, 103, 11, slot_color if g.charge else DIM)
 
@@ -588,21 +602,36 @@ func _hud() -> void:
 	else:
 		_text(g.timecode(g.run_time), 576, 96, 14, DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
 
+	_rect(0, 539, W, 109, Color("#0c2029f5"))
+	_line(Vector2(28, 539), Vector2(1124, 539), Color(accent, 0.6))
 	var prompt := Locale.text(_instruction())
-	if g.last_device == "pad":
-		prompt = prompt.replace(" / E", " / Y")
-	_rect(27, 582, 1098, 43, Color("#111e2be8"))
-	_rect(27, 582, 3, 43, accent)
-	_text(prompt, 45, 609, 17, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 925)
-	_text("ESC" if g.last_device != "pad" else "START", 1105, 609, 13, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(prompt, 32, 563, 15, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 1080)
+	var actions := ["left", "right", "jump", "strike", "dodge", "steal", "rule"]
+	var titles := ["Move left", "Move right", "Jump", "Strike", "Dodge", "Shift", "Use your rule"]
+	for i in actions.size():
+		var col := i % 4
+		var row := i / 4
+		var x := 32.0 + col * 203.0
+		var y := 580.0 + row * 31.0
+		var key: String = g.key_label(actions[i])
+		var key_width := 56.0 if key.length() > 2 else 32.0
+		var active := Input.is_action_pressed(actions[i])
+		_rect(x, y, key_width, 24, accent if active else Color("#243e48"))
+		_rect(x, y, key_width, 24, Color(accent, 0.45), false)
+		_text(key, x + key_width / 2, y + 17, 11, INK if active else PAPER, true, HORIZONTAL_ALIGNMENT_CENTER, key_width - 6)
+		_text(titles[i], x + key_width + 9, y + 17, 12, DIM, false, HORIZONTAL_ALIGNMENT_LEFT, 133 - (key_width - 32))
+	_text(g.key_label("pause") + "  " + Locale.text("Pause"), 1114, 595, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(g.key_label("retry") + "  " + Locale.text("Retry"), 1114, 625, 12, DIM, false, HORIZONTAL_ALIGNMENT_RIGHT)
+	if g.counter_time > 0.0:
+		_text("Counter ready", 837, 624, 13, Color("#ffe1a1"), true)
 	var n := 0
 	for id in g.effects:
 		var x := 1108.0 - n * 85.0
 		var tint: Color = g.equipment_color(id)
-		_rect(x - 81, 545, 81, 24, _soft(INK, 0.93))
-		_rect(x - 81, 567, clampf(g.effects[id] / Gear.ITEMS[id][2], 0.0, 1.0) * 81, 2, tint)
-		Icons.paint(g, Vector2(x - 66, 557), 0.63, tint, id)
-		_text("%.1fs" % g.effects[id], x - 32, 562, 12, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
+		_rect(x - 81, 505, 81, 24, _soft(INK, 0.93))
+		_rect(x - 81, 527, clampf(g.effects[id] / Gear.ITEMS[id][2], 0.0, 1.0) * 81, 2, tint)
+		Icons.paint(g, Vector2(x - 66, 517), 0.63, tint, id)
+		_text("%.1fs" % g.effects[id], x - 32, 522, 12, tint, true, HORIZONTAL_ALIGNMENT_CENTER)
 		n += 1
 	_combat_hint(route_run)
 	if g.hit_flash > 0.0 and not g.reduced_motion:
@@ -614,14 +643,18 @@ func _combat_hint(route_run: bool) -> void:
 		var old_rule := Locale.text(g.RULE_NAMES[g.player_rule])
 		var swap := Locale.text("You gain %s   /   Boss gains %s") % [next_rule, old_rule]
 		var ready := GREEN if g.can_shift() else DIM
-		_rect(323, 132, 506, 34, _soft(INK, 0.91))
-		_text(swap, 576, 155, 15, ready, false, HORIZONTAL_ALIGNMENT_CENTER, 466)
+		_rect(302, 127, 548, 63, _soft(INK, 0.96))
+		Icons.paint_rule(g, Vector2(337, 157), 1.3, g.RULE_COLORS[g.boss_rule], g.boss_rule)
+		Icons.paint_rule(g, Vector2(815, 157), 1.3, g.RULE_COLORS[g.player_rule], g.player_rule)
+		_line(Vector2(368, 173), Vector2(785, 173), Color(ready, 0.30), 1.1)
+		_text(swap, 576, 153, 15, ready, false, HORIZONTAL_ALIGNMENT_CENTER, 409)
+		_text("Rule exchange", 576, 179, 12, DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
 		if g.can_shift():
 			var core: Vector2 = g.core_pos()
 			var x := clampf(core.x, 77.0, 1074.0)
 			var y := maxf(184.0, core.y - 75.0)
 			_rect(x - 33, y - 19, 66, 27, GREEN)
-			_text("RB" if g.last_device == "pad" else "SHIFT", x, y, 13, INK, true, HORIZONTAL_ALIGNMENT_CENTER)
+			_text(g.key_label("steal"), x, y, 13, INK, true, HORIZONTAL_ALIGNMENT_CENTER)
 		return
 	if g.state == "windup" and not route_run:
 		var move_label: String = g.move_name
@@ -638,6 +671,8 @@ func _instruction() -> String:
 	var route: RefCounted = g.route
 	if route.active():
 		match route.kind:
+			"phase": return "Shift the world phase to match each beacon."
+			"blink": return "Shift places with each anchor inside its range."
 			"cross", "chase", "sensor":
 				if route.target().y < g.p.y - 22.0:
 					return "Jump to the next beacon."
@@ -714,18 +749,31 @@ func _title() -> void:
 	g.draw_texture_rect(OVERLOOK, Rect2(0, 0, W, H), false)
 	if g.title_menu != null and not g.title_menu.page.is_empty():
 		return
-	_rect(0, 0, W, H, Color("#0a142c25"))
+	_rect(0, 0, W, H, Color("#07292f6b"))
 	for i in 22:
 		var t := float(i) / 21.0
 		_rect(i * 21.0, 0, 22.0, H, _soft(INK, 0.43 * pow(1.0 - t, 1.6)))
 	_rect(0, 0, W, 88, Color("#0d1728a5"))
 	_line(Vector2(66, 88), Vector2(1095, 88), Color("#edd6ac45"))
 	_text("Lobby", 66, 54, 22, PAPER, true)
-	_line(Vector2(66, 169), Vector2(338, 169), Color("#e5b276"), 1.8)
-	_text("STEAL THE", 65, 269, 96, PAPER, true)
-	_text("RULES", 64, 363, 118, PAPER, true)
-	_text("SHIFT  PROTOCOL", 68, 406, 24, Color("#f5c58d"), true)
-	_rect(0, 565, W, 83, Color("#101a2bc9"))
+	var time: float = 0.0 if g.reduced_motion else g.clock
+	var center := Vector2(607, 340)
+	for radius in [147.0, 179.0, 186.0, 231.0]:
+		g.draw_arc(center, radius, 0.24, TAU - 0.2, 80, Color("#d8b4782c"), 1.0, true)
+	for index in 24:
+		var angle := index * TAU / 24
+		_line(center + Vector2.from_angle(angle) * 226, center + Vector2.from_angle(angle) * 232, Color("#d8b4784a"), 1.0)
+	var sway := 0.0 if g.reduced_motion else sin(time * 1.2) * 1.6
+	g.draw_texture_rect(PORTRAIT, Rect2(377 + sway, 107, 433, 577), false)
+	for i in 3:
+		var orbit := center + Vector2.from_angle(-0.7 + i * 1.3 + time * 0.065) * 200
+		g.draw_circle(orbit, 23.0, Color("#0b202bf0"), true, -1.0, true)
+		g.draw_circle(orbit, 23.0, Color("#d8b47885"), false, 1.0, true)
+		Icons.paint_rule(g, orbit, 1.4, g.RULE_COLORS[i + 1], i + 1)
+	_text("STEAL THE RULES", 64, 171, 51, PAPER, true, HORIZONTAL_ALIGNMENT_LEFT, 470)
+	_text("SHIFT  PROTOCOL", 66, 209, 26, Color("#dcb777"), true)
+	_text("Exchange. Reposition. Transform.", 66, 244, 14, TEXT, false, HORIZONTAL_ALIGNMENT_LEFT, 450)
+	_rect(0, 565, W, 83, Color("#081d29"))
 	_line(Vector2(66, 566), Vector2(1096, 566), Color("#edd6ac47"))
 	_text(_tally(), 68, 608, 17, PAPER, false)
 	var progress: float = g.campaign.records.size() / 6.0

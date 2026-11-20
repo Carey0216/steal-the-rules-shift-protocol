@@ -13,6 +13,9 @@ var stage_pitch := 1.0
 var live := false
 var menu_active := false
 var noise := RandomNumberGenerator.new()
+var master_level := 1.0
+var music_level := 0.7
+var effects_level := 0.85
 
 func _ready() -> void:
 	noise.seed = 6831
@@ -39,7 +42,9 @@ func _ready() -> void:
 		"ui_confirm": [329.6, 493.8, 0.15, 0.026, 0.17],
 		"objective": [329.6, 493.8, 0.30, 0.018, 0.21],
 		"pickup": [523.3, 784.0, 0.26, 0.022, 0.24],
-		"penalty": [286.0, 133.0, 0.25, 0.07, 0.20]
+		"penalty": [286.0, 133.0, 0.25, 0.07, 0.20],
+		"perfect": [659.3, 1318.5, 0.26, 0.012, 0.26],
+		"counter": [196.0, 784.0, 0.23, 0.14, 0.30],
 	}
 	for key in table:
 		var p: Array = table[key]
@@ -111,13 +116,22 @@ func _compose() -> AudioStreamWAV:
 	sample.loop_end = data.size() / 4
 	return sample
 
+func set_levels(master: float, backing: float, effects: float) -> void:
+	master_level = master
+	music_level = backing
+	effects_level = effects
+	for voice in voices:
+		voice.volume_db = linear_to_db(maxf(0.0001, master_level * effects_level))
+	if music != null:
+		music.volume_db = -80.0 if muted else linear_to_db(maxf(mix * master_level * music_level, 0.0001))
+
 func set_mute(value: bool) -> void:
 	muted = value
 	for voice in voices:
 		if muted:
 			voice.stop()
 	if music != null:
-		music.volume_db = -80.0 if muted else linear_to_db(maxf(mix, 0.001))
+		music.volume_db = -80.0 if muted else linear_to_db(maxf(mix * master_level * music_level, 0.0001))
 
 func set_stage(stage: int, in_combat: bool) -> void:
 	live = in_combat
@@ -133,7 +147,7 @@ func set_stage(stage: int, in_combat: bool) -> void:
 
 func _process(delta: float) -> void:
 	mix = move_toward(mix, 0.34 if live else 0.09, delta * 0.24)
-	music.volume_db = -80.0 if muted else linear_to_db(maxf(mix, 0.001))
+	music.volume_db = -80.0 if muted else linear_to_db(maxf(mix * master_level * music_level, 0.0001))
 	music.pitch_scale = move_toward(music.pitch_scale, stage_pitch, delta * 0.3)
 
 func fire(key: String) -> void:

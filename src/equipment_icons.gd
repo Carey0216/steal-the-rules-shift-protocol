@@ -24,6 +24,18 @@ static func paint_rule(canvas: CanvasItem, center: Vector2, unit: float, color: 
 
 static func paint(canvas: CanvasItem, center: Vector2, unit: float, color: Color, id: int) -> void:
 	match id:
+		20:
+			_path(canvas, center, unit, [[-9, 6], [-2, 0], [-9, -6]], color)
+			_path(canvas, center, unit, [[0, 7], [8, 0], [0, -7]], color)
+			_path(canvas, center, unit, [[-8, 0], [5, 0]], color)
+		21:
+			paint_rule(canvas, center, unit * 0.77, color, 3)
+			canvas.draw_arc(center, 11.0 * unit, -0.9, 0.9, 18, color, 1.6, true)
+			canvas.draw_arc(center, 11.0 * unit, PI - 0.9, PI + 0.9, 18, color, 1.6, true)
+		22:
+			_path(canvas, center, unit, [[-9,-4],[8,-4],[4,-8]], color)
+			_path(canvas, center, unit, [[9,4],[-8,4],[-4,8]], color)
+			canvas.draw_circle(center, 3.0 * unit, color, false, 1.3, true)
 		0: # Oil and blade
 			_path(canvas, center, unit, [[-6, 7], [7, -8], [8, -2], [-1, 7]], color, true)
 			canvas.draw_circle(center + Vector2(-7, -4) * unit, 2.4 * unit, color, true, -1, true)

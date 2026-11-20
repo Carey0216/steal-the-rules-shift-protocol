@@ -1,387 +1,443 @@
 keys,en,zh_CN,zh_TW,ja,ko
-"Start operation","Start operation","开始行动","開始行動","作戦開始","작전 시작"
-"Continue operation","Continue operation","继续作战","繼續作戰","作戦を続ける","작전 계속"
-"Mission briefing","Mission briefing","任务简报","任務簡報","出撃概要","임무 브리핑"
-"Bonus star targets","Bonus star targets","额外星级条件","額外星級條件","追加の星の条件","추가 별 조건"
-"Starting loadout","Starting loadout","出战配置","出戰配置","出撃装備","출격 장비"
-"Equipment is optional.","Equipment is optional.","可直接出战，也可购买装备。","可直接出戰，也可購買裝備。","そのまま出撃するか、装備を購入できます。","바로 출격하거나 장비를 구매할 수 있습니다."
-"Return to briefing","Return to briefing","返回任务简报","返回任務簡報","出撃概要へ戻る","임무 브리핑으로 돌아가기"
-"Target met","Target met","已达标","已達標","条件達成","조건 달성"
-"Target missed","Target missed","未达标","未達標","条件未達成","조건 미달"
-"Regions","Regions","区域","區域","エリア","지역"
-"Loadout full","Loadout full","装备已满","裝備已滿","装備枠が満杯","장비 슬롯 가득 참"
-"%d coins short","%d coins short","还差 %d 金币","還差 %d 金幣","あと %d コイン","코인 %d개 부족"
-"Time ran out. Retry from the start of this sector.","Time ran out. Retry from the start of this sector.","时间已到。可以从本关起点重试。","時間已到。可以從本關起點重試。","時間切れです。この区画の最初からやり直せます。","시간이 끝났습니다. 이 구역의 처음부터 다시 도전할 수 있습니다."
-"Time expired","Time expired","挑战超时","挑戰超時","時間切れ","시간 초과"
-"Jump to the next beacon.","Jump to the next beacon.","跳上平台，抵达下一处信标。","跳上平台，抵達下一處信標。","足場に跳び乗って次の信号へ進みます。","발판에 뛰어올라 다음 표지에 도달하세요."
-"Clear sector %02d to advance.","Clear sector %02d to advance.","先完成第 %02d 关，解锁后续关卡。","先完成第 %02d 關，解鎖後續關卡。","区画 %02d をクリアすると先へ進めます。","%02d 구역을 클리어하면 다음 구역이 열립니다."
-"Tidal Works","Tidal Works","潮汐工区","潮汐工區","潮汐工区","조수 작업장"
-"Quiet Galleries","Quiet Galleries","静默长廊","靜默長廊","静寂回廊","고요한 회랑"
-"Sky Reservoir","Sky Reservoir","空中蓄水池","空中蓄水池","空中貯水槽","공중 저수조"
-"Root Vault","Root Vault","根权限库","根權限庫","ルート保管庫","루트 금고"
-"Tidal Crossing","Tidal Crossing","潮汐渡口","潮汐渡口","潮汐の渡し","조수 나루"
-"Pump Choir","Pump Choir","泵组共鸣","泵組共鳴","ポンプの共鳴","펌프 공명"
-"Caisson","Caisson","沉箱","沉箱","ケーソン","케이슨"
-"Two-bank Junction","Two-bank Junction","双岸接线","雙岸接線","両岸接続","양안 접속"
-"Silt Lift","Silt Lift","沉泥升降台","沉泥升降台","沈泥リフト","침전물 승강기"
-"Undertow","Undertow","暗流","暗流","引き潮","역류"
-"Watchkeeper","Watchkeeper","巡检眼","巡檢眼","監視の目","감시의 눈"
-"Hush Freight","Hush Freight","无声货运","無聲貨運","静かな荷運び","무음 화물"
-"Cold Lens","Cold Lens","冷镜","冷鏡","コールドレンズ","냉각 렌즈"
-"Glass Dials","Glass Dials","玻璃仪盘","玻璃儀盤","ガラス盤","유리 계기판"
-"Deadband","Deadband","死区","死區","デッドバンド","불감대"
-"Quiet Hours","Quiet Hours","静默时段","靜默時段","静寂時間","침묵 시간"
-"Ballast Run","Ballast Run","压载抢运","壓載搶運","バラスト輸送","평형추 운송"
-"Updraft Ferry","Updraft Ferry","升流渡台","升流渡台","上昇流の渡し","상승류 발판"
-"Cloudbreak","Cloudbreak","破云机","破雲機","クラウドブレイク","구름절단기"
-"Storm Moorings","Storm Moorings","风暴系泊点","風暴繫泊點","嵐の係留所","폭풍 계류장"
-"Float Relay","Float Relay","浮台接线","浮台接線","浮き台回路","부유대 회로"
-"Lightning Wells","Lightning Wells","雷电井","雷電井","雷の井戸","번개 우물"
-"Ghost Circuit","Ghost Circuit","幽灵回路","幽靈迴路","ゴースト回路","유령 회로"
-"Triple Interlock","Triple Interlock","三重联锁","三重聯鎖","三重ロック","삼중 인터록"
-"Backfeed","Backfeed","逆馈机","逆饋機","逆流機","역류 장치"
-"Redline Protocol","Redline Protocol","红线协议","紅線協議","レッドラインプロトコル","레드라인 프로토콜"
-"Forty-second Stand","Forty-second Stand","限时固守","限時固守","時間制防衛","시간제 방어"
-"Root Warden","Root Warden","根库守卫","根庫守衛","ルート番人","루트 수호자"
-"Moving ferries","Moving ferries","移动渡台","移動渡台","移動する渡し台","이동 발판"
-"Step onto the moving platform to ride it. Its deck carries you between the high beacons.","Step onto the moving platform to ride it. Its deck carries you between the high beacons.","跳上移动渡台，随它穿过高处信标之间的空档。","跳上移動渡台，隨它穿過高處信標之間的空檔。","動く足場の上に乗り、高所の信号の間を渡ります。","움직이는 발판에 올라 높은 표지 사이를 이동하세요."
-"Relay combos","Relay combos","中继器连击","中繼器連擊","連撃リレー","중계기 연속 공격"
-"Get close and land three hits in quick succession. Watch the lit pips. A long pause resets the relay.","Get close and land three hits in quick succession. Watch the lit pips. A long pause resets the relay.","靠近装置快速连续击中三次。亮点显示连击数，停太久会重置。","靠近裝置快速連續擊中三次。亮點顯示連擊數，停太久會重設。","装置の近くで素早く3回攻撃します。点灯数を確認してください。間が空くとリセットされます。","장치에 접근해 빠르게 세 번 연속 공격하세요. 불빛이 타격 수를 표시하며, 오래 멈추면 초기화됩니다."
-"Rule gates","Rule gates","规则闸门","規則閘門","ルールゲート","규칙 관문"
-"Take the rule shown at the gate from the matching socket. Move to the gate and use that rule with E.","Take the rule shown at the gate from the matching socket. Move to the gate and use that rule with E.","从匹配的规则座拿到闸门上显示的能力。走到闸门旁按 E 使用。","從相符的規則座取得閘門顯示的能力。走到閘門旁按 E 使用。","対応する端末からゲートに表示されたルールを取得し、ゲートのそばで E を押します。","관문에 표시된 규칙을 맞는 단말기에서 가져오세요. 관문에 접근해 E로 사용하세요."
-"Sweep sensors","Sweep sensors","扫描传感器","掃描感測器","走査センサー","이동 감지기"
-"Watch the beam move across the floor. Jump over it, or dodge through. Enter each station while the beam is clear.","Watch the beam move across the floor. Jump over it, or dodge through. Enter each station while the beam is clear.","看准地面扫掠光束的移动方向。跳过或闪过光束，光束离开站点后再进入。","看準地面掃掠光束的移動方向。跳過或閃過光束，光束離開站點後再進入。","床を横切るビームを観察し、跳ぶか回避で抜けます。ビームが離れてから各地点に入ります。","바닥을 훑는 광선을 보고 뛰어넘거나 회피하세요. 광선이 벗어났을 때 각 지점에 들어가세요."
-"Emergency holds","Emergency holds","应急驻守","應急駐守","緊急エリア確保","비상 지역 점령"
-"Stay inside the beacon to charge it. Leave the red strike marker and return before the beacon empties.","Stay inside the beacon to charge it. Leave the red strike marker and return before the beacon empties.","站在信标范围内为它充能。红色落点出现时躲开，能量耗尽前回到信标。","站在信標範圍內充能。紅色落點出現時躲開，在能量耗盡前返回。","信号の範囲内で充電します。赤い攻撃予告が出たら離れ、充電が空になる前に戻ります。","신호 범위 안에 머물러 충전하세요. 빨간 공격 표식을 피한 뒤 충전량이 사라지기 전에 돌아오세요."
-"Dodge capacitors","Dodge capacitors","闪避蓄能器","閃避蓄能器","回避充電器","회피 축전기"
-"Stand within the ring. When the marker flashes solid, dodge through the pulse to charge the capacitor.","Stand within the ring. When the marker flashes solid, dodge through the pulse to charge the capacitor.","站在圆环里，预警快变为实色时按 K 闪过脉冲，给蓄能器充能。","站在圓環內，預警快變成實色時按 K 閃過脈衝，為蓄能器充能。","円の中に立ち、予告の色が濃くなる直前に K でパルスを回避して充電します。","고리 안에 서서 표식이 진해지기 직전에 K로 펄스를 피하면 축전기가 충전됩니다."
-"Ride the ferry and reach each high beacon.","Ride the ferry and reach each high beacon.","乘渡台依次抵达高处信标。","乘渡台依序抵達高處信標。","渡し台に乗って高所の信号へ。","발판을 타고 높은 신호에 도달하세요."
-"Chain three strikes to break each relay.","Chain three strikes to break each relay.","三连击破坏每一台中继器。","三連擊破壞每一台中繼器。","3 連撃で各リレーを破壊。","세 번 연속 공격해 각 중계기를 파괴하세요."
-"Borrow the shown rule and activate the gate.","Borrow the shown rule and activate the gate.","借到闸门标注的规则，再用它开门。","借到閘門標示的規則，再用它開門。","表示されたルールを借りてゲートを起動。","표시된 규칙을 빌려 관문을 여세요."
-"Cross the sensor beam and visit each station.","Cross the sensor beam and visit each station.","避开扫描光束，经过每个站点。","避開掃描光束，經過每個站點。","走査ビームを越えて各地点へ。","감지 광선을 피해 지점마다 방문하세요."
-"Charge each beacon while avoiding the strikes.","Charge each beacon while avoiding the strikes.","避开攻击，给每个信标充能。","避開攻擊，為每個信標充能。","攻撃を避けながら各信号を充電。","공격을 피하면서 신호를 각각 충전하세요."
-"Dodge a pulse inside each ring.","Dodge a pulse inside each ring.","在每个圆环内闪过脉冲。","在每個圓環內閃過脈衝。","各円の中でパルスを回避。","각 고리 안에서 펄스를 회피하세요."
-"Effect lasts %d seconds","Effect lasts %d seconds","效果持续 %d 秒","效果持續 %d 秒","効果時間 %d 秒","효과 지속 %d초"
-"Capacitor","Capacitor","蓄能机","蓄能機","蓄電機","축전기"
-"Playback speed","Playback speed","播放速度","播放速度","再生速度","재생 속도"
-"Seek in recording","Seek in recording","跳转到录像位置","跳轉到錄影位置","録画位置を選択","재생 위치 이동"
-"Back one second","Back one second","后退一秒","後退一秒","1 秒戻る","1초 뒤로"
-"Forward one second","Forward one second","前进一秒","前進一秒","1 秒進む","1초 앞으로"
-"Equipment timers start when the fight begins.","Equipment timers start when the fight begins.","装备效果在开战时开始计时。","裝備效果在開戰時開始計時。","装備の効果時間は戦闘開始時から数えます。","장비 효과 시간은 전투 시작부터 줄어듭니다."
-"Infiltration Line","Infiltration Line","入侵线","入侵線","侵入ライン","침투 라인"
-"Power Junction","Power Junction","配电枢纽","配電樞紐","配電区画","배전 구역"
-"The Foundry","The Foundry","铸造厂","鑄造廠","鋳造所","주조소"
-"Reflection Core","Reflection Core","反射核心","反射核心","反射コア","반사 코어"
-"Redline Entry","Redline Entry","红线入侵","紅線入侵","レッドライン","레드라인 진입"
-"First Lock","First Lock","第一道闸","第一道閘","最初のゲート","첫 번째 관문"
-"Warden","Warden","监守者","監守者","ウォーデン","감시자"
-"Catch the Lift","Catch the Lift","追上货梯","追上貨梯","リフトを追え","화물 승강기"
-"Shaft Trial","Shaft Trial","天井试飞","天井試飛","昇降路テスト","수직 통로"
-"Lattice","Lattice","悬阵机","懸陣機","ラティス","래티스"
-"Rebound Workshop","Rebound Workshop","回弹车间","回彈車間","反射工房","반사 작업장"
-"The Rule Seat","The Rule Seat","规则座","規則座","ルール端末","규칙 단말기"
-"Pulse Routing","Pulse Routing","脉冲转向","脈衝轉向","パルス分岐","펄스 분기"
-"Pressure Divide","Pressure Divide","压差捷径","壓差捷徑","加圧通路","압력 통로"
-"Recover the Cell","Recover the Cell","断线回收","斷線回收","バッテリー回収","셀 회수"
-"First Heat","First Heat","热线第一拍","熱線第一拍","最初の噴火","첫 분출"
-"Against the Belt","Against the Belt","逆向带","逆向帶","逆走ベルト","역주행 벨트"
-"Press Key","Press Key","压铸钥匙","壓鑄鑰匙","プレスの鍵","압착기 열쇠"
-"Hot Handoff","Hot Handoff","滚烫交接","滾燙交接","熱所の受け渡し","과열 화물"
-"Slag Run","Slag Run","火线逃生","火線逃生","スラグ脱出","슬래그 탈출"
-"Furnace","Furnace","熔炉","熔爐","ファーネス","용광로"
-"Leave a Mark","Leave a Mark","留下位置","留下位置","痕跡を残せ","흔적 남기기"
-"Glass Archive","Glass Archive","玻璃档案","玻璃檔案","ガラス保管庫","유리 기록고"
-"Crossfire","Crossfire","交叉截击","交叉截擊","クロスファイア","교차 사격"
-"Mirror","Mirror","镜像机","鏡像機","ミラー","미러"
-"Contingency","Contingency","核心预案","核心預案","緊急手順","비상 절차"
-"Executor","Executor","执行者","執行者","エグゼキューター","집행자"
-"Route markers","Route markers","路线标记","路線標記","進路マーカー","경로 표지"
-"Follow the exit beacon. Jump onto ledges when the beacon is above you.","Follow the exit beacon. Jump onto ledges when the beacon is above you.","跟着出口信标走。信标在高处时，跳上平台。","跟著出口信標走。信標在高處時，跳上平台。","出口の信号を追います。信号が上にあるときは足場に跳び乗ります。","출구 신호를 따라가세요. 신호가 위쪽에 있으면 발판으로 점프하세요."
-"Breakable devices","Breakable devices","可击破装置","可擊破裝置","破壊できる装置","파괴 장치"
-"Get close and press J to strike the amber device. Tap K as a warning turns solid to dodge the sweep.","Get close and press J to strike the amber device. Tap K as a warning turns solid to dodge the sweep.","靠近琥珀色装置后按 J 挥刀。预警变为实色时按 K 闪过扫击。","靠近琥珀色裝置後按 J 揮刀。預警變為實色時按 K 閃過掃擊。","琥珀色の装置に近づき J で攻撃。警告が濃くなったら K で回避します。","황색 장치에 다가가 J로 공격하세요. 경고가 진해지는 순간 K로 피하세요."
-"Closing gates","Closing gates","关门倒计时","關門倒數","閉鎖ゲート","폐쇄 관문"
-"Touch the checkpoints in order before the countdown expires. A rule socket lets you borrow a shortcut.","Touch the checkpoints in order before the countdown expires. A rule socket lets you borrow a shortcut.","倒计时结束前依次碰到检查点。规则座里的能力可以帮你抄近路。","倒數結束前依序碰到檢查點。規則座裡的能力可以幫你抄近路。","制限時間内に各チェックポイントを順番に通過します。端末のルールで近道できます。","제한 시간 안에 표시 지점을 순서대로 통과하세요. 단말기의 규칙으로 지름길을 이용할 수 있습니다."
-"Lift sockets","Lift sockets","升空规则座","升空規則座","上昇ルール端末","상승 규칙 단말기"
-"Stand near the glowing socket and press Shift or Q. Press E to lift off and land on the upper ledges.","Stand near the glowing socket and press Shift or Q. Press E to lift off and land on the upper ledges.","靠近发光规则座，按 Shift 或 Q。按 E 喷升，落在高处平台。","靠近發光規則座，按 Shift 或 Q。按 E 噴升，落在高處平台。","光る端末のそばで Shift または Q。E で上昇し、高い足場に着地します。","빛나는 단말기 근처에서 Shift 또는 Q를 누른 뒤 E로 상승해 높은 발판에 착지하세요."
-"Reflect pulses","Reflect pulses","反射脉冲","反射脈衝","パルス反射","펄스 반사"
-"Take AEGIS from the socket. Stay on the target while it flashes, then press E just before the flash closes to reflect its pulse.","Take AEGIS from the socket. Stay on the target while it flashes, then press E just before the flash closes to reflect its pulse.","从规则座取出 AEGIS。站在闪烁的标记上，预警即将结束时按 E 反射脉冲。","從規則座取出 AEGIS。站在閃爍的標記上，預警即將結束時按 E 反射脈衝。","端末から AEGIS を取得。点滅する印の上で警告が終わる直前に E を押し、パルスを反射します。","단말기에서 AEGIS를 획득하세요. 깜빡이는 표식에 서서 경고가 끝나기 직전 E로 펄스를 반사하세요."
-"Exchange sockets","Exchange sockets","交换规则座","交換規則座","ルール交換端末","규칙 교환 단말기"
-"Stand beside an illuminated socket and press Shift or Q to swap rules. The socket takes the rule you brought.","Stand beside an illuminated socket and press Shift or Q to swap rules. The socket takes the rule you brought.","站在亮起的规则座旁，按 Shift 或 Q。你获得新规则，规则座收下带来的规则。","站在亮起的規則座旁，按 Shift 或 Q。你獲得新規則，規則座收下帶來的規則。","光る端末のそばで Shift または Q。自分のルールと端末のルールが入れ替わります。","빛나는 단말기 옆에서 Shift 또는 Q를 누르면 단말기의 규칙과 내 규칙이 바뀝니다."
-"Live circuits","Live circuits","通电地面","通電地板","通電回路","활성 회로"
-"The striped floor warns before power comes on. Cross the dim gap, or press K just before crossing a live segment.","The striped floor warns before power comes on. Cross the dim gap, or press K just before crossing a live segment.","带条纹的地板会先预警再通电。走未亮的路，或在穿过通电区域前按 K。","帶條紋的地板會先預警再通電。走未亮的路，或在穿過通電區域前按 K。","縞模様の床は通電前に警告します。暗い区間を進むか、通電区間の手前で K を押します。","줄무늬 바닥은 전기가 흐르기 전에 경고합니다. 어두운 틈으로 가거나 통전 구간 직전에 K를 누르세요."
-"Cargo relay","Cargo relay","货物接驳","貨物接駁","貨物リレー","화물 릴레이"
-"Press J next to the cargo to connect it. Carry it through each checkpoint in order. Damage breaks your connection.","Press J next to the cargo to connect it. Carry it through each checkpoint in order. Damage breaks your connection.","在货物旁按 J 接驳，依次送到各检查点。受伤会断开连接。","在貨物旁按 J 接駁，依序送到各檢查點。受傷會斷開連接。","貨物のそばで J を押して接続し、各地点に順番に運びます。被弾すると接続が切れます。","화물 옆에서 J로 연결하고 표시 지점에 순서대로 옮기세요. 피해를 받으면 연결이 끊깁니다."
-"Timed gates","Timed gates","限时闸门","限時閘門","時間制ゲート","시간제 관문"
-"Step on the pressure plate to extend the timer. Reach the device and strike before its window closes.","Step on the pressure plate to extend the timer. Reach the device and strike before its window closes.","踩上压板开启计时。关闭前到装置旁挥刀。","踩上壓板開啟計時。關閉前到裝置旁揮刀。","床のスイッチを踏んでタイマーを起動。時間内に装置に近づき攻撃します。","압력판을 밟아 타이머를 시작하세요. 시간이 끝나기 전에 장치에 다가가 공격하세요."
-"Echo locks","Echo locks","回声锁","回聲鎖","残響ロック","잔향 잠금장치"
-"Wait beside the lock until the target holds still. Step away before the pulse hits the recorded position.","Wait beside the lock until the target holds still. Step away before the pulse hits the recorded position.","在锁旁等标记固定，再离开。脉冲会命中你刚才的位置。","在鎖旁等標記固定，再離開。脈衝會命中你剛才的位置。","ロックのそばで照準が固定されるまで待ち、記録された地点に攻撃が落ちる前に離れます。","잠금장치 옆에서 조준이 고정될 때까지 기다린 뒤, 기록된 위치에 펄스가 떨어지기 전에 벗어나세요."
-"Core evacuation","Core evacuation","核心撤离","核心撤離","コアからの脱出","코어 탈출"
-"The Executor repeats a rule you gave it. After the core breaks, reach the beacon before the doors shut.","The Executor repeats a rule you gave it. After the core breaks, reach the beacon before the doors shut.","执行者会强化你交给它的规则。摧毁核心后，在门关闭前抵达信标。","執行者會強化你交給它的規則。摧毀核心後，在門關閉前抵達信標。","エグゼキューターは受け取ったルールを強化します。コア破壊後、扉が閉まる前に脱出信号へ。","집행자는 넘겨받은 규칙을 강화합니다. 코어 파괴 후 문이 닫히기 전에 신호 지점으로 가세요."
-"Equipment drops","Equipment drops","装备掉落","裝備掉落","装備のドロップ","장비 드롭"
-"Penalty capsules","Penalty capsules","减益气泡","減益氣泡","弱体化カプセル","약화 캡슐"
-"Coral capsules weaken a stat for 5 seconds. Jump over one to avoid it, or wait for its ring to empty.","Coral capsules weaken a stat for 5 seconds. Jump over one to avoid it, or wait for its ring to empty.","珊瑚红气泡会削弱一项属性，持续 5 秒。跳过去可以避开，也可以等外圈耗尽后再通过。","珊瑚紅氣泡會削弱一項屬性，持續 5 秒。跳過去可以避開，也可以等外圈耗盡後再通過。","赤い泡は能力を 5 秒間弱めます。飛び越えるか、外側のリングが消えるまで待ちます。","산호색 캡슐은 능력치 하나를 5초간 낮춥니다. 뛰어넘거나 바깥 고리가 사라질 때까지 기다리세요."
-"Field supply","Field supply","战前补给","戰前補給","出撃前の補給","출격 보급"
-"Each clear pays 1,000 coins per star, including replays. Buy up to three different items before entry. Their timers start when the fight begins.","Each clear pays 1,000 coins per star, including replays. Buy up to three different items before entry. Their timers start when the fight begins.","首次通关和重玩，每颗星都奖励 1000 金币。每次入场可购买三种不同装备，开战后才开始计时。","首次通關和重玩，每顆星都獎勵 1000 金幣。每次入場可購買三種不同裝備，開戰後才開始計時。","初回も再挑戦も星 1 つにつき 1000 コイン。出撃前に異なる装備を 3 種類まで買えます。効果時間は戦闘開始から数えます。","첫 클리어와 다시 플레이 모두 별 하나당 코인 1000개를 받습니다. 출격 전 다른 장비를 최대 3종 구매하며 전투 시작부터 효과 시간이 줄어듭니다."
-"Continue","Continue","继续","繼續","続ける","계속"
-"Next","Next","下一页","下一頁","次へ","다음"
-"Damage can knock loose a capsule. Move into its bubble to equip it automatically. Mint is a bonus; coral is a penalty.","Damage can knock loose a capsule. Move into its bubble to equip it automatically. Mint is a bonus; coral is a penalty.","有效攻击有几率打出装备。靠近气泡自动拾取。薄荷绿是增益，珊瑚红是减益。","有效攻擊有機率打出裝備。靠近氣泡自動拾取。薄荷綠是增益，珊瑚紅是減益。","命中すると装備が落ちることがあります。泡に近づくと自動で装備。緑は強化、赤は弱体化です。","공격이 적중하면 장비가 떨어질 수 있습니다. 거품에 다가가면 자동 장착됩니다. 민트색은 강화, 산호색은 약화입니다."
-"Reach the exit beacon.","Reach the exit beacon.","抵达出口信标。","抵達出口信標。","出口の信号へ向かいます。","출구 신호에 도달하세요."
-"Strike the lock devices.","Strike the lock devices.","打碎锁定装置。","打碎鎖定裝置。","ロック装置を攻撃します。","잠금장치를 공격하세요."
-"Reach each beacon before the gates close.","Reach each beacon before the gates close.","在关闸前依次穿过信标。","在關閘前依序穿過信標。","ゲートが閉じる前に全信号を通過します。","관문이 닫히기 전에 표시 지점을 모두 통과하세요."
-"Borrow LIFT and reach the high beacons.","Borrow LIFT and reach the high beacons.","拿到 LIFT，到达高处信标。","拿到 LIFT，到達高處信標。","LIFT を借り、高所の信号に到達します。","LIFT를 빌려 높은 신호에 도달하세요."
-"Reflect each pulse with AEGIS.","Reflect each pulse with AEGIS.","用 AEGIS 反射每个脉冲。","用 AEGIS 反射每個脈衝。","AEGIS でパルスを反射します。","AEGIS로 펄스를 반사하세요."
-"Exchange with every active socket.","Exchange with every active socket.","与亮起的每个规则座交换。","與亮起的每個規則座交換。","稼働中の全端末と交換します。","활성 단말기마다 규칙을 교환하세요."
-"Cross the live floor to the exit.","Cross the live floor to the exit.","穿过通电地面，抵达出口。","穿過通電地板，抵達出口。","通電床を渡って出口へ。","통전 바닥을 건너 출구로 가세요."
-"Connect the cargo with J and deliver it through the checkpoints.","Connect the cargo with J and deliver it through the checkpoints.","按 J 接驳货物，依次经过检查点。","按 J 接駁貨物，依序經過檢查點。","J で貨物を接続し、各地点に運びます。","J로 화물을 연결하고 각 지점으로 운반하세요."
-"Cross the belts and strike each relay.","Cross the belts and strike each relay.","穿过传送带，击破中继器。","穿過輸送帶，擊破中繼器。","ベルトを渡り全リレーを攻撃します。","벨트를 건너 중계기마다 공격하세요."
-"Stand on the plate, then strike the timed latch.","Stand on the plate, then strike the timed latch.","踩压板，再攻击限时门栓。","踩壓板，再攻擊限時門栓。","床スイッチを踏み、時間内にラッチを攻撃。","압력판을 밟고 제한 시간 안에 걸쇠를 공격하세요."
-"Lure the recorded strike onto each lock.","Lure the recorded strike onto each lock.","把记录位置的攻击引到每一道锁上。","把記錄位置的攻擊引到每一道鎖上。","記録攻撃を各ロックに誘導します。","기록 공격을 잠금장치마다 유도하세요."
-"Dodge the attack, steal from the exposed core, then strike.","Dodge the attack, steal from the exposed core, then strike.","躲过攻击，从暴露的核心偷取，然后挥刀。","躲過攻擊，從暴露的核心偷取，然後揮刀。","攻撃を回避し、露出したコアから奪取して反撃。","공격을 피하고 노출된 코어에서 규칙을 훔친 뒤 공격하세요."
-"Reflect with AEGIS or strike the right relay with RUSH.","Reflect with AEGIS or strike the right relay with RUSH.","用 AEGIS 反射，或用 RUSH 打右侧中继器。","用 AEGIS 反射，或用 RUSH 打右側中繼器。","AEGIS で反射、または RUSH で右のリレーを攻撃。","AEGIS로 반사하거나 RUSH로 오른쪽 중계기를 공격하세요."
-"Evacuate","Evacuate","立刻撤离","立刻撤離","直ちに脱出","즉시 탈출"
-"Checkpoints","Checkpoints","检查点","檢查點","通過地点","통과 지점"
-"Coins","Coins","金币","金幣","コイン","코인"
-"Pad: A jump · X strike · B dodge · RB swap · Y rule","Pad: A jump · X strike · B dodge · RB swap · Y rule","手柄　A 跳跃 · X 挥刀 · B 闪避 · RB 交换 · Y 使用","控制器　A 跳躍 · X 揮刀 · B 閃避 · RB 交換 · Y 使用","パッド　A ジャンプ · X 攻撃 · B 回避 · RB 交換 · Y 使用","패드　A 점프 · X 공격 · B 회피 · RB 교환 · Y 사용"
-"Confirm","Confirm","确认","確認","確定","확인"
-"Clear save","Clear save","清除存档","清除存檔","セーブを消去","저장 지우기"
-"Erase sector records, stars, coins and purchased equipment?","Erase sector records, stars, coins and purchased equipment?","清除关卡记录、星级、金币以及已购装备？","清除關卡記錄、星級、金幣以及已購裝備？","ステージ記録・星・コイン・購入済み装備を消去しますか？","구역 기록, 별, 코인, 구매 장비를 모두 지울까요?"
-"Cancel","Cancel","取消","取消","キャンセル","취소"
-"Erase progress","Erase progress","删除进度","刪除進度","進行状況を消去","진행 기록 삭제"
-"Equipment shop","Equipment shop","装备商城","裝備商城","装備ショップ","장비 상점"
-"Equip up to 3 items for the next attempt.","Equip up to 3 items for the next attempt.","下一次出战最多带 3 种装备。","下一次出戰最多帶 3 種裝備。","次の出撃に装備を最大 3 種類まで用意できます。","다음 출격에 장비를 최대 3종까지 준비할 수 있습니다."
-"%d coins  ·  %d / 3 equipped","%d coins  ·  %d / 3 equipped","%d 金币　·　已装备 %d / 3","%d 金幣　·　已裝備 %d / 3","%d コイン　·　装備 %d / 3","코인 %d　·　장착 %d / 3"
-"Equipped","Equipped","已装备","已裝備","装備済み","장착됨"
-"Buy for next attempt","Buy for next attempt","购买供下一次出战使用","購買供下一次出戰使用","次回の出撃用に購入","다음 출격용 구매"
-"Start without equipment","Start without equipment","直接出战","直接出戰","装備なしで出撃","장비 없이 출격"
-"Start sector","Start sector","开始关卡","開始關卡","出撃","구역 시작"
-"Equipment index","Equipment index","装备图鉴","裝備圖鑑","装備図鑑","장비 도감"
-"Field archive","Field archive","行动档案","行動檔案","作戦資料室","작전 기록실"
-"Mechanics","Mechanics","玩法指南","玩法指南","仕掛け","게임 기믹"
-"Drop only","Drop only","仅掉落","僅掉落","ドロップ専用","드롭 전용"
-"Retry","Retry","重试","重試","リトライ","재도전"
-"+%d coins","+%d coins","+%d 金币","+%d 金幣","+%d コイン","+%d 코인"
-"Time ≤ %ds","Time ≤ %ds","用时 ≤ %d 秒","用時 ≤ %d 秒","タイム ≤ %d 秒","시간 ≤ %d초"
-"Hits ≤ %d","Hits ≤ %d","受击 ≤ %d","受擊 ≤ %d","被弾 ≤ %d","피격 ≤ %d"
-"Edge Oil","Edge Oil","锋刃油","鋒刃油","刃研ぎ油","칼날 오일"
-"Damage ×1.5","Damage ×1.5","伤害 ×1.5","傷害 ×1.5","ダメージ ×1.5","피해 ×1.5"
-"Runner Mesh","Runner Mesh","奔跑纤维","奔跑纖維","ランナーメッシュ","러너 메쉬"
-"Run speed ×1.2","Run speed ×1.2","跑速 ×1.2","跑速 ×1.2","走行速度 ×1.2","달리기 속도 ×1.2"
-"Slip Bearing","Slip Bearing","滑动轴承","滑動軸承","スリップ軸受","슬립 베어링"
-"Dodge recovery ×0.68","Dodge recovery ×0.68","闪避冷却 ×0.68","閃避冷卻 ×0.68","回避の再使用時間 ×0.68","회피 재사용 시간 ×0.68"
-"Spring Soles","Spring Soles","弹簧鞋底","彈簧鞋底","バネ入り靴底","스프링 밑창"
-"Jump strength ×1.2","Jump strength ×1.2","起跳力度 ×1.2","起跳力度 ×1.2","ジャンプの初速 ×1.2","점프 초기 속도 ×1.2"
-"Quick Coil","Quick Coil","速动线圈","速動線圈","クイックコイル","퀵 코일"
-"Strike recovery ×0.72","Strike recovery ×0.72","挥刀间隔 ×0.72","揮刀間隔 ×0.72","斬撃間隔 ×0.72","공격 간격 ×0.72"
-"Wide Arc","Wide Arc","宽弧刀环","寬弧刀環","ワイドアーク","와이드 아크"
-"Strike reach ×1.35","Strike reach ×1.35","挥刀距离 ×1.35","揮刀距離 ×1.35","斬撃の間合い ×1.35","공격 거리 ×1.35"
-"Impact Liner","Impact Liner","减震护衬","減震護襯","耐衝撃ライナー","충격 방어 안감"
-"Blocks one hit","Blocks one hit","抵挡一次攻击","抵擋一次攻擊","攻撃を 1 回防ぐ","공격 1회 방어"
-"Guard Prism","Guard Prism","守护棱镜","守護稜鏡","ガードプリズム","가드 프리즘"
-"Dodge protection +0.14 s","Dodge protection +0.14 s","闪避保护 +0.14 秒","閃避保護 +0.14 秒","回避の無敵時間 +0.14 秒","회피 무적 +0.14초"
-"Auxiliary Cell","Auxiliary Cell","备用电芯","備用電芯","補助セル","보조 전지"
-"Rule abilities recharge after 2 s","Rule abilities recharge after 2 s","规则能力在 2 秒后充能","規則能力在 2 秒後充能","ルールが 2 秒で再充電","규칙 능력이 2초 후 재충전"
-"Breach Catalyst","Breach Catalyst","破甲催化剂","破甲催化劑","ブリーチ触媒","돌파 촉매"
-"Damage ×1.8; run speed ×0.85","Damage ×1.8; run speed ×0.85","伤害 ×1.8，跑速 ×0.85","傷害 ×1.8，跑速 ×0.85","ダメージ ×1.8、走行速度 ×0.85","피해 ×1.8, 달리기 속도 ×0.85"
-"Blunt Relay","Blunt Relay","钝化继电器","鈍化繼電器","鈍化リレー","둔화 중계기"
-"Damage ×0.65","Damage ×0.65","伤害 ×0.65","傷害 ×0.65","ダメージ ×0.65","피해 ×0.65"
-"Magnetic Drag","Magnetic Drag","磁阻","磁阻","磁気抵抗","자기 제동"
-"Run speed ×0.70","Run speed ×0.70","跑速 ×0.70","跑速 ×0.70","走行速度 ×0.70","달리기 속도 ×0.70"
-"Sticky Joint","Sticky Joint","卡滞关节","卡滯關節","固着ジョイント","굳은 관절"
-"Dodge recovery ×1.5","Dodge recovery ×1.5","闪避冷却 ×1.5","閃避冷卻 ×1.5","回避の再使用時間 ×1.5","회피 재사용 시간 ×1.5"
-"Heavy Soles","Heavy Soles","重型鞋底","重型鞋底","重い靴底","무거운 밑창"
-"Jump strength ×0.78","Jump strength ×0.78","起跳力度 ×0.78","起跳力度 ×0.78","ジャンプの初速 ×0.78","점프 초기 속도 ×0.78"
-"Rust Link","Rust Link","锈蚀链节","鏽蝕鏈節","錆びたリンク","녹슨 링크"
-"Strike recovery ×1.4","Strike recovery ×1.4","挥刀间隔 ×1.4","揮刀間隔 ×1.4","斬撃間隔 ×1.4","공격 간격 ×1.4"
-"Cracked Optic","Cracked Optic","裂纹传感器","裂紋感測器","割れた光学器","금 간 센서"
-"Strike reach ×0.75","Strike reach ×0.75","挥刀距离 ×0.75","揮刀距離 ×0.75","斬撃の間合い ×0.75","공격 거리 ×0.75"
-"Hull Patch","Hull Patch","机体修补片","機體修補片","装甲補修パッチ","기체 보수 패치"
-"Repairs one hull after 4 s","Repairs one hull after 4 s","4 秒后恢复一格耐久","4 秒後恢復一格耐久","4 秒後に耐久を 1 回復","4초 뒤 내구도 1 회복"
-"Grounding Mat","Grounding Mat","绝缘踏片","絕緣踏片","絶縁マット","절연 매트"
-"Blocks live floor and vent damage","Blocks live floor and vent damage","免疫通电地面和喷口伤害","免疫通電地板和噴口傷害","通電床と噴出口のダメージを防ぐ","통전 바닥 및 분출구 피해 차단"
-"Feedback Loop","Feedback Loop","反馈闭环","回授迴路","フィードバックループ","피드백 루프"
-"Rule use locked while active","Rule use locked while active","持续期间无法主动使用规则","持續期間無法主動使用規則","効果中はルールを使用できない","효과 중 규칙 사용 불가"
-"Brake Teeth","Brake Teeth","制动卡齿","制動卡齒","ブレーキの歯","브레이크 이빨"
-"Dodge distance ×0.7","Dodge distance ×0.7","闪避距离 ×0.7","閃避距離 ×0.7","回避距離 ×0.7","회피 거리 ×0.7"
-"Select a language","Select a language","选择语言","選擇語言","言語を選択","언어 선택"
-"You can change this anytime in Settings.","You can change this anytime in Settings.","之后可在设置中更改。","之後可在設定中變更。","設定からいつでも変更できます。","설정에서 언제든지 바꿀 수 있습니다."
-"Continue to guide","Continue to guide","继续查看操作指南","繼續查看操作指南","ガイドへ進む","조작 가이드 보기"
-"Settings","Settings","设置","設定","設定","설정"
-"Controls guide","Controls guide","操作指南","操作指南","操作ガイド","조작 가이드"
-"Infiltrate","Infiltrate","开始行动","開始行動","潜入開始","침투 시작"
-"Back","Back","返回","返回","戻る","뒤로"
-"Done","Done","完成","完成","完了","완료"
-"Language","Language","语言","語言","言語","언어"
-"Display mode","Display mode","显示模式","顯示模式","画面モード","화면 모드"
-"Fullscreen","Fullscreen","全屏","全螢幕","フルスクリーン","전체 화면"
-"Windowed","Windowed","窗口","視窗","ウィンドウ","창 모드"
-"Window size","Window size","窗口大小","視窗大小","ウィンドウサイズ","창 크기"
-"Text size","Text size","文字大小","文字大小","文字サイズ","글자 크기"
-"Audio","Audio","声音","音效","サウンド","소리"
-"Reduced motion","Reduced motion","减少动效","減少動態效果","動きを抑える","움직임 줄이기"
-"Assist mode","Assist mode","辅助模式","輔助模式","アシストモード","보조 모드"
-"On","On","开启","開啟","オン","켜기"
-"Off","Off","关闭","關閉","オフ","끄기"
-"Larger timing windows for steals and dodges.","Larger timing windows for steals and dodges.","延长偷取时机与受击后的保护时间。","延長偷取時機與受擊後的保護時間。","ルールを奪える時間と被弾後の無敵時間が長くなります。","규칙을 훔칠 수 있는 시간과 피격 후 무적 시간이 늘어납니다."
-"Muted","Muted","已静音","已靜音","ミュート中","음소거"
-"Play","Play","播放","播放","再生","재생"
-"Pause demo","Pause demo","暂停演示","暫停示範","デモを一時停止","시범 일시 정지"
-"Gameplay recording","Gameplay recording","实战录像","實戰錄影","実際のプレイ映像","실제 플레이 녹화"
-"Move & jump","Move & jump","移动与跳跃","移動與跳躍","移動とジャンプ","이동과 점프"
-"Strike","Strike","挥刀","揮刀","斬撃","공격"
-"Dodge","Dodge","闪避","閃避","回避","회피"
-"Steal a rule","Steal a rule","偷取规则","偷取規則","ルールを奪う","규칙 훔치기"
-"Use your rule","Use your rule","使用能力","使用能力","ルールを使う","규칙 사용"
-"Run toward the boss and jump over low attacks.","Run toward the boss and jump over low attacks.","跑向 Boss，跳过低位攻击。","跑向 Boss，跳過低位攻擊。","ボスに近づき、低い攻撃はジャンプで越えます。","보스에게 다가가고 낮은 공격은 뛰어넘으세요."
-"Hold the strike button to keep swinging. An open core takes more damage.","Hold the strike button to keep swinging. An open core takes more damage.","按住挥刀键可连续攻击。核心开启时伤害更高。","按住揮刀鍵可連續攻擊。核心開啟時傷害更高。","斬撃ボタンを長押しすると連続で攻撃します。コアが開いたときに大きなダメージを与えられます。","공격 버튼을 누르고 있으면 연속으로 공격합니다. 코어가 열렸을 때 더 큰 피해를 줍니다."
-"Dodge through an attack just before it hits you.","Dodge through an attack just before it hits you.","在攻击即将命中时闪避穿过去。","在攻擊即將命中時閃避穿過去。","攻撃が当たる直前に回避してすり抜けます。","공격에 맞기 직전에 회피로 통과하세요."
-"After an attack, approach the open core and press Shift. The boss takes your old rule.","After an attack, approach the open core and press Shift. The boss takes your old rule.","等 Boss 攻击结束后，靠近开启的核心并按 Shift。Boss 会接过你的旧规则。","等 Boss 攻擊結束後，靠近開啟的核心並按 Shift。Boss 會接過你的舊規則。","攻撃後に開いたコアへ近づき、Shift を押します。ボスには自分が持っていたルールが渡ります。","공격이 끝나면 열린 코어에 접근해 Shift를 누르세요. 보스는 내가 갖고 있던 규칙을 가져갑니다."
-"Use your current rule once per attack cycle. The recording shows RUSH, a forward dash strike.","Use your current rule once per attack cycle. The recording shows RUSH, a forward dash strike.","每轮 Boss 攻击间可使用一次能力。录像展示的是 RUSH：向前冲刺斩击。","每輪 Boss 攻擊間可使用一次能力。錄影展示的是 RUSH：向前衝刺斬擊。","ボスの攻撃一巡につき一度使えます。映像では突進斬りの RUSH を使っています。","보스의 공격 주기마다 한 번 쓸 수 있습니다. 영상은 전방 돌진 공격인 RUSH를 보여 줍니다."
-"Move with A/D or arrows. Jump with Space.","Move with A/D or arrows. Jump with Space.","A/D 或方向键移动，空格跳跃。","A/D 或方向鍵移動，空白鍵跳躍。","A/D または矢印キーで移動。Space でジャンプ。","A/D 또는 방향키로 이동하고 Space로 점프합니다."
-"Demo unavailable","Demo unavailable","演示无法播放","無法播放示範","デモを再生できません","시범을 재생할 수 없습니다"
-"One slot. Three machines. Their rules are yours.","One slot. Three machines. Their rules are yours.","一个能力槽，三台守卫机。夺走它们的规则。","一個能力槽，三臺守衛機。奪走它們的規則。","スロットは一つ、機械は三体。敵のルールを奪え。","규칙 슬롯은 하나, 기계는 셋. 그들의 규칙을 빼앗으세요."
-"THE WARDEN","THE WARDEN","监守者","監守者","監視機","감시자"
-"THE LATTICE","THE LATTICE","悬阵机","懸陣機","格子機","격자기"
-"THE EXECUTOR","THE EXECUTOR","执行者","執行者","執行機","집행자"
-"01 / INTAKE","01 / INTAKE","01 / 入口","01 / 入口","01 / 入口","01 / 입구"
-"02 / SUSPENSION","02 / SUSPENSION","02 / 悬空区","02 / 懸空區","02 / 懸架区","02 / 현수 구역"
-"03 / ROOT ACCESS","03 / ROOT ACCESS","03 / 核心区","03 / 核心區","03 / 中枢区","03 / 핵심 구역"
-"The doors only open from the inside.","The doors only open from the inside.","大门只能从内部开启。","大門只能從內部開啟。","扉は内側からしか開かない。","문은 안쪽에서만 열린다."
-"Take its lift. See what the floor is made of.","Take its lift. See what the floor is made of.","夺走它的飞行能力，看看地板能不能扛住。","奪走它的飛行能力，看看地板能不能撐住。","飛行能力を奪い、床の強度を確かめろ。","비행 능력을 빼앗고 바닥이 버티는지 확인하라."
-"Whatever you hand over, it will learn to use.","Whatever you hand over, it will learn to use.","你交出的每条规则，它都会用。","你交出的每條規則，它都會用。","渡したルールは、どれも使いこなしてくる。","넘겨준 규칙은 무엇이든 사용한다."
-"SUBLEVEL","SUBLEVEL","地下层","地下層","地下階","지하층"
-"AUTHORIZED MACHINES ONLY","AUTHORIZED MACHINES ONLY","仅限授权机器","僅限授權機器","認可された機体のみ","허가된 기계만 출입"
-"SECTOR","SECTOR","区域","區域","区画","구역"
-"RUN CLOCK","RUN CLOCK","用时","用時","経過時間","경과 시간"
-"HULL","HULL","机体","機體","耐久","내구도"
-"YOUR RULE","YOUR RULE","你的规则","你的規則","自分のルール","내 규칙"
-"BOSS RULE","BOSS RULE","Boss 规则","Boss 規則","ボスのルール","보스 규칙"
-"SHIFT LINK","SHIFT LINK","偷取连接","偷取連線","奪取リンク","탈취 연결"
-"EMPTY","EMPTY","空槽","空槽","空き","비어 있음"
-"IN RANGE","IN RANGE","可偷取","可偷取","奪取可能","탈취 가능"
-"APPROACH","APPROACH","靠近核心","靠近核心","コアに接近","코어에 접근"
-"WAIT","WAIT","等待","等待","待機","대기"
-"[%s] READY","[%s] READY","[%s] 可用","[%s] 可用","[%s] 使用可能","[%s] 사용 가능"
-"RECHARGING","RECHARGING","充能中","充能中","充電中","충전 중"
-"A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE","A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE","A/D 移动    空格 跳跃    J 挥刀    K 闪避    SHIFT 偷取    E 能力","A/D 移動    空白鍵 跳躍    J 揮刀    K 閃避    SHIFT 偷取    E 能力","A/D 移動    SPACE ジャンプ    J 斬撃    K 回避    SHIFT 奪取    E ルール","A/D 이동    SPACE 점프    J 공격    K 회피    SHIFT 탈취    E 규칙"
-"STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE","STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE","摇杆 移动    A 跳跃    X 挥刀    B 闪避    RB 偷取    Y 能力","搖桿 移動    A 跳躍    X 揮刀    B 閃避    RB 偷取    Y 能力","スティック 移動    A ジャンプ    X 斬撃    B 回避    RB 奪取    Y ルール","스틱 이동    A 점프    X 공격    B 회피    RB 탈취    Y 규칙"
-"M AUDIO  /  V MOTION  /  ESC PAUSE","M AUDIO  /  V MOTION  /  ESC PAUSE","M 声音  /  V 动效  /  ESC 暂停","M 音效  /  V 動態  /  ESC 暫停","M 音声  /  V 動き  /  ESC 一時停止","M 소리  /  V 움직임  /  ESC 일시 정지"
-"RAIL CUT","RAIL CUT","轨道冲锋","軌道衝鋒","レールカット","레일 커트"
-"SKY ANVIL","SKY ANVIL","高空重砸","高空重砸","スカイアンビル","스카이 앤빌"
-"PULSE LATTICE","PULSE LATTICE","脉冲阵列","脈衝陣列","パルス格子","펄스 격자"
-"DEAD CIRCUIT","DEAD CIRCUIT","断路冲击","斷路衝擊","サーキット遮断","회로 차단"
-"Sector clear. Your rule carries into the next fight.","Sector clear. Your rule carries into the next fight.","区域已清除。当前规则将带入下一战。","區域已清除。目前的規則將帶入下一戰。","区画クリア。現在のルールを次の戦いに持ち越します。","구역을 돌파했습니다. 현재 규칙은 다음 전투에 이어집니다."
-"Reserve booting. Strike while the core is unprotected.","Reserve booting. Strike while the core is unprotected.","备用规则正在启动。趁核心无防护时挥刀。","備用規則正在啟動。趁核心無防護時揮刀。","予備ルールを起動中。無防備なコアを斬りつけましょう。","예비 규칙을 가동 중입니다. 무방비한 코어를 공격하세요."
-"Core open. Steal now, or keep your current rule and strike.","Core open. Steal now, or keep your current rule and strike.","核心已开启。可以偷取，也可以保留当前规则并挥刀。","核心已開啟。可以偷取，也可以保留目前的規則並揮刀。","コアが開きました。ルールを奪うか、今のルールを保って斬りつけましょう。","코어가 열렸습니다. 규칙을 훔치거나 지금 규칙을 유지하며 공격하세요."
-"Core open. Move in for SHIFT or a close strike.","Core open. Move in for SHIFT or a close strike.","核心已开启。靠近后按 SHIFT 或挥刀。","核心已開啟。靠近後按 SHIFT 或揮刀。","コアが開きました。近づいて SHIFT か斬撃を使いましょう。","코어가 열렸습니다. 가까이 가서 SHIFT를 누르거나 공격하세요."
-"Rail Cut: jump over the charge, or dodge through it.","Rail Cut: jump over the charge, or dodge through it.","轨道冲锋：跳过去或闪避穿过。","軌道衝鋒：跳過去或閃避穿過。","レールカット：ジャンプで越えるか回避ですり抜けましょう。","레일 커트: 뛰어넘거나 회피로 통과하세요."
-"Sky Anvil: leave the target zone, then jump the shockwave.","Sky Anvil: leave the target zone, then jump the shockwave.","高空重砸：离开落点，再跳过冲击波。","高空重砸：離開落點，再跳過衝擊波。","スカイアンビル：着地点を離れ、衝撃波を飛び越えましょう。","스카이 앤빌: 착지 지점을 벗어나 충격파를 뛰어넘으세요."
-"Pulse Lattice: find a gap between the marked columns.","Pulse Lattice: find a gap between the marked columns.","脉冲阵列：躲进标记柱之间的空隙。","脈衝陣列：躲進標記柱之間的空隙。","パルス格子：マークされた柱の隙間に入りましょう。","펄스 격자: 표시된 기둥 사이의 틈을 찾으세요."
-"Dead Circuit: jump its shockwave. The reserve rule is next.","Dead Circuit: jump its shockwave. The reserve rule is next.","断路冲击：跳过冲击波，下一轮是备用规则。","斷路衝擊：跳過衝擊波，下一輪是備用規則。","サーキット遮断：衝撃波を越えましょう。次は予備ルールが発動します。","회로 차단: 충격파를 뛰어넘으세요. 다음에는 예비 규칙이 발동합니다."
-"RUSH / E: slash through the boss from range. Aim before firing.","RUSH / E: slash through the boss from range. Aim before firing.","RUSH / E：对准 Boss 冲刺斩击。","RUSH / E：對準 Boss 衝刺斬擊。","RUSH / E：ボスに向かって突進斬り。","RUSH / E: 보스를 향해 돌진 공격합니다."
-"LIFT / E: jet upward. Strike on the ascent to pierce armor.","LIFT / E: jet upward. Strike on the ascent to pierce armor.","LIFT / E：向上喷射，上升中挥刀可以破甲。","LIFT / E：向上噴射，上升中揮刀可以破甲。","LIFT / E：上昇中の斬撃で装甲を貫けます。","LIFT / E: 상승 중 공격하면 장갑을 뚫습니다."
-"AEGIS / E: catch a hit near the boss to reflect 8 damage.","AEGIS / E: catch a hit near the boss to reflect 8 damage.","AEGIS / E：在 Boss 附近挡下一击，反弹 8 点伤害。","AEGIS / E：在 Boss 附近擋下一擊，反彈 8 點傷害。","AEGIS / E：ボスの近くで攻撃を受け止めると 8 ダメージを返します。","AEGIS / E: 보스 근처에서 공격을 받아치면 피해 8을 반사합니다."
-"Read the warning. Survive the attack. Take the open core.","Read the warning. Survive the attack. Take the open core.","看清预警，躲过攻击，再偷取核心里的规则。","看清預警，躲過攻擊，再偷取核心裡的規則。","予兆を見て攻撃をかわし、開いたコアからルールを奪いましょう。","경고를 보고 공격을 피한 뒤 열린 코어에서 규칙을 훔치세요."
-"OUT OF REACH","OUT OF REACH","超出范围","超出範圍","範囲外","범위 밖"
-"Get closer to the exposed core.","Get closer to the exposed core.","再靠近开启的核心。","再靠近開啟的核心。","開いたコアへ近づいてください。","열린 코어에 더 가까이 가세요."
-"LINK COOLING","LINK COOLING","连接冷却","連線冷卻","リンク冷却中","연결 냉각 중"
-"Read the next attack.","Read the next attack.","留意下一次攻击。","留意下一次攻擊。","次の攻撃を見極めましょう。","다음 공격에 대비하세요."
-"CORE SEALED","CORE SEALED","核心紧闭","核心緊閉","コア閉鎖中","코어 닫힘"
-"SHIFT after an attack, when the core opens.","SHIFT after an attack, when the core opens.","等攻击结束、核心开启后再按 SHIFT。","等攻擊結束、核心開啟後再按 SHIFT。","攻撃後にコアが開いたら SHIFT を押しましょう。","공격이 끝나고 코어가 열리면 SHIFT를 누르세요."
-"Boss stripped  /  reserve rule warming up","Boss stripped  /  reserve rule warming up","Boss 失去规则  /  备用规则启动中","Boss 失去規則  /  備用規則啟動中","ボスがルールを喪失  /  予備ルールを起動中","보스 규칙 상실  /  예비 규칙 가동 중"
-"Boss inherited %s  /  its next attack changes","Boss inherited %s  /  its next attack changes","Boss 接过 %s  /  下一次攻击改变","Boss 接過 %s  /  下一次攻擊改變","ボスは %s を取得  /  次の攻撃が変化","보스가 %s 획득  /  다음 공격 변경"
-"Boss loses flight  /  lower deck breached","Boss loses flight  /  lower deck breached","Boss 失去飞行能力  /  地板坍塌","Boss 失去飛行能力  /  地板坍塌","ボスが飛行能力を喪失  /  床が崩落","보스 비행 능력 상실  /  바닥 붕괴"
-"Boss loses flight  /  heavy impact","Boss loses flight  /  heavy impact","Boss 失去飞行能力  /  重重坠地","Boss 失去飛行能力  /  重重墜地","ボスが飛行能力を喪失  /  地面に落下","보스 비행 능력 상실  /  바닥으로 추락"
-"%s TRANSFERRED","%s TRANSFERRED","已取得 %s","已取得 %s","%s を奪取","%s 탈취 성공"
-"PULSE PARRIED","PULSE PARRIED","脉冲已格挡","脈衝已格擋","パルスを受け流した","펄스 받아치기 성공"
-"Reflected to the core","Reflected to the core","伤害已反弹至核心","傷害已反彈至核心","コアに反射","코어로 반사됨"
-"Too far to reflect","Too far to reflect","距离太远，无法反弹","距離太遠，無法反彈","コアが遠く反射できない","거리가 멀어 반사할 수 없음"
-"INTRUSION","INTRUSION","入侵","入侵","侵入","침입"
-"Get close when the core opens. Press SHIFT or Q.","Get close when the core opens. Press SHIFT or Q.","核心开启时靠近，按 SHIFT 或 Q。","核心開啟時靠近，按 SHIFT 或 Q。","コアが開いたら近づき、SHIFT または Q を押します。","코어가 열리면 가까이 가서 SHIFT 또는 Q를 누르세요."
-"One slot. Each swap hands your old rule to the boss.","One slot. Each swap hands your old rule to the boss.","只有一个能力槽。每次交换，旧规则都归 Boss。","只有一個能力槽。每次交換，舊規則都歸 Boss。","スロットは一つ。交換すると古いルールはボスに渡ります。","규칙 슬롯은 하나입니다. 교환할 때 이전 규칙은 보스에게 넘어갑니다."
-"Carried: %s   /   Hull %s of 7","Carried: %s   /   Hull %s of 7","携带 %s   /   机体 %s / 7","攜帶 %s   /   機體 %s / 7","保持ルール %s   /   耐久 %s / 7","보유 규칙 %s   /   내구도 %s / 7"
-"Reboots restore this sector's starting loadout.","Reboots restore this sector's starting loadout.","重启将恢复进入该区域时的状态。","重啟將恢復進入此區域時的狀態。","再起動すると、この区画の開始時の状態に戻ります。","재시작하면 구역 진입 시 상태로 돌아갑니다."
-"ENGAGE","ENGAGE","开始战斗","開始戰鬥","戦闘開始","전투 시작"
-"GATE UNLOCKED","GATE UNLOCKED","大门已解锁","大門已解鎖","ゲート解錠","문 잠금 해제"
-"Carry %s into the next sector.","Carry %s into the next sector.","将 %s 带入下一区域。","將 %s 帶入下一區域。","%s を次の区画へ持ち越します。","%s 규칙을 다음 구역으로 가져갑니다."
-"Repair up to three hull points on entry.","Repair up to three hull points on entry.","进入后最多恢复三格机体耐久。","進入後最多恢復三格機體耐久。","進入時に耐久が最大 3 回復します。","다음 구역에서 내구도가 최대 3 회복됩니다."
-"DESCEND","DESCEND","前往下一区域","前往下一區域","次の区画へ","다음 구역"
-"LINK PAUSED","LINK PAUSED","连接已暂停","連線已暫停","リンク一時停止","연결 일시 정지"
-"R  Reboot sector   /   T  Return to title","R  Reboot sector   /   T  Return to title","R 重启本区   /   T 返回标题","R 重啟本區   /   T 返回標題","R 区画を再起動   /   T タイトルへ","R 구역 재시작   /   T 타이틀로"
-"RESUME","RESUME","继续","繼續","再開","계속"
-"LINK LOST","LINK LOST","连接中断","連線中斷","リンク切断","연결 끊김"
-"HULL BREACHED","HULL BREACHED","机体受损","機體損毀","機体大破","기체 파손"
-"Reboot from this sector with your entry loadout.","Reboot from this sector with your entry loadout.","按进入本区域时的状态重启。","以進入此區域時的狀態重啟。","区画の開始時の状態でやり直します。","구역에 진입했을 때의 상태로 재시작합니다."
-"Dodge through danger. Strike when the core opens.","Dodge through danger. Strike when the core opens.","用闪避穿过攻击，趁核心开启时挥刀。","用閃避穿過攻擊，趁核心開啟時揮刀。","攻撃を回避し、コアが開いた瞬間に斬りつけましょう。","회피로 공격을 피하고 코어가 열리면 공격하세요."
-"REBOOT","REBOOT","重启","重啟","再起動","재시작"
-"ROOT ACCESS GRANTED","ROOT ACCESS GRANTED","已取得核心权限","已取得核心權限","ルート権限取得","루트 권한 획득"
-"RULES REWRITTEN","RULES REWRITTEN","规则已改写","規則已改寫","ルールを書き換えた","규칙 재작성 완료"
-"%s    /    %s transfers    /    %s hits","%s    /    %s transfers    /    %s hits","%s    /    交换 %s 次    /    受击 %s 次","%s    /    交換 %s 次    /    受擊 %s 次","%s    /    奪取 %s 回    /    被弾 %s 回","%s    /    탈취 %s회    /    피격 %s회"
-"Assist run complete.","Assist run complete.","辅助模式通关。","輔助模式通關。","アシストモードでクリア。","보조 모드로 완료했습니다."
-"Personal best: %s","Personal best: %s","个人最佳 %s","個人最佳 %s","自己ベスト %s","최고 기록 %s"
-"BACK TO TITLE","BACK TO TITLE","返回标题","返回標題","タイトルへ","타이틀로 돌아가기"
-"A/D + SPACE","A/D + SPACE","A/D + 空格","A/D + 空白鍵","A/D + SPACE","A/D + SPACE"
-"STICK + A","STICK + A","摇杆 + A","搖桿 + A","スティック + A","스틱 + A"
-"Display","Display","画面","畫面","画面","화면"
-"Start game","Start game","开始游戏","開始遊戲","ゲーム開始","게임 시작"
-"Captured with in-game controls.","Captured with in-game controls.","使用游戏内操作录制。","使用遊戲內操作錄製。","ゲーム内の操作で収録。","게임 내 조작으로 녹화했습니다."
-"Lobby","Lobby","大厅","大廳","ロビー","로비"
-"Sector map","Sector map","关卡地图","關卡地圖","区画マップ","구역 지도"
-"%d of %d sectors cleared","%d of %d sectors cleared","已通关 %d / %d 关","已通關 %d / %d 關","%d / %d 区画クリア","구역 %d / %d 돌파"
-"Cleared","Cleared","已通关","已通關","クリア済み","돌파 완료"
-"Next sector","Next sector","下一关","下一關","次の区画","다음 구역"
-"Locked","Locked","未解锁","未解鎖","未解放","잠김"
-"Best %s","Best %s","最佳 %s","最佳 %s","ベスト %s","최고 %s"
-"Select a cleared sector to replay it.","Select a cleared sector to replay it.","选择已点亮的关卡即可重玩。","選擇已點亮的關卡即可重玩。","クリア済みの区画は選び直して再挑戦できます。","완료한 구역을 선택해 다시 플레이할 수 있습니다."
-"Save and quit","Save and quit","保存并退出","儲存並離開","保存して終了","저장하고 종료"
-"Save and return","Save and return","保存并返回","儲存並返回","保存して戻る","저장하고 돌아가기"
-"Could not save. Try again before closing.","Could not save. Try again before closing.","保存失败，请重试后再退出。","儲存失敗，請重試後再離開。","保存できませんでした。終了前に再試行してください。","저장하지 못했습니다. 종료하기 전에 다시 시도하세요."
-"Your cleared sectors are saved.","Your cleared sectors are saved.","已通关的进度会保存在本地。","已通關的進度會儲存在本機。","クリアした区画の進行状況は保存されます。","돌파한 구역은 이 기기에 저장됩니다."
-"Restart sector","Restart sector","重开本关","重開本關","この区画をやり直す","현재 구역 재시작"
-"Return to lobby","Return to lobby","返回大厅","返回大廳","ロビーに戻る","로비로 돌아가기"
-"Sector secured","Sector secured","关卡完成","關卡完成","区画クリア","구역 확보"
-"%s  /  %s hits  /  %s retries","%s / Hits %s / Retries %s","%s  /  受击 %s 次  /  重试 %s 次","%s  /  受擊 %s 次  /  重試 %s 次","%s  /  被弾 %s 回  /  再挑戦 %s 回","%s  /  피격 %s회  /  재시도 %s회"
-"Practice complete","Practice complete","练习完成","練習完成","練習完了","연습 완료"
-"You can try another action from the guide.","You can try another action from the guide.","回到指南还可以试练其他动作。","回到指南還可以試練其他動作。","ガイドに戻って別の操作も試せます。","가이드로 돌아가 다른 동작도 연습할 수 있습니다."
-"Return to guide","Return to guide","返回指南","返回指南","ガイドに戻る","가이드로 돌아가기"
-"Practice","Practice","操作练习","操作練習","操作練習","조작 연습"
-"Run and jump to the right.","Run and jump to the right.","向右跑，并在移动中跳起。","向右跑，並在移動中跳起。","右へ走りながらジャンプしましょう。","오른쪽으로 달리면서 뛰어오르세요."
-"Face the core and strike.","Face the core and strike.","面向核心，按挥刀键。","面向核心，按揮刀鍵。","コアの方を向いて斬撃します。","코어를 향해 공격하세요."
-"Dodge as the charge reaches you.","Dodge as the charge reaches you.","等冲锋快碰到你时按闪避。","等衝鋒快碰到你時按閃避。","突進が届く直前に回避します。","돌진이 닿기 직전에 회피하세요."
-"Approach the open core and press Shift.","Approach the open core and press Shift.","靠近开启的核心，按 Shift 偷取。","靠近開啟的核心，按 Shift 偷取。","開いたコアに近づき、Shift を押します。","열린 코어에 접근해 Shift를 누르세요."
-"Face the core and press E to use RUSH.","Face the core and press E to use RUSH.","面向核心并按 E，发动 RUSH。","面向核心並按 E，發動 RUSH。","コアの方を向き、E で RUSH を使います。","코어를 향해 E로 RUSH를 사용하세요."
-"Try again","Try again","再试一次","再試一次","もう一度","다시 시도"
-"Lesson %d of %d","Lesson %d of %d","第 %d 课，共 %d 课","第 %d 課，共 %d 課","レッスン %d / %d","레슨 %d / %d"
-"Try it","Try it","亲手练习","親手練習","実際に試す","직접 해보기"
-"Previous","Previous","上一步","上一步","前へ","이전"
-"Next lesson","Next lesson","下一步","下一步","次のレッスン","다음 레슨"
-"Enter lobby","Enter lobby","进入大厅","進入大廳","ロビーへ","로비 입장"
-"Replay demo","Replay demo","重播录像","重播錄影","映像を再生し直す","시범 다시 보기"
-"Move toward the boss. When a warning hugs the floor, jump as the attack approaches. Land close enough to counter.","Move toward the boss. When a warning hugs the floor, jump as the attack approaches. Land close enough to counter.","朝 Boss 移动。看到贴地预警，等攻击接近时跳过。尽量落在能反击的位置。","朝 Boss 移動。看到貼地預警，等攻擊接近時跳過。盡量落在能反擊的位置。","ボスへ近づき、床に沿った予兆が出たら攻撃が迫る直前にジャンプ。反撃できる位置に着地しましょう。","보스에게 다가가세요. 바닥 경고가 보이면 공격이 가까워질 때 점프하고, 반격할 수 있는 거리에 착지하세요."
-"Face the boss and move within blade reach. Hold the strike button to keep swinging. The open core takes more damage.","Face the boss and move within blade reach. Hold the strike button to keep swinging. The open core takes more damage.","面向 Boss 并靠近到刀能碰到的距离。按住挥刀可连续攻击。核心开启时受到的伤害更高。","面向 Boss 並靠近到刀能碰到的距離。按住揮刀可連續攻擊。核心開啟時受到的傷害更高。","ボスの方を向き、刃が届く距離に入ります。斬撃ボタンを長押しすると連続攻撃。開いたコアには大きなダメージを与えられます。","보스를 향해 칼이 닿는 거리까지 접근하세요. 공격 버튼을 길게 누르면 연속 공격합니다. 열린 코어에는 더 큰 피해를 줄 수 있습니다."
-"Dodge through the charge as it reaches you. The outline shows protection. Wait for the dodge bar to refill.","Dodge through the charge as it reaches you. The outline shows protection. Wait for the dodge bar to refill.","冲锋快碰到你时按闪避。发亮的轮廓代表保护生效。等冷却条填满后才能再次闪避。","衝鋒快碰到你時按閃避。發亮的輪廓代表保護生效。等冷卻條填滿後才能再次閃避。","突進が届く直前に回避。輪郭が光っている間は無敵です。ゲージが満ちると再び回避できます。","돌진이 닿기 직전에 회피하세요. 윤곽이 빛나는 동안 보호됩니다. 게이지가 차면 다시 회피할 수 있습니다."
-"Survive the attack and approach the open core. Check what each side gains before pressing Shift.","Dodge, then approach the open core and press Shift. The boss takes your old rule. The display shows what each side gains.","躲过攻击，靠近开启的核心并按 Shift。Boss 会接过你的旧规则。界面会提前显示双方各能获得什么。","躲過攻擊，靠近開啟的核心並按 Shift。Boss 會接過你的舊規則。介面會提前顯示雙方各能獲得什麼。","攻撃をかわして開いたコアに近づき、Shift を押します。元のルールはボスに渡ります。画面で交換内容を確認できます。","공격을 피하고 열린 코어에 접근해 Shift를 누르세요. 보스가 이전 규칙을 가져갑니다. 화면에서 양쪽이 얻을 규칙을 확인하세요."
-"Face the boss and press E when the rule is ready. RUSH cuts forward, LIFT lifts you, and AEGIS reflects a nearby hit.","Face the boss and press E when the rule is ready. RUSH cuts forward, LIFT lifts you, and AEGIS reflects a nearby hit.","能力就绪时面向 Boss 按 E。RUSH 向前冲斩，LIFT 升空，AEGIS 在近处挡下并反弹一击。","能力就緒時面向 Boss 按 E。RUSH 向前衝斬，LIFT 升空，AEGIS 在近處擋下並反彈一擊。","ルールが使用可能になったらボスの方を向いて E。RUSH は突進斬り、LIFT は上昇、AEGIS は近距離で反射します。","규칙이 준비되면 보스를 향해 E를 누르세요. RUSH는 돌진 공격, LIFT는 상승, AEGIS는 가까운 공격을 반사합니다."
-"You gain %s   /   Boss gains %s","You gain %s   /   Boss gains %s","你获得 %s   /   Boss 获得 %s","你獲得 %s   /   Boss 獲得 %s","自分は %s を取得   /   ボスは %s を取得","내 획득 %s   /   보스 획득 %s"
-"Take a rule. Change the fight.","Take a rule. Change the fight.","夺走规则，改变战局。","奪走規則，改變戰局。","ルールを奪い、戦いを変えろ。","규칙을 빼앗아 전투를 바꾸세요."
-"CAPACITOR","CAPACITOR","蓄能机","蓄能機","蓄電機","축전기"
-"THE FURNACE","THE FURNACE","熔炉","熔爐","溶鉱炉","용광로"
-"THE MIRROR","THE MIRROR","镜像机","鏡像機","反射機","반사기"
-"03 / POWER","03 / POWER","03 / 供电区","03 / 供電區","03 / 電源区","03 / 전력 구역"
-"04 / FORGE","04 / FORGE","04 / 锻造区","04 / 鍛造區","04 / 鍛造区","04 / 단조 구역"
-"05 / REFLECTION","05 / REFLECTION","05 / 镜像区","05 / 鏡像區","05 / 反射区","05 / 반사 구역"
-"06 / ROOT ACCESS","06 / ROOT ACCESS","06 / 核心区","06 / 核心區","06 / 中枢区","06 / 핵심 구역"
-"The live conduits alternate. Cross on the dark side.","The live conduits alternate. Cross on the dark side.","通电柱轮流亮起，从熄灭的一侧通过。","通電柱輪流亮起，從熄滅的一側通過。","通電する導管が交互に切り替わる。暗い側を通れ。","도관에 번갈아 전기가 흐른다. 어두운 쪽으로 건너가라."
-"When the vents flare, get off the floor.","When the vents flare, get off the floor.","喷口亮起时，马上跳离地面。","噴口亮起時，馬上跳離地面。","噴出口が光ったら、床から離れろ。","분출구에 불이 켜지면 바닥에서 벗어나라."
-"The mirror marks where you were. Keep moving.","The mirror marks where you were. Keep moving.","镜像会锁定你刚才的位置，别停下。","鏡像會鎖定你剛才的位置，別停下。","反射機は直前にいた場所を狙う。足を止めるな。","반사기는 직전에 있던 자리를 노린다. 멈추지 마라."
-"An inherited rule comes back stronger.","An inherited rule comes back stronger.","交给执行者的规则，会在它手里变得更强。","交給執行者的規則，會在它手裡變得更強。","渡したルールは、執行機が強化して使ってくる。","집행자에게 넘긴 규칙은 더 강해져 돌아온다."
-"RETURN SWEEP","RETURN SWEEP","折返冲锋","折返衝鋒","折り返し突進","되돌아오는 돌진"
-"OVERCLOCK","OVERCLOCK","规则强化","規則強化","ルール強化","규칙 강화"
-"Boss encounter","Boss encounter","首领战","首領戰","ボス戦","보스전"
-"Checkpoint route","Checkpoint route","检查点路线","檢查點路線","チェックポイント経路","체크포인트 경로"
-"Step on the plate to open the latch.","Step on the plate to open the latch.","踩下踏板，开启定时锁。","踩下踏板，開啟定時鎖。","床のプレートを踏み、時限ラッチを開きます。","발판을 밟아 시간 제한 잠금장치를 여세요."
-"Carry the linked cargo to the next beacon.","Carry the linked cargo to the next beacon.","把已接驳的货物运到下一座信标。","把已接駁的貨物運到下一座信標。","接続した荷物を次のビーコンまで運びます。","연결한 화물을 다음 신호기까지 옮기세요."
-"Strike near the cargo to connect it.","Strike near the cargo to connect it.","靠近货物并挥刀，建立连接。","靠近貨物並揮刀，建立連線。","荷物のそばで斬撃し、接続します。","화물 근처에서 공격해 연결하세요."
-"Take LIFT from the lit socket.","Take LIFT from the lit socket.","从发亮的插槽借取 LIFT。","從發亮的插槽借取 LIFT。","光っているソケットから LIFT を取得します。","빛나는 소켓에서 LIFT를 가져오세요."
-"Board the ferry at its low point.","Board the ferry at its low point.","等渡台降到低处，再跳上去。","等渡台降到低處，再跳上去。","足場が低い場所に来たら飛び乗ります。","이동 발판이 낮아질 때 뛰어오르세요."
-"Step outside the strike marker, then return.","Step outside the strike marker, then return.","离开攻击标记，等危险过去后再回来。","離開攻擊標記，等危險過去後再回來。","攻撃マーカーの外に出て、攻撃後に戻ります。","공격 표식 밖으로 나갔다가 공격 후 돌아오세요."
-"Dodge just before the ring discharges.","Dodge just before the ring discharges.","能量圈释放前的一瞬间闪避。","能量圈釋放前的一瞬間閃避。","リングが放電する直前に回避します。","고리가 방전하기 직전에 회피하세요."
+Start operation,Start operation,开始行动,開始行動,作戦開始,작전 시작
+Continue operation,Continue operation,继续作战,繼續作戰,作戦を続ける,작전 계속
+Mission briefing,Mission briefing,任务简报,任務簡報,出撃概要,임무 브리핑
+Bonus star targets,Bonus star targets,额外星级条件,額外星級條件,追加の星の条件,추가 별 조건
+Starting loadout,Starting loadout,出战配置,出戰配置,出撃装備,출격 장비
+Equipment is optional.,Equipment is optional.,可直接出战，也可购买装备。,可直接出戰，也可購買裝備。,そのまま出撃するか、装備を購入できます。,바로 출격하거나 장비를 구매할 수 있습니다.
+Return to briefing,Return to briefing,返回任务简报,返回任務簡報,出撃概要へ戻る,임무 브리핑으로 돌아가기
+Target met,Target met,已达标,已達標,条件達成,조건 달성
+Target missed,Target missed,未达标,未達標,条件未達成,조건 미달
+Regions,Regions,区域,區域,エリア,지역
+Loadout full,Loadout full,装备已满,裝備已滿,装備枠が満杯,장비 슬롯 가득 참
+%d coins short,%d coins short,还差 %d 金币,還差 %d 金幣,あと %d コイン,코인 %d개 부족
+Time ran out. Retry from the start of this sector.,Time ran out. Retry from the start of this sector.,时间已到。可以从本关起点重试。,時間已到。可以從本關起點重試。,時間切れです。この区画の最初からやり直せます。,시간이 끝났습니다. 이 구역의 처음부터 다시 도전할 수 있습니다.
+Time expired,Time expired,挑战超时,挑戰超時,時間切れ,시간 초과
+Jump to the next beacon.,Jump to the next beacon.,跳上平台，抵达下一处信标。,跳上平台，抵達下一處信標。,足場に跳び乗って次の信号へ進みます。,발판에 뛰어올라 다음 표지에 도달하세요.
+Clear sector %02d to advance.,Clear sector %02d to advance.,先完成第 %02d 关，解锁后续关卡。,先完成第 %02d 關，解鎖後續關卡。,区画 %02d をクリアすると先へ進めます。,%02d 구역을 클리어하면 다음 구역이 열립니다.
+Tidal Works,Tidal Works,潮汐工区,潮汐工區,潮汐工区,조수 작업장
+Quiet Galleries,Quiet Galleries,静默长廊,靜默長廊,静寂回廊,고요한 회랑
+Sky Reservoir,Sky Reservoir,空中蓄水池,空中蓄水池,空中貯水槽,공중 저수조
+Root Vault,Root Vault,根权限库,根權限庫,ルート保管庫,루트 금고
+Tidal Crossing,Tidal Crossing,潮汐渡口,潮汐渡口,潮汐の渡し,조수 나루
+Pump Choir,Pump Choir,泵组共鸣,泵組共鳴,ポンプの共鳴,펌프 공명
+Caisson,Caisson,沉箱,沉箱,ケーソン,케이슨
+Two-bank Junction,Two-bank Junction,双岸接线,雙岸接線,両岸接続,양안 접속
+Silt Lift,Silt Lift,沉泥升降台,沉泥升降台,沈泥リフト,침전물 승강기
+Undertow,Undertow,暗流,暗流,引き潮,역류
+Watchkeeper,Watchkeeper,巡检眼,巡檢眼,監視の目,감시의 눈
+Hush Freight,Hush Freight,无声货运,無聲貨運,静かな荷運び,무음 화물
+Cold Lens,Cold Lens,冷镜,冷鏡,コールドレンズ,냉각 렌즈
+Glass Dials,Glass Dials,玻璃仪盘,玻璃儀盤,ガラス盤,유리 계기판
+Deadband,Deadband,死区,死區,デッドバンド,불감대
+Quiet Hours,Quiet Hours,静默时段,靜默時段,静寂時間,침묵 시간
+Ballast Run,Ballast Run,压载抢运,壓載搶運,バラスト輸送,평형추 운송
+Updraft Ferry,Updraft Ferry,升流渡台,升流渡台,上昇流の渡し,상승류 발판
+Cloudbreak,Cloudbreak,破云机,破雲機,クラウドブレイク,구름절단기
+Storm Moorings,Storm Moorings,风暴系泊点,風暴繫泊點,嵐の係留所,폭풍 계류장
+Float Relay,Float Relay,浮台接线,浮台接線,浮き台回路,부유대 회로
+Lightning Wells,Lightning Wells,雷电井,雷電井,雷の井戸,번개 우물
+Ghost Circuit,Ghost Circuit,幽灵回路,幽靈迴路,ゴースト回路,유령 회로
+Triple Interlock,Triple Interlock,三重联锁,三重聯鎖,三重ロック,삼중 인터록
+Backfeed,Backfeed,逆馈机,逆饋機,逆流機,역류 장치
+Redline Protocol,Redline Protocol,红线协议,紅線協議,レッドラインプロトコル,레드라인 프로토콜
+Forty-second Stand,Forty-second Stand,限时固守,限時固守,時間制防衛,시간제 방어
+Root Warden,Root Warden,根库守卫,根庫守衛,ルート番人,루트 수호자
+Moving ferries,Moving ferries,移动渡台,移動渡台,移動する渡し台,이동 발판
+Step onto the moving platform to ride it. Its deck carries you between the high beacons.,Step onto the moving platform to ride it. Its deck carries you between the high beacons.,跳上移动渡台，随它穿过高处信标之间的空档。,跳上移動渡台，隨它穿過高處信標之間的空檔。,動く足場の上に乗り、高所の信号の間を渡ります。,움직이는 발판에 올라 높은 표지 사이를 이동하세요.
+Relay combos,Relay combos,中继器连击,中繼器連擊,連撃リレー,중계기 연속 공격
+Get close and land three hits in quick succession. Watch the lit pips. A long pause resets the relay.,Get close and land three hits in quick succession. Watch the lit pips. A long pause resets the relay.,靠近装置快速连续击中三次。亮点显示连击数，停太久会重置。,靠近裝置快速連續擊中三次。亮點顯示連擊數，停太久會重設。,装置の近くで素早く3回攻撃します。点灯数を確認してください。間が空くとリセットされます。,"장치에 접근해 빠르게 세 번 연속 공격하세요. 불빛이 타격 수를 표시하며, 오래 멈추면 초기화됩니다."
+Rule gates,Rule gates,规则闸门,規則閘門,ルールゲート,규칙 관문
+Take the rule shown at the gate from the matching socket. Move to the gate and use that rule with E.,Take the rule shown at the gate from the matching socket. Move to the gate and use that rule with E.,从匹配的规则座拿到闸门上显示的能力。走到闸门旁按 E 使用。,從相符的規則座取得閘門顯示的能力。走到閘門旁按 E 使用。,対応する端末からゲートに表示されたルールを取得し、ゲートのそばで E を押します。,관문에 표시된 규칙을 맞는 단말기에서 가져오세요. 관문에 접근해 E로 사용하세요.
+Sweep sensors,Sweep sensors,扫描传感器,掃描感測器,走査センサー,이동 감지기
+"Watch the beam move across the floor. Jump over it, or dodge through. Enter each station while the beam is clear.","Watch the beam move across the floor. Jump over it, or dodge through. Enter each station while the beam is clear.",看准地面扫掠光束的移动方向。跳过或闪过光束，光束离开站点后再进入。,看準地面掃掠光束的移動方向。跳過或閃過光束，光束離開站點後再進入。,床を横切るビームを観察し、跳ぶか回避で抜けます。ビームが離れてから各地点に入ります。,바닥을 훑는 광선을 보고 뛰어넘거나 회피하세요. 광선이 벗어났을 때 각 지점에 들어가세요.
+Emergency holds,Emergency holds,应急驻守,應急駐守,緊急エリア確保,비상 지역 점령
+Stay inside the beacon to charge it. Leave the red strike marker and return before the beacon empties.,Stay inside the beacon to charge it. Leave the red strike marker and return before the beacon empties.,站在信标范围内为它充能。红色落点出现时躲开，能量耗尽前回到信标。,站在信標範圍內充能。紅色落點出現時躲開，在能量耗盡前返回。,信号の範囲内で充電します。赤い攻撃予告が出たら離れ、充電が空になる前に戻ります。,신호 범위 안에 머물러 충전하세요. 빨간 공격 표식을 피한 뒤 충전량이 사라지기 전에 돌아오세요.
+Dodge capacitors,Dodge capacitors,闪避蓄能器,閃避蓄能器,回避充電器,회피 축전기
+"Stand within the ring. When the marker flashes solid, dodge through the pulse to charge the capacitor.","Stand within the ring. When the marker flashes solid, dodge through the pulse to charge the capacitor.",站在圆环里，预警快变为实色时按 K 闪过脉冲，给蓄能器充能。,站在圓環內，預警快變成實色時按 K 閃過脈衝，為蓄能器充能。,円の中に立ち、予告の色が濃くなる直前に K でパルスを回避して充電します。,고리 안에 서서 표식이 진해지기 직전에 K로 펄스를 피하면 축전기가 충전됩니다.
+Ride the ferry and reach each high beacon.,Ride the ferry and reach each high beacon.,乘渡台依次抵达高处信标。,乘渡台依序抵達高處信標。,渡し台に乗って高所の信号へ。,발판을 타고 높은 신호에 도달하세요.
+Chain three strikes to break each relay.,Chain three strikes to break each relay.,三连击破坏每一台中继器。,三連擊破壞每一台中繼器。,3 連撃で各リレーを破壊。,세 번 연속 공격해 각 중계기를 파괴하세요.
+Borrow the shown rule and activate the gate.,Borrow the shown rule and activate the gate.,借到闸门标注的规则，再用它开门。,借到閘門標示的規則，再用它開門。,表示されたルールを借りてゲートを起動。,표시된 규칙을 빌려 관문을 여세요.
+Cross the sensor beam and visit each station.,Cross the sensor beam and visit each station.,避开扫描光束，经过每个站点。,避開掃描光束，經過每個站點。,走査ビームを越えて各地点へ。,감지 광선을 피해 지점마다 방문하세요.
+Charge each beacon while avoiding the strikes.,Charge each beacon while avoiding the strikes.,避开攻击，给每个信标充能。,避開攻擊，為每個信標充能。,攻撃を避けながら各信号を充電。,공격을 피하면서 신호를 각각 충전하세요.
+Dodge a pulse inside each ring.,Dodge a pulse inside each ring.,在每个圆环内闪过脉冲。,在每個圓環內閃過脈衝。,各円の中でパルスを回避。,각 고리 안에서 펄스를 회피하세요.
+Effect lasts %d seconds,Effect lasts %d seconds,效果持续 %d 秒,效果持續 %d 秒,効果時間 %d 秒,효과 지속 %d초
+Capacitor,Capacitor,蓄能机,蓄能機,蓄電機,축전기
+Playback speed,Playback speed,播放速度,播放速度,再生速度,재생 속도
+Seek in recording,Seek in recording,跳转到录像位置,跳轉到錄影位置,録画位置を選択,재생 위치 이동
+Back one second,Back one second,后退一秒,後退一秒,1 秒戻る,1초 뒤로
+Forward one second,Forward one second,前进一秒,前進一秒,1 秒進む,1초 앞으로
+Equipment timers start when the fight begins.,Equipment timers start when the fight begins.,装备效果在开战时开始计时。,裝備效果在開戰時開始計時。,装備の効果時間は戦闘開始時から数えます。,장비 효과 시간은 전투 시작부터 줄어듭니다.
+Infiltration Line,Infiltration Line,入侵线,入侵線,侵入ライン,침투 라인
+Power Junction,Power Junction,配电枢纽,配電樞紐,配電区画,배전 구역
+The Foundry,The Foundry,铸造厂,鑄造廠,鋳造所,주조소
+Reflection Core,Reflection Core,反射核心,反射核心,反射コア,반사 코어
+Redline Entry,Redline Entry,红线入侵,紅線入侵,レッドライン,레드라인 진입
+First Lock,First Lock,第一道闸,第一道閘,最初のゲート,첫 번째 관문
+Warden,Warden,监守者,監守者,ウォーデン,감시자
+Catch the Lift,Catch the Lift,追上货梯,追上貨梯,リフトを追え,화물 승강기
+Shaft Trial,Shaft Trial,天井试飞,天井試飛,昇降路テスト,수직 통로
+Lattice,Lattice,悬阵机,懸陣機,ラティス,래티스
+Rebound Workshop,Rebound Workshop,回弹车间,回彈車間,反射工房,반사 작업장
+The Rule Seat,The Rule Seat,规则座,規則座,ルール端末,규칙 단말기
+Pulse Routing,Pulse Routing,脉冲转向,脈衝轉向,パルス分岐,펄스 분기
+Pressure Divide,Pressure Divide,压差捷径,壓差捷徑,加圧通路,압력 통로
+Recover the Cell,Recover the Cell,断线回收,斷線回收,バッテリー回収,셀 회수
+First Heat,First Heat,热线第一拍,熱線第一拍,最初の噴火,첫 분출
+Against the Belt,Against the Belt,逆向带,逆向帶,逆走ベルト,역주행 벨트
+Press Key,Press Key,压铸钥匙,壓鑄鑰匙,プレスの鍵,압착기 열쇠
+Hot Handoff,Hot Handoff,滚烫交接,滾燙交接,熱所の受け渡し,과열 화물
+Slag Run,Slag Run,火线逃生,火線逃生,スラグ脱出,슬래그 탈출
+Furnace,Furnace,熔炉,熔爐,ファーネス,용광로
+Leave a Mark,Leave a Mark,留下位置,留下位置,痕跡を残せ,흔적 남기기
+Glass Archive,Glass Archive,玻璃档案,玻璃檔案,ガラス保管庫,유리 기록고
+Crossfire,Crossfire,交叉截击,交叉截擊,クロスファイア,교차 사격
+Mirror,Mirror,镜像机,鏡像機,ミラー,미러
+Contingency,Contingency,核心预案,核心預案,緊急手順,비상 절차
+Executor,Executor,执行者,執行者,エグゼキューター,집행자
+Route markers,Route markers,路线标记,路線標記,進路マーカー,경로 표지
+Follow the exit beacon. Jump onto ledges when the beacon is above you.,Follow the exit beacon. Jump onto ledges when the beacon is above you.,跟着出口信标走。信标在高处时，跳上平台。,跟著出口信標走。信標在高處時，跳上平台。,出口の信号を追います。信号が上にあるときは足場に跳び乗ります。,출구 신호를 따라가세요. 신호가 위쪽에 있으면 발판으로 점프하세요.
+Breakable devices,Breakable devices,可击破装置,可擊破裝置,破壊できる装置,파괴 장치
+Get close and press J to strike the amber device. Tap K as a warning turns solid to dodge the sweep.,Get close and press J to strike the amber device. Tap K as a warning turns solid to dodge the sweep.,靠近琥珀色装置，按住 J 连击三次。预警变为实线时按 K 闪避扫击。,靠近琥珀色裝置，按住 J 連擊三次。預警變成實線時按 K 閃避掃擊。,琥珀色の装置に近づき、J 長押しで3回斬撃。予兆が実線になったら K で回避します。,황색 장치 옆에서 J를 길게 눌러 세 번 공격하세요. 경고가 실선으로 변할 때 K로 회피하세요.
+Closing gates,Closing gates,关门倒计时,關門倒數,閉鎖ゲート,폐쇄 관문
+Touch the checkpoints in order before the countdown expires. A rule socket lets you borrow a shortcut.,Touch the checkpoints in order before the countdown expires. A rule socket lets you borrow a shortcut.,倒计时结束前依次碰到检查点。规则座里的能力可以帮你抄近路。,倒數結束前依序碰到檢查點。規則座裡的能力可以幫你抄近路。,制限時間内に各チェックポイントを順番に通過します。端末のルールで近道できます。,제한 시간 안에 표시 지점을 순서대로 통과하세요. 단말기의 규칙으로 지름길을 이용할 수 있습니다.
+Lift sockets,Lift sockets,升空规则座,升空規則座,上昇ルール端末,상승 규칙 단말기
+Stand near the glowing socket and press Shift or Q. Press E to lift off and land on the upper ledges.,Stand near the glowing socket and press Shift. Press E to lift off and land on the upper ledges.,靠近发光规则座，按 Shift。按 E 喷升，落在高处平台。,靠近發光規則座，按 Shift。按 E 噴升，落在高處平台。,光る端末のそばで Shift。E で上昇し、高い足場に着地します。,빛나는 단말기 근처에서 Shift를 누른 뒤 E로 상승해 높은 발판에 착지하세요.
+Reflect pulses,Reflect pulses,反射脉冲,反射脈衝,パルス反射,펄스 반사
+"Take AEGIS from the socket. Stay on the target while it flashes, then press E just before the flash closes to reflect its pulse.","Take AEGIS from the socket. Stay on the target while it flashes, then press E just before the flash closes to reflect its pulse.",从规则座取出 AEGIS。站在闪烁的标记上，预警即将结束时按 E 反射脉冲。,從規則座取出 AEGIS。站在閃爍的標記上，預警即將結束時按 E 反射脈衝。,端末から AEGIS を取得。点滅する印の上で警告が終わる直前に E を押し、パルスを反射します。,단말기에서 AEGIS를 획득하세요. 깜빡이는 표식에 서서 경고가 끝나기 직전 E로 펄스를 반사하세요.
+Exchange sockets,Exchange sockets,交换规则座,交換規則座,ルール交換端末,규칙 교환 단말기
+Stand beside an illuminated socket and press Shift or Q to swap rules. The socket takes the rule you brought.,Stand beside an illuminated socket and press Shift to swap rules. The socket takes the rule you brought.,站在亮起的规则座旁，按 Shift。你获得新规则，规则座收下带来的规则。,站在亮起的規則座旁，按 Shift。你獲得新規則，規則座收下帶來的規則。,光る端末のそばで Shift。自分のルールと端末のルールが入れ替わります。,빛나는 단말기 옆에서 Shift를 누르면 단말기의 규칙과 내 규칙이 바뀝니다.
+Live circuits,Live circuits,通电地面,通電地板,通電回路,활성 회로
+"The striped floor warns before power comes on. Cross the dim gap, or press K just before crossing a live segment.","The striped floor warns before power comes on. Cross the dim gap, or press K just before crossing a live segment.",带条纹的地板会先预警再通电。走未亮的路，或在穿过通电区域前按 K。,帶條紋的地板會先預警再通電。走未亮的路，或在穿過通電區域前按 K。,縞模様の床は通電前に警告します。暗い区間を進むか、通電区間の手前で K を押します。,줄무늬 바닥은 전기가 흐르기 전에 경고합니다. 어두운 틈으로 가거나 통전 구간 직전에 K를 누르세요.
+Cargo relay,Cargo relay,货物接驳,貨物接駁,貨物リレー,화물 릴레이
+Press J next to the cargo to connect it. Carry it through each checkpoint in order. Damage breaks your connection.,Press J next to the cargo to connect it. Carry it through each checkpoint in order. Damage breaks your connection.,在货物旁按 J 接驳，依次送到各检查点。受伤会断开连接。,在貨物旁按 J 接駁，依序送到各檢查點。受傷會斷開連接。,貨物のそばで J を押して接続し、各地点に順番に運びます。被弾すると接続が切れます。,화물 옆에서 J로 연결하고 표시 지점에 순서대로 옮기세요. 피해를 받으면 연결이 끊깁니다.
+Timed gates,Timed gates,限时闸门,限時閘門,時間制ゲート,시간제 관문
+Step on the pressure plate to extend the timer. Reach the device and strike before its window closes.,Step on the pressure plate to extend the timer. Reach the device and strike before its window closes.,踩上压板开启计时。关闭前到装置旁挥刀。,踩上壓板開啟計時。關閉前到裝置旁揮刀。,床のスイッチを踏んでタイマーを起動。時間内に装置に近づき攻撃します。,압력판을 밟아 타이머를 시작하세요. 시간이 끝나기 전에 장치에 다가가 공격하세요.
+Echo locks,Echo locks,回声锁,回聲鎖,残響ロック,잔향 잠금장치
+Wait beside the lock until the target holds still. Step away before the pulse hits the recorded position.,Wait beside the lock until the target holds still. Step away before the pulse hits the recorded position.,在锁旁等标记固定，再离开。脉冲会命中你刚才的位置。,在鎖旁等標記固定，再離開。脈衝會命中你剛才的位置。,ロックのそばで照準が固定されるまで待ち、記録された地点に攻撃が落ちる前に離れます。,"잠금장치 옆에서 조준이 고정될 때까지 기다린 뒤, 기록된 위치에 펄스가 떨어지기 전에 벗어나세요."
+Core evacuation,Core evacuation,核心撤离,核心撤離,コアからの脱出,코어 탈출
+"The Executor repeats a rule you gave it. After the core breaks, reach the beacon before the doors shut.","The Executor repeats a rule you gave it. After the core breaks, reach the beacon before the doors shut.",执行者会强化你交给它的规则。摧毁核心后，在门关闭前抵达信标。,執行者會強化你交給它的規則。摧毀核心後，在門關閉前抵達信標。,エグゼキューターは受け取ったルールを強化します。コア破壊後、扉が閉まる前に脱出信号へ。,집행자는 넘겨받은 규칙을 강화합니다. 코어 파괴 후 문이 닫히기 전에 신호 지점으로 가세요.
+Equipment drops,Equipment drops,装备掉落,裝備掉落,装備のドロップ,장비 드롭
+Penalty capsules,Penalty capsules,减益气泡,減益氣泡,弱体化カプセル,약화 캡슐
+"Coral capsules weaken a stat for 5 seconds. Jump over one to avoid it, or wait for its ring to empty.","Coral capsules weaken a stat for 5 seconds. Jump over one to avoid it, or wait for its ring to empty.",珊瑚红气泡会削弱一项属性，持续 5 秒。跳过去可以避开，也可以等外圈耗尽后再通过。,珊瑚紅氣泡會削弱一項屬性，持續 5 秒。跳過去可以避開，也可以等外圈耗盡後再通過。,赤い泡は能力を 5 秒間弱めます。飛び越えるか、外側のリングが消えるまで待ちます。,산호색 캡슐은 능력치 하나를 5초간 낮춥니다. 뛰어넘거나 바깥 고리가 사라질 때까지 기다리세요.
+Field supply,Field supply,战前补给,戰前補給,出撃前の補給,출격 보급
+"Each clear pays 1,000 coins per star, including replays. Buy up to three different items before entry. Their timers start when the fight begins.","Each clear pays 1,000 coins per star, including replays. Buy up to three different items before entry. Their timers start when the fight begins.",首次通关和重玩，每颗星都奖励 1000 金币。每次入场可购买三种不同装备，开战后才开始计时。,首次通關和重玩，每顆星都獎勵 1000 金幣。每次入場可購買三種不同裝備，開戰後才開始計時。,初回も再挑戦も星 1 つにつき 1000 コイン。出撃前に異なる装備を 3 種類まで買えます。効果時間は戦闘開始から数えます。,첫 클리어와 다시 플레이 모두 별 하나당 코인 1000개를 받습니다. 출격 전 다른 장비를 최대 3종 구매하며 전투 시작부터 효과 시간이 줄어듭니다.
+Continue,Continue,继续,繼續,続ける,계속
+Next,Next,下一页,下一頁,次へ,다음
+Damage can knock loose a capsule. Move into its bubble to equip it automatically. Mint is a bonus; coral is a penalty.,Damage can knock loose a capsule. Move into its bubble to equip it automatically. Mint is a bonus; coral is a penalty.,有效攻击有几率打出装备。靠近气泡自动拾取。薄荷绿是增益，珊瑚红是减益。,有效攻擊有機率打出裝備。靠近氣泡自動拾取。薄荷綠是增益，珊瑚紅是減益。,命中すると装備が落ちることがあります。泡に近づくと自動で装備。緑は強化、赤は弱体化です。,"공격이 적중하면 장비가 떨어질 수 있습니다. 거품에 다가가면 자동 장착됩니다. 민트색은 강화, 산호색은 약화입니다."
+Reach the exit beacon.,Reach the exit beacon.,抵达出口信标。,抵達出口信標。,出口の信号へ向かいます。,출구 신호에 도달하세요.
+Strike the lock devices.,Strike the lock devices.,打碎锁定装置。,打碎鎖定裝置。,ロック装置を攻撃します。,잠금장치를 공격하세요.
+Reach each beacon before the gates close.,Reach each beacon before the gates close.,在关闸前依次穿过信标。,在關閘前依序穿過信標。,ゲートが閉じる前に全信号を通過します。,관문이 닫히기 전에 표시 지점을 모두 통과하세요.
+Borrow LIFT and reach the high beacons.,Borrow LIFT and reach the high beacons.,拿到 LIFT，到达高处信标。,拿到 LIFT，到達高處信標。,LIFT を借り、高所の信号に到達します。,LIFT를 빌려 높은 신호에 도달하세요.
+Reflect each pulse with AEGIS.,Reflect each pulse with AEGIS.,用 AEGIS 反射每个脉冲。,用 AEGIS 反射每個脈衝。,AEGIS でパルスを反射します。,AEGIS로 펄스를 반사하세요.
+Exchange with every active socket.,Exchange with every active socket.,与亮起的每个规则座交换。,與亮起的每個規則座交換。,稼働中の全端末と交換します。,활성 단말기마다 규칙을 교환하세요.
+Cross the live floor to the exit.,Cross the live floor to the exit.,穿过通电地面，抵达出口。,穿過通電地板，抵達出口。,通電床を渡って出口へ。,통전 바닥을 건너 출구로 가세요.
+Connect the cargo with J and deliver it through the checkpoints.,Connect the cargo with J and deliver it through the checkpoints.,按 J 接驳货物，依次经过检查点。,按 J 接駁貨物，依序經過檢查點。,J で貨物を接続し、各地点に運びます。,J로 화물을 연결하고 각 지점으로 운반하세요.
+Cross the belts and strike each relay.,Cross the belts and strike each relay.,穿过传送带，击破中继器。,穿過輸送帶，擊破中繼器。,ベルトを渡り全リレーを攻撃します。,벨트를 건너 중계기마다 공격하세요.
+"Stand on the plate, then strike the timed latch.","Stand on the plate, then strike the timed latch.",踩压板，再攻击限时门栓。,踩壓板，再攻擊限時門栓。,床スイッチを踏み、時間内にラッチを攻撃。,압력판을 밟고 제한 시간 안에 걸쇠를 공격하세요.
+Lure the recorded strike onto each lock.,Lure the recorded strike onto each lock.,把记录位置的攻击引到每一道锁上。,把記錄位置的攻擊引到每一道鎖上。,記録攻撃を各ロックに誘導します。,기록 공격을 잠금장치마다 유도하세요.
+"Dodge the attack, steal from the exposed core, then strike.","Dodge the attack, steal from the exposed core, then strike.",躲过攻击，从暴露的核心偷取，然后挥刀。,躲過攻擊，從暴露的核心偷取，然後揮刀。,攻撃を回避し、露出したコアから奪取して反撃。,공격을 피하고 노출된 코어에서 규칙을 훔친 뒤 공격하세요.
+Reflect with AEGIS or strike the right relay with RUSH.,Reflect with AEGIS or strike the right relay with RUSH.,用 AEGIS 反射，或用 RUSH 打右侧中继器。,用 AEGIS 反射，或用 RUSH 打右側中繼器。,AEGIS で反射、または RUSH で右のリレーを攻撃。,AEGIS로 반사하거나 RUSH로 오른쪽 중계기를 공격하세요.
+Evacuate,Evacuate,立刻撤离,立刻撤離,直ちに脱出,즉시 탈출
+Checkpoints,Checkpoints,检查点,檢查點,通過地点,통과 지점
+Coins,Coins,金币,金幣,コイン,코인
+Pad: A jump · X strike · B dodge · RB swap · Y rule,Pad: A jump · X strike · B dodge · RB swap · Y rule,手柄　A 跳跃 · X 挥刀 · B 闪避 · RB 交换 · Y 使用,控制器　A 跳躍 · X 揮刀 · B 閃避 · RB 交換 · Y 使用,パッド　A ジャンプ · X 攻撃 · B 回避 · RB 交換 · Y 使用,패드　A 점프 · X 공격 · B 회피 · RB 교환 · Y 사용
+Confirm,Confirm,确认,確認,確定,확인
+Clear save,Clear save,清除存档,清除存檔,セーブを消去,저장 지우기
+"Erase sector records, stars, coins and purchased equipment?","Erase sector records, stars, coins and purchased equipment?",清除关卡记录、星级、金币以及已购装备？,清除關卡記錄、星級、金幣以及已購裝備？,ステージ記録・星・コイン・購入済み装備を消去しますか？,"구역 기록, 별, 코인, 구매 장비를 모두 지울까요?"
+Cancel,Cancel,取消,取消,キャンセル,취소
+Erase progress,Erase progress,删除进度,刪除進度,進行状況を消去,진행 기록 삭제
+Equipment shop,Equipment shop,装备商城,裝備商城,装備ショップ,장비 상점
+Equip up to 3 items for the next attempt.,Equip up to 3 items for the next attempt.,下一次出战最多带 3 种装备。,下一次出戰最多帶 3 種裝備。,次の出撃に装備を最大 3 種類まで用意できます。,다음 출격에 장비를 최대 3종까지 준비할 수 있습니다.
+%d coins  ·  %d / 3 equipped,%d coins  ·  %d / 3 equipped,%d 金币　·　已装备 %d / 3,%d 金幣　·　已裝備 %d / 3,%d コイン　·　装備 %d / 3,코인 %d　·　장착 %d / 3
+Equipped,Equipped,已装备,已裝備,装備済み,장착됨
+Buy for next attempt,Buy for next attempt,购买供下一次出战使用,購買供下一次出戰使用,次回の出撃用に購入,다음 출격용 구매
+Start without equipment,Start without equipment,直接出战,直接出戰,装備なしで出撃,장비 없이 출격
+Start sector,Start sector,开始关卡,開始關卡,出撃,구역 시작
+Equipment index,Equipment index,装备图鉴,裝備圖鑑,装備図鑑,장비 도감
+Field archive,Field archive,行动档案,行動檔案,作戦資料室,작전 기록실
+Mechanics,Mechanics,玩法指南,玩法指南,仕掛け,게임 기믹
+Drop only,Drop only,仅掉落,僅掉落,ドロップ専用,드롭 전용
+Retry,Retry,重试,重試,リトライ,재도전
++%d coins,+%d coins,+%d 金币,+%d 金幣,+%d コイン,+%d 코인
+Time ≤ %ds,Time ≤ %ds,用时 ≤ %d 秒,用時 ≤ %d 秒,タイム ≤ %d 秒,시간 ≤ %d초
+Hits ≤ %d,Hits ≤ %d,受击 ≤ %d,受擊 ≤ %d,被弾 ≤ %d,피격 ≤ %d
+Edge Oil,Edge Oil,锋刃油,鋒刃油,刃研ぎ油,칼날 오일
+Damage ×1.5,Damage ×1.5,伤害 ×1.5,傷害 ×1.5,ダメージ ×1.5,피해 ×1.5
+Runner Mesh,Runner Mesh,奔跑纤维,奔跑纖維,ランナーメッシュ,러너 메쉬
+Run speed ×1.2,Run speed ×1.2,跑速 ×1.2,跑速 ×1.2,走行速度 ×1.2,달리기 속도 ×1.2
+Slip Bearing,Slip Bearing,滑动轴承,滑動軸承,スリップ軸受,슬립 베어링
+Dodge recovery ×0.68,Dodge recovery ×0.68,闪避冷却 ×0.68,閃避冷卻 ×0.68,回避の再使用時間 ×0.68,회피 재사용 시간 ×0.68
+Spring Soles,Spring Soles,弹簧鞋底,彈簧鞋底,バネ入り靴底,스프링 밑창
+Jump strength ×1.2,Jump strength ×1.2,起跳力度 ×1.2,起跳力度 ×1.2,ジャンプの初速 ×1.2,점프 초기 속도 ×1.2
+Quick Coil,Quick Coil,速动线圈,速動線圈,クイックコイル,퀵 코일
+Strike recovery ×0.72,Strike recovery ×0.72,挥刀间隔 ×0.72,揮刀間隔 ×0.72,斬撃間隔 ×0.72,공격 간격 ×0.72
+Wide Arc,Wide Arc,宽弧刀环,寬弧刀環,ワイドアーク,와이드 아크
+Strike reach ×1.35,Strike reach ×1.35,挥刀距离 ×1.35,揮刀距離 ×1.35,斬撃の間合い ×1.35,공격 거리 ×1.35
+Impact Liner,Impact Liner,减震护衬,減震護襯,耐衝撃ライナー,충격 방어 안감
+Blocks one hit,Blocks one hit,抵挡一次攻击,抵擋一次攻擊,攻撃を 1 回防ぐ,공격 1회 방어
+Guard Prism,Guard Prism,守护棱镜,守護稜鏡,ガードプリズム,가드 프리즘
+Dodge protection +0.14 s,Dodge protection +0.14 s,闪避保护 +0.14 秒,閃避保護 +0.14 秒,回避の無敵時間 +0.14 秒,회피 무적 +0.14초
+Auxiliary Cell,Auxiliary Cell,备用电芯,備用電芯,補助セル,보조 전지
+Rule abilities recharge after 2 s,Rule abilities recharge after 2 s,规则能力在 2 秒后充能,規則能力在 2 秒後充能,ルールが 2 秒で再充電,규칙 능력이 2초 후 재충전
+Breach Catalyst,Breach Catalyst,破甲催化剂,破甲催化劑,ブリーチ触媒,돌파 촉매
+Damage ×1.8; run speed ×0.85,Damage ×1.8; run speed ×0.85,伤害 ×1.8，跑速 ×0.85,傷害 ×1.8，跑速 ×0.85,ダメージ ×1.8、走行速度 ×0.85,"피해 ×1.8, 달리기 속도 ×0.85"
+Blunt Relay,Blunt Relay,钝化继电器,鈍化繼電器,鈍化リレー,둔화 중계기
+Damage ×0.65,Damage ×0.65,伤害 ×0.65,傷害 ×0.65,ダメージ ×0.65,피해 ×0.65
+Magnetic Drag,Magnetic Drag,磁阻,磁阻,磁気抵抗,자기 제동
+Run speed ×0.70,Run speed ×0.70,跑速 ×0.70,跑速 ×0.70,走行速度 ×0.70,달리기 속도 ×0.70
+Sticky Joint,Sticky Joint,卡滞关节,卡滯關節,固着ジョイント,굳은 관절
+Dodge recovery ×1.5,Dodge recovery ×1.5,闪避冷却 ×1.5,閃避冷卻 ×1.5,回避の再使用時間 ×1.5,회피 재사용 시간 ×1.5
+Heavy Soles,Heavy Soles,重型鞋底,重型鞋底,重い靴底,무거운 밑창
+Jump strength ×0.78,Jump strength ×0.78,起跳力度 ×0.78,起跳力度 ×0.78,ジャンプの初速 ×0.78,점프 초기 속도 ×0.78
+Rust Link,Rust Link,锈蚀链节,鏽蝕鏈節,錆びたリンク,녹슨 링크
+Strike recovery ×1.4,Strike recovery ×1.4,挥刀间隔 ×1.4,揮刀間隔 ×1.4,斬撃間隔 ×1.4,공격 간격 ×1.4
+Cracked Optic,Cracked Optic,裂纹传感器,裂紋感測器,割れた光学器,금 간 센서
+Strike reach ×0.75,Strike reach ×0.75,挥刀距离 ×0.75,揮刀距離 ×0.75,斬撃の間合い ×0.75,공격 거리 ×0.75
+Hull Patch,Hull Patch,机体修补片,機體修補片,装甲補修パッチ,기체 보수 패치
+Repairs one hull after 4 s,Repairs one hull after 4 s,4 秒后恢复一格耐久,4 秒後恢復一格耐久,4 秒後に耐久を 1 回復,4초 뒤 내구도 1 회복
+Grounding Mat,Grounding Mat,绝缘踏片,絕緣踏片,絶縁マット,절연 매트
+Blocks live floor and vent damage,Blocks live floor and vent damage,免疫通电地面和喷口伤害,免疫通電地板和噴口傷害,通電床と噴出口のダメージを防ぐ,통전 바닥 및 분출구 피해 차단
+Feedback Loop,Feedback Loop,反馈闭环,回授迴路,フィードバックループ,피드백 루프
+Rule use locked while active,Rule use locked while active,持续期间无法主动使用规则,持續期間無法主動使用規則,効果中はルールを使用できない,효과 중 규칙 사용 불가
+Brake Teeth,Brake Teeth,制动卡齿,制動卡齒,ブレーキの歯,브레이크 이빨
+Dodge distance ×0.7,Dodge distance ×0.7,闪避距离 ×0.7,閃避距離 ×0.7,回避距離 ×0.7,회피 거리 ×0.7
+Select a language,Select a language,选择语言,選擇語言,言語を選択,언어 선택
+You can change this anytime in Settings.,You can change this anytime in Settings.,之后可在设置中更改。,之後可在設定中變更。,設定からいつでも変更できます。,설정에서 언제든지 바꿀 수 있습니다.
+Continue to guide,Continue to guide,继续查看操作指南,繼續查看操作指南,ガイドへ進む,조작 가이드 보기
+Settings,Settings,设置,設定,設定,설정
+Controls guide,Controls guide,操作指南,操作指南,操作ガイド,조작 가이드
+Infiltrate,Infiltrate,开始行动,開始行動,潜入開始,침투 시작
+Back,Back,返回,返回,戻る,뒤로
+Done,Done,完成,完成,完了,완료
+Language,Language,语言,語言,言語,언어
+Display mode,Display mode,显示模式,顯示模式,画面モード,화면 모드
+Fullscreen,Fullscreen,全屏,全螢幕,フルスクリーン,전체 화면
+Windowed,Windowed,窗口,視窗,ウィンドウ,창 모드
+Window size,Window size,窗口大小,視窗大小,ウィンドウサイズ,창 크기
+Text size,Text size,文字大小,文字大小,文字サイズ,글자 크기
+Audio,Audio,声音,音效,サウンド,소리
+Reduced motion,Reduced motion,减少动效,減少動態效果,動きを抑える,움직임 줄이기
+Assist mode,Assist mode,辅助模式,輔助模式,アシストモード,보조 모드
+On,On,开启,開啟,オン,켜기
+Off,Off,关闭,關閉,オフ,끄기
+Larger timing windows for steals and dodges.,Larger timing windows for steals and dodges.,延长偷取时机与受击后的保护时间。,延長偷取時機與受擊後的保護時間。,ルールを奪える時間と被弾後の無敵時間が長くなります。,규칙을 훔칠 수 있는 시간과 피격 후 무적 시간이 늘어납니다.
+Muted,Muted,已静音,已靜音,ミュート中,음소거
+Play,Play,播放,播放,再生,재생
+Pause demo,Pause demo,暂停演示,暫停示範,デモを一時停止,시범 일시 정지
+Gameplay recording,Gameplay recording,实战录像,實戰錄影,実際のプレイ映像,실제 플레이 녹화
+Move & jump,Move & jump,移动与跳跃,移動與跳躍,移動とジャンプ,이동과 점프
+Strike,Strike,挥刀,揮刀,斬撃,공격
+Dodge,Dodge,闪避,閃避,回避,회피
+Steal a rule,Steal a rule,偷取规则,偷取規則,ルールを奪う,규칙 훔치기
+Use your rule,Use your rule,使用能力,使用能力,ルールを使う,규칙 사용
+Run toward the boss and jump over low attacks.,Run toward the boss and jump over low attacks.,跑向 Boss，跳过低位攻击。,跑向 Boss，跳過低位攻擊。,ボスに近づき、低い攻撃はジャンプで越えます。,보스에게 다가가고 낮은 공격은 뛰어넘으세요.
+Hold the strike button to keep swinging. An open core takes more damage.,Hold the strike button to keep swinging. An open core takes more damage.,按住挥刀键可连续攻击。核心开启时伤害更高。,按住揮刀鍵可連續攻擊。核心開啟時傷害更高。,斬撃ボタンを長押しすると連続で攻撃します。コアが開いたときに大きなダメージを与えられます。,공격 버튼을 누르고 있으면 연속으로 공격합니다. 코어가 열렸을 때 더 큰 피해를 줍니다.
+Dodge through an attack just before it hits you.,Dodge through an attack just before it hits you.,在攻击即将命中时闪避穿过去。,在攻擊即將命中時閃避穿過去。,攻撃が当たる直前に回避してすり抜けます。,공격에 맞기 직전에 회피로 통과하세요.
+"After an attack, approach the open core and press Shift. The boss takes your old rule.","After an attack, approach the open core and press Shift. The boss takes your old rule.",等 Boss 攻击结束后，靠近开启的核心并按 Shift。Boss 会接过你的旧规则。,等 Boss 攻擊結束後，靠近開啟的核心並按 Shift。Boss 會接過你的舊規則。,攻撃後に開いたコアへ近づき、Shift を押します。ボスには自分が持っていたルールが渡ります。,공격이 끝나면 열린 코어에 접근해 Shift를 누르세요. 보스는 내가 갖고 있던 규칙을 가져갑니다.
+"Use your current rule once per attack cycle. The recording shows RUSH, a forward dash strike.","Use your current rule once per attack cycle. The recording shows RUSH, a forward dash strike.",每轮 Boss 攻击间可使用一次能力。录像展示的是 RUSH：向前冲刺斩击。,每輪 Boss 攻擊間可使用一次能力。錄影展示的是 RUSH：向前衝刺斬擊。,ボスの攻撃一巡につき一度使えます。映像では突進斬りの RUSH を使っています。,보스의 공격 주기마다 한 번 쓸 수 있습니다. 영상은 전방 돌진 공격인 RUSH를 보여 줍니다.
+Move with A/D or arrows. Jump with Space.,Move with A/D or arrows. Jump with Space.,A/D 或方向键移动，空格跳跃。,A/D 或方向鍵移動，空白鍵跳躍。,A/D または矢印キーで移動。Space でジャンプ。,A/D 또는 방향키로 이동하고 Space로 점프합니다.
+Demo unavailable,Demo unavailable,演示无法播放,無法播放示範,デモを再生できません,시범을 재생할 수 없습니다
+One slot. Three machines. Their rules are yours.,One slot. Three machines. Their rules are yours.,一个能力槽，三台守卫机。夺走它们的规则。,一個能力槽，三臺守衛機。奪走它們的規則。,スロットは一つ、機械は三体。敵のルールを奪え。,"규칙 슬롯은 하나, 기계는 셋. 그들의 규칙을 빼앗으세요."
+THE WARDEN,THE WARDEN,监守者,監守者,監視機,감시자
+THE LATTICE,THE LATTICE,悬阵机,懸陣機,格子機,격자기
+THE EXECUTOR,THE EXECUTOR,执行者,執行者,執行機,집행자
+01 / INTAKE,01 / INTAKE,01 / 入口,01 / 入口,01 / 入口,01 / 입구
+02 / SUSPENSION,02 / SUSPENSION,02 / 悬空区,02 / 懸空區,02 / 懸架区,02 / 현수 구역
+03 / ROOT ACCESS,03 / ROOT ACCESS,03 / 核心区,03 / 核心區,03 / 中枢区,03 / 핵심 구역
+The doors only open from the inside.,The doors only open from the inside.,大门只能从内部开启。,大門只能從內部開啟。,扉は内側からしか開かない。,문은 안쪽에서만 열린다.
+Take its lift. See what the floor is made of.,Take its lift. See what the floor is made of.,夺走它的飞行能力，看看地板能不能扛住。,奪走它的飛行能力，看看地板能不能撐住。,飛行能力を奪い、床の強度を確かめろ。,비행 능력을 빼앗고 바닥이 버티는지 확인하라.
+"Whatever you hand over, it will learn to use.","Whatever you hand over, it will learn to use.",你交出的每条规则，它都会用。,你交出的每條規則，它都會用。,渡したルールは、どれも使いこなしてくる。,넘겨준 규칙은 무엇이든 사용한다.
+SUBLEVEL,SUBLEVEL,地下层,地下層,地下階,지하층
+AUTHORIZED MACHINES ONLY,AUTHORIZED MACHINES ONLY,仅限授权机器,僅限授權機器,認可された機体のみ,허가된 기계만 출입
+SECTOR,SECTOR,区域,區域,区画,구역
+RUN CLOCK,RUN CLOCK,用时,用時,経過時間,경과 시간
+HULL,HULL,机体,機體,耐久,내구도
+YOUR RULE,YOUR RULE,你的规则,你的規則,自分のルール,내 규칙
+BOSS RULE,BOSS RULE,Boss 规则,Boss 規則,ボスのルール,보스 규칙
+SHIFT LINK,SHIFT LINK,偷取连接,偷取連線,奪取リンク,탈취 연결
+EMPTY,EMPTY,空槽,空槽,空き,비어 있음
+IN RANGE,IN RANGE,可偷取,可偷取,奪取可能,탈취 가능
+APPROACH,APPROACH,靠近核心,靠近核心,コアに接近,코어에 접근
+WAIT,WAIT,等待,等待,待機,대기
+[%s] READY,[%s] READY,[%s] 可用,[%s] 可用,[%s] 使用可能,[%s] 사용 가능
+RECHARGING,RECHARGING,充能中,充能中,充電中,충전 중
+A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE,A/D MOVE     SPACE JUMP     J STRIKE     K DODGE     SHIFT STEAL     E RULE,A/D 移动    空格 跳跃    J 挥刀    K 闪避    SHIFT 偷取    E 能力,A/D 移動    空白鍵 跳躍    J 揮刀    K 閃避    SHIFT 偷取    E 能力,A/D 移動    SPACE ジャンプ    J 斬撃    K 回避    SHIFT 奪取    E ルール,A/D 이동    SPACE 점프    J 공격    K 회피    SHIFT 탈취    E 규칙
+STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE,STICK MOVE    A JUMP    X STRIKE    B DODGE    RB SHIFT    Y RULE,摇杆 移动    A 跳跃    X 挥刀    B 闪避    RB 偷取    Y 能力,搖桿 移動    A 跳躍    X 揮刀    B 閃避    RB 偷取    Y 能力,スティック 移動    A ジャンプ    X 斬撃    B 回避    RB 奪取    Y ルール,스틱 이동    A 점프    X 공격    B 회피    RB 탈취    Y 규칙
+M AUDIO  /  V MOTION  /  ESC PAUSE,M AUDIO  /  V MOTION  /  ESC PAUSE,M 声音  /  V 动效  /  ESC 暂停,M 音效  /  V 動態  /  ESC 暫停,M 音声  /  V 動き  /  ESC 一時停止,M 소리  /  V 움직임  /  ESC 일시 정지
+RAIL CUT,RAIL CUT,轨道冲锋,軌道衝鋒,レールカット,레일 커트
+SKY ANVIL,SKY ANVIL,高空重砸,高空重砸,スカイアンビル,스카이 앤빌
+PULSE LATTICE,PULSE LATTICE,脉冲阵列,脈衝陣列,パルス格子,펄스 격자
+DEAD CIRCUIT,DEAD CIRCUIT,断路冲击,斷路衝擊,サーキット遮断,회로 차단
+Sector clear. Your rule carries into the next fight.,Sector clear. Your rule carries into the next fight.,区域已清除。当前规则将带入下一战。,區域已清除。目前的規則將帶入下一戰。,区画クリア。現在のルールを次の戦いに持ち越します。,구역을 돌파했습니다. 현재 규칙은 다음 전투에 이어집니다.
+Reserve booting. Strike while the core is unprotected.,Reserve booting. Strike while the core is unprotected.,备用规则正在启动。趁核心无防护时挥刀。,備用規則正在啟動。趁核心無防護時揮刀。,予備ルールを起動中。無防備なコアを斬りつけましょう。,예비 규칙을 가동 중입니다. 무방비한 코어를 공격하세요.
+"Core open. Steal now, or keep your current rule and strike.","Core open. Steal now, or keep your current rule and strike.",核心已开启。可以偷取，也可以保留当前规则并挥刀。,核心已開啟。可以偷取，也可以保留目前的規則並揮刀。,コアが開きました。ルールを奪うか、今のルールを保って斬りつけましょう。,코어가 열렸습니다. 규칙을 훔치거나 지금 규칙을 유지하며 공격하세요.
+Core open. Move in for SHIFT or a close strike.,Core open. Move in for SHIFT or a close strike.,核心已开启。靠近后按 SHIFT 或挥刀。,核心已開啟。靠近後按 SHIFT 或揮刀。,コアが開きました。近づいて SHIFT か斬撃を使いましょう。,코어가 열렸습니다. 가까이 가서 SHIFT를 누르거나 공격하세요.
+"Rail Cut: jump over the charge, or dodge through it.","Rail Cut: jump over the charge, or dodge through it.",轨道冲锋：跳过去或闪避穿过。,軌道衝鋒：跳過去或閃避穿過。,レールカット：ジャンプで越えるか回避ですり抜けましょう。,레일 커트: 뛰어넘거나 회피로 통과하세요.
+"Sky Anvil: leave the target zone, then jump the shockwave.","Sky Anvil: leave the target zone, then jump the shockwave.",高空重砸：离开落点，再跳过冲击波。,高空重砸：離開落點，再跳過衝擊波。,スカイアンビル：着地点を離れ、衝撃波を飛び越えましょう。,스카이 앤빌: 착지 지점을 벗어나 충격파를 뛰어넘으세요.
+Pulse Lattice: find a gap between the marked columns.,Pulse Lattice: find a gap between the marked columns.,脉冲阵列：躲进标记柱之间的空隙。,脈衝陣列：躲進標記柱之間的空隙。,パルス格子：マークされた柱の隙間に入りましょう。,펄스 격자: 표시된 기둥 사이의 틈을 찾으세요.
+Dead Circuit: jump its shockwave. The reserve rule is next.,Dead Circuit: jump its shockwave. The reserve rule is next.,断路冲击：跳过冲击波，下一轮是备用规则。,斷路衝擊：跳過衝擊波，下一輪是備用規則。,サーキット遮断：衝撃波を越えましょう。次は予備ルールが発動します。,회로 차단: 충격파를 뛰어넘으세요. 다음에는 예비 규칙이 발동합니다.
+RUSH / E: slash through the boss from range. Aim before firing.,RUSH / E: slash through the boss from range. Aim before firing.,RUSH / E：对准 Boss 冲刺斩击。,RUSH / E：對準 Boss 衝刺斬擊。,RUSH / E：ボスに向かって突進斬り。,RUSH / E: 보스를 향해 돌진 공격합니다.
+LIFT / E: jet upward. Strike on the ascent to pierce armor.,LIFT / E: jet upward. Strike on the ascent to pierce armor.,LIFT / E：向上喷射，上升中挥刀可以破甲。,LIFT / E：向上噴射，上升中揮刀可以破甲。,LIFT / E：上昇中の斬撃で装甲を貫けます。,LIFT / E: 상승 중 공격하면 장갑을 뚫습니다.
+AEGIS / E: catch a hit near the boss to reflect 8 damage.,AEGIS / E: catch a hit near the boss to reflect 8 damage.,AEGIS / E：在 Boss 附近挡下一击，反弹 8 点伤害。,AEGIS / E：在 Boss 附近擋下一擊，反彈 8 點傷害。,AEGIS / E：ボスの近くで攻撃を受け止めると 8 ダメージを返します。,AEGIS / E: 보스 근처에서 공격을 받아치면 피해 8을 반사합니다.
+Read the warning. Survive the attack. Take the open core.,Read the warning. Survive the attack. Take the open core.,看清预警，躲过攻击，再偷取核心里的规则。,看清預警，躲過攻擊，再偷取核心裡的規則。,予兆を見て攻撃をかわし、開いたコアからルールを奪いましょう。,경고를 보고 공격을 피한 뒤 열린 코어에서 규칙을 훔치세요.
+OUT OF REACH,OUT OF REACH,超出范围,超出範圍,範囲外,범위 밖
+Get closer to the exposed core.,Get closer to the exposed core.,再靠近开启的核心。,再靠近開啟的核心。,開いたコアへ近づいてください。,열린 코어에 더 가까이 가세요.
+LINK COOLING,LINK COOLING,连接冷却,連線冷卻,リンク冷却中,연결 냉각 중
+Read the next attack.,Read the next attack.,留意下一次攻击。,留意下一次攻擊。,次の攻撃を見極めましょう。,다음 공격에 대비하세요.
+CORE SEALED,CORE SEALED,核心紧闭,核心緊閉,コア閉鎖中,코어 닫힘
+"SHIFT after an attack, when the core opens.","SHIFT after an attack, when the core opens.",等攻击结束、核心开启后再按 SHIFT。,等攻擊結束、核心開啟後再按 SHIFT。,攻撃後にコアが開いたら SHIFT を押しましょう。,공격이 끝나고 코어가 열리면 SHIFT를 누르세요.
+Boss stripped  /  reserve rule warming up,Boss stripped  /  reserve rule warming up,Boss 失去规则  /  备用规则启动中,Boss 失去規則  /  備用規則啟動中,ボスがルールを喪失  /  予備ルールを起動中,보스 규칙 상실  /  예비 규칙 가동 중
+Boss inherited %s  /  its next attack changes,Boss inherited %s  /  its next attack changes,Boss 接过 %s  /  下一次攻击改变,Boss 接過 %s  /  下一次攻擊改變,ボスは %s を取得  /  次の攻撃が変化,보스가 %s 획득  /  다음 공격 변경
+Boss loses flight  /  lower deck breached,Boss loses flight  /  lower deck breached,Boss 失去飞行能力  /  地板坍塌,Boss 失去飛行能力  /  地板坍塌,ボスが飛行能力を喪失  /  床が崩落,보스 비행 능력 상실  /  바닥 붕괴
+Boss loses flight  /  heavy impact,Boss loses flight  /  heavy impact,Boss 失去飞行能力  /  重重坠地,Boss 失去飛行能力  /  重重墜地,ボスが飛行能力を喪失  /  地面に落下,보스 비행 능력 상실  /  바닥으로 추락
+%s TRANSFERRED,%s TRANSFERRED,已取得 %s,已取得 %s,%s を奪取,%s 탈취 성공
+PULSE PARRIED,PULSE PARRIED,脉冲已格挡,脈衝已格擋,パルスを受け流した,펄스 받아치기 성공
+Reflected to the core,Reflected to the core,伤害已反弹至核心,傷害已反彈至核心,コアに反射,코어로 반사됨
+Too far to reflect,Too far to reflect,距离太远，无法反弹,距離太遠，無法反彈,コアが遠く反射できない,거리가 멀어 반사할 수 없음
+INTRUSION,INTRUSION,入侵,入侵,侵入,침입
+Get close when the core opens. Press SHIFT or Q.,Get close when the core opens. Press Shift.,核心开启时靠近，按 SHIFT 或 Q。,核心開啟時靠近，按 SHIFT 或 Q。,コアが開いたら近づき、SHIFT または Q を押します。,코어가 열리면 가까이 가서 SHIFT 또는 Q를 누르세요.
+One slot. Each swap hands your old rule to the boss.,One slot. Each swap hands your old rule to the boss.,只有一个能力槽。每次交换，旧规则都归 Boss。,只有一個能力槽。每次交換，舊規則都歸 Boss。,スロットは一つ。交換すると古いルールはボスに渡ります。,규칙 슬롯은 하나입니다. 교환할 때 이전 규칙은 보스에게 넘어갑니다.
+Carried: %s   /   Hull %s of 7,Carried: %s   /   Hull %s of 7,携带 %s   /   机体 %s / 7,攜帶 %s   /   機體 %s / 7,保持ルール %s   /   耐久 %s / 7,보유 규칙 %s   /   내구도 %s / 7
+Reboots restore this sector's starting loadout.,Reboots restore this sector's starting loadout.,重启将恢复进入该区域时的状态。,重啟將恢復進入此區域時的狀態。,再起動すると、この区画の開始時の状態に戻ります。,재시작하면 구역 진입 시 상태로 돌아갑니다.
+ENGAGE,ENGAGE,开始战斗,開始戰鬥,戦闘開始,전투 시작
+GATE UNLOCKED,GATE UNLOCKED,大门已解锁,大門已解鎖,ゲート解錠,문 잠금 해제
+Carry %s into the next sector.,Carry %s into the next sector.,将 %s 带入下一区域。,將 %s 帶入下一區域。,%s を次の区画へ持ち越します。,%s 규칙을 다음 구역으로 가져갑니다.
+Repair up to three hull points on entry.,Repair up to three hull points on entry.,进入后最多恢复三格机体耐久。,進入後最多恢復三格機體耐久。,進入時に耐久が最大 3 回復します。,다음 구역에서 내구도가 최대 3 회복됩니다.
+DESCEND,DESCEND,前往下一区域,前往下一區域,次の区画へ,다음 구역
+LINK PAUSED,LINK PAUSED,连接已暂停,連線已暫停,リンク一時停止,연결 일시 정지
+R  Reboot sector   /   T  Return to title,R  Reboot sector   /   T  Return to title,R 重启本区   /   T 返回标题,R 重啟本區   /   T 返回標題,R 区画を再起動   /   T タイトルへ,R 구역 재시작   /   T 타이틀로
+RESUME,RESUME,继续,繼續,再開,계속
+LINK LOST,LINK LOST,连接中断,連線中斷,リンク切断,연결 끊김
+HULL BREACHED,HULL BREACHED,机体受损,機體損毀,機体大破,기체 파손
+Reboot from this sector with your entry loadout.,Reboot from this sector with your entry loadout.,按进入本区域时的状态重启。,以進入此區域時的狀態重啟。,区画の開始時の状態でやり直します。,구역에 진입했을 때의 상태로 재시작합니다.
+Dodge through danger. Strike when the core opens.,Dodge through danger. Strike when the core opens.,用闪避穿过攻击，趁核心开启时挥刀。,用閃避穿過攻擊，趁核心開啟時揮刀。,攻撃を回避し、コアが開いた瞬間に斬りつけましょう。,회피로 공격을 피하고 코어가 열리면 공격하세요.
+REBOOT,REBOOT,重启,重啟,再起動,재시작
+ROOT ACCESS GRANTED,ROOT ACCESS GRANTED,已取得核心权限,已取得核心權限,ルート権限取得,루트 권한 획득
+RULES REWRITTEN,RULES REWRITTEN,规则已改写,規則已改寫,ルールを書き換えた,규칙 재작성 완료
+%s    /    %s transfers    /    %s hits,%s    /    %s transfers    /    %s hits,%s    /    交换 %s 次    /    受击 %s 次,%s    /    交換 %s 次    /    受擊 %s 次,%s    /    奪取 %s 回    /    被弾 %s 回,%s    /    탈취 %s회    /    피격 %s회
+Assist run complete.,Assist run complete.,辅助模式通关。,輔助模式通關。,アシストモードでクリア。,보조 모드로 완료했습니다.
+Personal best: %s,Personal best: %s,个人最佳 %s,個人最佳 %s,自己ベスト %s,최고 기록 %s
+BACK TO TITLE,BACK TO TITLE,返回标题,返回標題,タイトルへ,타이틀로 돌아가기
+A/D + SPACE,A/D + SPACE,A/D + 空格,A/D + 空白鍵,A/D + SPACE,A/D + SPACE
+STICK + A,STICK + A,摇杆 + A,搖桿 + A,スティック + A,스틱 + A
+Display,Display,画面,畫面,画面,화면
+Start game,Start game,开始游戏,開始遊戲,ゲーム開始,게임 시작
+Captured with in-game controls.,Captured with in-game controls.,使用游戏内操作录制。,使用遊戲內操作錄製。,ゲーム内の操作で収録。,게임 내 조작으로 녹화했습니다.
+Lobby,Lobby,大厅,大廳,ロビー,로비
+Sector map,Sector map,关卡地图,關卡地圖,区画マップ,구역 지도
+%d of %d sectors cleared,%d of %d sectors cleared,已通关 %d / %d 关,已通關 %d / %d 關,%d / %d 区画クリア,구역 %d / %d 돌파
+Cleared,Cleared,已通关,已通關,クリア済み,돌파 완료
+Next sector,Next sector,下一关,下一關,次の区画,다음 구역
+Locked,Locked,未解锁,未解鎖,未解放,잠김
+Best %s,Best %s,最佳 %s,最佳 %s,ベスト %s,최고 %s
+Select a cleared sector to replay it.,Select a cleared sector to replay it.,选择已点亮的关卡即可重玩。,選擇已點亮的關卡即可重玩。,クリア済みの区画は選び直して再挑戦できます。,완료한 구역을 선택해 다시 플레이할 수 있습니다.
+Save and quit,Save and quit,保存并退出,儲存並離開,保存して終了,저장하고 종료
+Save and return,Save and return,保存并返回,儲存並返回,保存して戻る,저장하고 돌아가기
+Could not save. Try again before closing.,Could not save. Try again before closing.,保存失败，请重试后再退出。,儲存失敗，請重試後再離開。,保存できませんでした。終了前に再試行してください。,저장하지 못했습니다. 종료하기 전에 다시 시도하세요.
+Your cleared sectors are saved.,Your cleared sectors are saved.,已通关的进度会保存在本地。,已通關的進度會儲存在本機。,クリアした区画の進行状況は保存されます。,돌파한 구역은 이 기기에 저장됩니다.
+Restart sector,Restart sector,重开本关,重開本關,この区画をやり直す,현재 구역 재시작
+Return to lobby,Return to lobby,返回大厅,返回大廳,ロビーに戻る,로비로 돌아가기
+Sector secured,Sector secured,关卡完成,關卡完成,区画クリア,구역 확보
+%s  /  %s hits  /  %s retries,%s / Hits %s / Retries %s,%s  /  受击 %s 次  /  重试 %s 次,%s  /  受擊 %s 次  /  重試 %s 次,%s  /  被弾 %s 回  /  再挑戦 %s 回,%s  /  피격 %s회  /  재시도 %s회
+Practice complete,Practice complete,练习完成,練習完成,練習完了,연습 완료
+You can try another action from the guide.,You can try another action from the guide.,回到指南还可以试练其他动作。,回到指南還可以試練其他動作。,ガイドに戻って別の操作も試せます。,가이드로 돌아가 다른 동작도 연습할 수 있습니다.
+Return to guide,Return to guide,返回指南,返回指南,ガイドに戻る,가이드로 돌아가기
+Practice,Practice,操作练习,操作練習,操作練習,조작 연습
+Run and jump to the right.,Run and jump to the right.,向右跑，并在移动中跳起。,向右跑，並在移動中跳起。,右へ走りながらジャンプしましょう。,오른쪽으로 달리면서 뛰어오르세요.
+Face the core and strike.,Face the core and strike.,面向核心，按挥刀键。,面向核心，按揮刀鍵。,コアの方を向いて斬撃します。,코어를 향해 공격하세요.
+Dodge as the charge reaches you.,Dodge as the charge reaches you.,等冲锋快碰到你时按闪避。,等衝鋒快碰到你時按閃避。,突進が届く直前に回避します。,돌진이 닿기 직전에 회피하세요.
+Approach the open core and press Shift.,Approach the open core and press Shift.,靠近开启的核心，按 Shift 偷取。,靠近開啟的核心，按 Shift 偷取。,開いたコアに近づき、Shift を押します。,열린 코어에 접근해 Shift를 누르세요.
+Face the core and press E to use RUSH.,Face the core and press E to use RUSH.,面向核心并按 E，发动 RUSH。,面向核心並按 E，發動 RUSH。,コアの方を向き、E で RUSH を使います。,코어를 향해 E로 RUSH를 사용하세요.
+Try again,Try again,再试一次,再試一次,もう一度,다시 시도
+Lesson %d of %d,Lesson %d of %d,第 %d 课，共 %d 课,第 %d 課，共 %d 課,レッスン %d / %d,레슨 %d / %d
+Try it,Try it,亲手练习,親手練習,実際に試す,직접 해보기
+Previous,Previous,上一步,上一步,前へ,이전
+Next lesson,Next lesson,下一步,下一步,次のレッスン,다음 레슨
+Enter lobby,Enter lobby,进入大厅,進入大廳,ロビーへ,로비 입장
+Replay demo,Replay demo,重播录像,重播錄影,映像を再生し直す,시범 다시 보기
+"Move toward the boss. When a warning hugs the floor, jump as the attack approaches. Land close enough to counter.","Move toward the boss. When a warning hugs the floor, jump as the attack approaches. Land close enough to counter.",朝 Boss 移动。看到贴地预警，等攻击接近时跳过。尽量落在能反击的位置。,朝 Boss 移動。看到貼地預警，等攻擊接近時跳過。盡量落在能反擊的位置。,ボスへ近づき、床に沿った予兆が出たら攻撃が迫る直前にジャンプ。反撃できる位置に着地しましょう。,"보스에게 다가가세요. 바닥 경고가 보이면 공격이 가까워질 때 점프하고, 반격할 수 있는 거리에 착지하세요."
+Face the boss and move within blade reach. Hold the strike button to keep swinging. The open core takes more damage.,Face the boss and move within blade reach. Hold the strike button to keep swinging. The open core takes more damage.,面向 Boss 并靠近到刀能碰到的距离。按住挥刀可连续攻击。核心开启时受到的伤害更高。,面向 Boss 並靠近到刀能碰到的距離。按住揮刀可連續攻擊。核心開啟時受到的傷害更高。,ボスの方を向き、刃が届く距離に入ります。斬撃ボタンを長押しすると連続攻撃。開いたコアには大きなダメージを与えられます。,보스를 향해 칼이 닿는 거리까지 접근하세요. 공격 버튼을 길게 누르면 연속 공격합니다. 열린 코어에는 더 큰 피해를 줄 수 있습니다.
+Dodge through the charge as it reaches you. The outline shows protection. Wait for the dodge bar to refill.,Dodge through the charge as it reaches you. The outline shows protection. Wait for the dodge bar to refill.,冲锋快碰到你时按闪避。发亮的轮廓代表保护生效。等冷却条填满后才能再次闪避。,衝鋒快碰到你時按閃避。發亮的輪廓代表保護生效。等冷卻條填滿後才能再次閃避。,突進が届く直前に回避。輪郭が光っている間は無敵です。ゲージが満ちると再び回避できます。,돌진이 닿기 직전에 회피하세요. 윤곽이 빛나는 동안 보호됩니다. 게이지가 차면 다시 회피할 수 있습니다.
+Survive the attack and approach the open core. Check what each side gains before pressing Shift.,"Dodge, then approach the open core and press Shift. The boss takes your old rule. The display shows what each side gains.",躲过攻击，靠近开启的核心并按 Shift。Boss 会接过你的旧规则。界面会提前显示双方各能获得什么。,躲過攻擊，靠近開啟的核心並按 Shift。Boss 會接過你的舊規則。介面會提前顯示雙方各能獲得什麼。,攻撃をかわして開いたコアに近づき、Shift を押します。元のルールはボスに渡ります。画面で交換内容を確認できます。,공격을 피하고 열린 코어에 접근해 Shift를 누르세요. 보스가 이전 규칙을 가져갑니다. 화면에서 양쪽이 얻을 규칙을 확인하세요.
+"Face the boss and press E when the rule is ready. RUSH cuts forward, LIFT lifts you, and AEGIS reflects a nearby hit.","Face the boss and press E when the rule is ready. RUSH cuts forward, LIFT lifts you, and AEGIS reflects a nearby hit.",能力就绪时面向 Boss 按 E。RUSH 向前冲斩，LIFT 升空，AEGIS 在近处挡下并反弹一击。,能力就緒時面向 Boss 按 E。RUSH 向前衝斬，LIFT 升空，AEGIS 在近處擋下並反彈一擊。,ルールが使用可能になったらボスの方を向いて E。RUSH は突進斬り、LIFT は上昇、AEGIS は近距離で反射します。,"규칙이 준비되면 보스를 향해 E를 누르세요. RUSH는 돌진 공격, LIFT는 상승, AEGIS는 가까운 공격을 반사합니다."
+You gain %s   /   Boss gains %s,You gain %s   /   Boss gains %s,你获得 %s   /   Boss 获得 %s,你獲得 %s   /   Boss 獲得 %s,自分は %s を取得   /   ボスは %s を取得,내 획득 %s   /   보스 획득 %s
+Take a rule. Change the fight.,Take a rule. Change the fight.,夺走规则，改变战局。,奪走規則，改變戰局。,ルールを奪い、戦いを変えろ。,규칙을 빼앗아 전투를 바꾸세요.
+CAPACITOR,CAPACITOR,蓄能机,蓄能機,蓄電機,축전기
+THE FURNACE,THE FURNACE,熔炉,熔爐,溶鉱炉,용광로
+THE MIRROR,THE MIRROR,镜像机,鏡像機,反射機,반사기
+03 / POWER,03 / POWER,03 / 供电区,03 / 供電區,03 / 電源区,03 / 전력 구역
+04 / FORGE,04 / FORGE,04 / 锻造区,04 / 鍛造區,04 / 鍛造区,04 / 단조 구역
+05 / REFLECTION,05 / REFLECTION,05 / 镜像区,05 / 鏡像區,05 / 反射区,05 / 반사 구역
+06 / ROOT ACCESS,06 / ROOT ACCESS,06 / 核心区,06 / 核心區,06 / 中枢区,06 / 핵심 구역
+The live conduits alternate. Cross on the dark side.,The live conduits alternate. Cross on the dark side.,通电柱轮流亮起，从熄灭的一侧通过。,通電柱輪流亮起，從熄滅的一側通過。,通電する導管が交互に切り替わる。暗い側を通れ。,도관에 번갈아 전기가 흐른다. 어두운 쪽으로 건너가라.
+"When the vents flare, get off the floor.","When the vents flare, get off the floor.",喷口亮起时，马上跳离地面。,噴口亮起時，馬上跳離地面。,噴出口が光ったら、床から離れろ。,분출구에 불이 켜지면 바닥에서 벗어나라.
+The mirror marks where you were. Keep moving.,The mirror marks where you were. Keep moving.,镜像会锁定你刚才的位置，别停下。,鏡像會鎖定你剛才的位置，別停下。,反射機は直前にいた場所を狙う。足を止めるな。,반사기는 직전에 있던 자리를 노린다. 멈추지 마라.
+An inherited rule comes back stronger.,An inherited rule comes back stronger.,交给执行者的规则，会在它手里变得更强。,交給執行者的規則，會在它手裡變得更強。,渡したルールは、執行機が強化して使ってくる。,집행자에게 넘긴 규칙은 더 강해져 돌아온다.
+RETURN SWEEP,RETURN SWEEP,折返冲锋,折返衝鋒,折り返し突進,되돌아오는 돌진
+OVERCLOCK,OVERCLOCK,规则强化,規則強化,ルール強化,규칙 강화
+Boss encounter,Boss encounter,首领战,首領戰,ボス戦,보스전
+Checkpoint route,Checkpoint route,检查点路线,檢查點路線,チェックポイント経路,체크포인트 경로
+Step on the plate to open the latch.,Step on the plate to open the latch.,踩下踏板，开启定时锁。,踩下踏板，開啟定時鎖。,床のプレートを踏み、時限ラッチを開きます。,발판을 밟아 시간 제한 잠금장치를 여세요.
+Carry the linked cargo to the next beacon.,Carry the linked cargo to the next beacon.,把已接驳的货物运到下一座信标。,把已接駁的貨物運到下一座信標。,接続した荷物を次のビーコンまで運びます。,연결한 화물을 다음 신호기까지 옮기세요.
+Strike near the cargo to connect it.,Strike near the cargo to connect it.,靠近货物并挥刀，建立连接。,靠近貨物並揮刀，建立連線。,荷物のそばで斬撃し、接続します。,화물 근처에서 공격해 연결하세요.
+Take LIFT from the lit socket.,Take LIFT from the lit socket.,从发亮的插槽借取 LIFT。,從發亮的插槽借取 LIFT。,光っているソケットから LIFT を取得します。,빛나는 소켓에서 LIFT를 가져오세요.
+Board the ferry at its low point.,Board the ferry at its low point.,等渡台降到低处，再跳上去。,等渡台降到低處，再跳上去。,足場が低い場所に来たら飛び乗ります。,이동 발판이 낮아질 때 뛰어오르세요.
+"Step outside the strike marker, then return.","Step outside the strike marker, then return.",离开攻击标记，等危险过去后再回来。,離開攻擊標記，等危險過去後再回來。,攻撃マーカーの外に出て、攻撃後に戻ります。,공격 표식 밖으로 나갔다가 공격 후 돌아오세요.
+Dodge just before the ring discharges.,Dodge just before the ring discharges.,能量圈释放前的一瞬间闪避。,能量圈釋放前的一瞬間閃避。,リングが放電する直前に回避します。,고리가 방전하기 직전에 회피하세요.
+Shift,Shift,相移 / 交换,相移 / 交換,シフト / 交換,시프트 / 교환
+Move left,Move left,向左移动,向左移動,左へ移動,왼쪽 이동
+Move right,Move right,向右移动,向右移動,右へ移動,오른쪽 이동
+Jump,Jump,跳跃,跳躍,ジャンプ,점프
+Pause,Pause,暂停,暫停,一時停止,일시 정지
+Display and access,Display and access,显示与辅助,顯示與輔助,画面・アクセシビリティ,화면 및 접근성
+Sound and feedback,Sound and feedback,声音与反馈,聲音與回饋,サウンド・反応,소리 및 피드백
+Keyboard controls,Keyboard controls,键盘操作,鍵盤操作,キー設定,키보드 설정
+Master volume,Master volume,总音量,總音量,全体音量,전체 음량
+Music volume,Music volume,音乐音量,音樂音量,音楽音量,음악 음량
+Effects volume,Effects volume,音效音量,音效音量,効果音量,효과음 음량
+Screen shake,Screen shake,震屏强度,震動畫面強度,画面の揺れ,화면 흔들림
+Press a key,Press a key,请按一个键,請按一個鍵,キーを押す,키를 누르세요
+Restore controls,Restore controls,恢复默认按键,恢復預設按鍵,キー設定を戻す,기본 키 복원
+This key is reserved. Choose another.,This key is reserved. Choose another.,此键用于系统操作，请换一个。,此鍵用於系統操作，請換一個。,システム用のキーです。別のキーを選んでください。,시스템 예약 키입니다. 다른 키를 선택하세요.
+One key per action. Assigning an occupied key swaps the bindings.,One key per action. Assigning an occupied key swaps the bindings.,每个动作只用一个键。选择已占用的键会交换两个动作的按键。,每個動作僅用一個鍵。選取已佔用的鍵會交換兩個動作的按鍵。,各操作にキーは1つ。使用中のキーを選ぶと割り当てが入れ替わります。,동작마다 키 하나를 사용합니다. 사용 중인 키를 지정하면 두 동작의 키가 교환됩니다.
+%d coins,%d coins,%d 金币,%d 金幣,%d コイン,코인 %d개
+Buy · %d coins,Buy · %d coins,购买 · %d 金币,購買 · %d 金幣,購入 · %d コイン,구매 · 코인 %d개
+Remove · %d coins,Remove · %d coins,撤销 · 退还 %d,撤銷 · 退還 %d,取消 · %d 返金,취소 · %d개 환불
+Click to refund,Click to refund,点击全额退还,點選全額退還,押して全額返金,눌러 전액 환불
+Empty slot,Empty slot,空装备槽,空裝備欄,空きスロット,빈 슬롯
+Cancel freely before deployment. Full refund.,Cancel freely before deployment. Full refund.,出战前可随时撤销，全额退还金币。,出戰前可隨時撤銷，全額退還金幣。,出撃前ならいつでも取り消し、全額返金できます。,출격 전에는 언제든 취소하고 전액 환불받을 수 있습니다.
+Phase shift,Phase shift,世界相移,世界相移,位相シフト,위상 전환
+Position shift,Position shift,位置交换,位置交換,位置シフト,위치 교환
+Perfect shift,Perfect shift,极限闪避,極限閃避,パーフェクト回避,완벽 회피
+Guardian intercept,Guardian intercept,守卫截击,守衛截擊,ガーディアン出現,수호자 출현
+Press Shift to switch the active world phase. Match the beacon symbol. Only platforms in the active phase can hold you.,Press Shift to switch the active world phase. Match the beacon symbol. Only platforms in the active phase can hold you.,按 Shift 切换世界相位。与信标的 I、II 符号对应；只有当前相位的平台能够站立。,按 Shift 切換世界相位。對應信標的 I、II 符號；僅目前相位的平台能站立。,Shift で位相を切替。ビーコンの I・II に合わせましょう。有効な位相の足場だけに乗れます。,Shift로 위상을 전환하세요. 신호기의 I·II 기호를 맞추세요. 활성 위상의 발판에만 설 수 있습니다.
+Move within the anchor ring and press Shift to trade places with it. The trail shows your old position. Chain anchors to reach the exit.,Move within the anchor ring and press Shift to trade places with it. The trail shows your old position. Chain anchors to reach the exit.,进入锚点范围后按 Shift，与它交换位置。轨迹标出原来的位置。连续交换，抵达出口。,進入錨點範圍後按 Shift 與其交換位置。軌跡標示原本的位置。連續交換抵達出口。,アンカーの範囲内で Shift を押し、位置を交換します。軌跡は元の位置です。交換をつないで出口へ。,닻의 범위 안에서 Shift로 위치를 교환하세요. 궤적은 원래 위치를 보여 줍니다. 연속 교환으로 출구에 도달하세요.
+Dodge through a hit just before it reaches you. A perfect shift primes one counterstrike for 2 seconds. Strike to spend it.,Dodge through a hit just before it reaches you. A perfect shift primes one counterstrike for 2 seconds. Strike to spend it.,攻击命中前的一瞬间闪避穿过，可获得一次反击强化，持续 2 秒。挥刀命中即可消耗。,攻擊命中前一瞬間閃避穿過，可獲得一次反擊強化，持續 2 秒。揮刀命中即可消耗。,攻撃が届く直前に回避すると、2秒間だけ次の斬撃を一度強化できます。,공격이 닿기 직전에 회피하면 2초 동안 다음 공격 한 번이 강화됩니다. 명중 시 소모됩니다.
+"Some routes end in a guardian battle. Complete the checkpoints, then dodge its attack and steal its rule. Clear the guardian to finish the sector.","Some routes end in a guardian battle. Complete the checkpoints, then dodge its attack and steal its rule. Clear the guardian to finish the sector.",部分路线的终点有守卫。先完成检查点，再躲避攻击、夺走规则。击败守卫才算通关。,部分路線終點有守衛。先完成檢查點，再閃避攻擊、奪取規則。擊敗守衛才能通關。,ルートの終点でガーディアンが出ることがあります。攻撃を回避し、ルールを奪って倒しましょう。,일부 경로의 끝에는 수호자가 있습니다. 체크포인트를 완료한 뒤 공격을 피하고 규칙을 빼앗아 쓰러뜨리세요.
+Shift the world phase to match each beacon.,Shift the world phase to match each beacon.,切换世界相位，对应每座信标的符号。,切換世界相位，對應每座信標的符號。,位相を切り替え、各ビーコンの記号に合わせます。,위상을 전환해 각 신호기의 기호를 맞추세요.
+Shift places with each anchor inside its range.,Shift places with each anchor inside its range.,进入范围后，与各个锚点交换位置。,進入範圍後，與各錨點交換位置。,範囲内に入り、各アンカーと位置を交換します。,범위 안에서 각 닻과 위치를 교환하세요.
+Anchor out of range,Anchor out of range,锚点超出范围,錨點超出範圍,アンカーが範囲外,닻이 범위 밖에 있습니다
+Move inside the anchor ring before shifting.,Move inside the anchor ring before shifting.,先进入锚点的圆环范围，再按 Shift。,先進入錨點圓環範圍，再按 Shift。,アンカーのリングの内側で Shift を押してください。,닻의 고리 안에 들어간 뒤 Shift를 누르세요.
+Counter ready,Counter ready,反击就绪,反擊就緒,反撃準備完了,반격 준비
+Your next strike gains +4 damage for 2 seconds.,Your next strike gains +4 damage for 2 seconds.,2 秒内的下一次挥刀，伤害额外增加 4。,2 秒內的下一次揮刀，傷害額外增加 4。,2秒以内の次の斬撃ダメージが4増加。,2초 안의 다음 공격 피해가 4 증가합니다.
+Rule exchange,Rule exchange,规则交换,規則交換,ルール交換,규칙 교환
+%d perfect shifts  /  %d exchanges,%d perfect shifts  /  %d exchanges,极限闪避 %d 次  /  交换 %d 次,極限閃避 %d 次  /  交換 %d 次,パーフェクト回避 %d 回  /  交換 %d 回,완벽 회피 %d회  /  교환 %d회
+Pursuit Spur,Pursuit Spur,追击刺轮,追擊刺輪,追撃スパー,추격 박차
+"After dodging, the next strike deals +2 damage","After dodging, the next strike deals +2 damage",闪避后，下次挥刀伤害额外增加 2,閃避後，下次揮刀傷害額外增加 2,回避後の次の斬撃ダメージが2増加,회피 후 다음 공격 피해 +2
+Echo Prism,Echo Prism,回响棱镜,迴響稜鏡,反響プリズム,메아리 프리즘
+A close reflection sends a second 5-damage pulse,A close reflection sends a second 5-damage pulse,近距离反射后，追加一次 5 伤害脉冲,近距離反射後，追加一次 5 傷害脈衝,近距離反射の後、5ダメージの追撃パルス,근접 반사 후 피해 5의 추가 파동
+Exchange Drive,Exchange Drive,换规驱动,換規驅動,交換ドライブ,교환 드라이브
+A rule swap primes a counterstrike and cools faster,A rule swap primes a counterstrike and cools faster,交换后获得反击强化，交换冷却缩短,交換後獲得反擊強化，交換冷卻縮短,交換で反撃を準備し、交換の待ち時間短縮,규칙 교환 후 반격 강화 및 교환 대기 단축
+Leave the marked zone before the attack lands.,Leave the marked zone before the attack lands.,攻击落下前，先离开地面的标记区域。,攻擊落下前，先離開地面標記區域。,攻撃が来る前にマーカーの外へ移動しましょう。,공격이 떨어지기 전에 표식 밖으로 이동하세요.
+"Wait for the dodge gauge, then dodge into the attack.","Wait for the dodge gauge, then dodge into the attack.",等闪避条充满，再迎着攻击闪避。,等閃避條充滿，再迎向攻擊閃避。,回避ゲージが満ちたら攻撃に向かって回避しましょう。,회피 게이지가 차면 공격을 향해 회피하세요.
+Watch the windup. Counter when the core opens.,Watch the windup. Counter when the core opens.,注意蓄力预警，核心开启后再反击。,注意蓄力預警，核心開啟後再反擊。,予兆を見て、コアが開いたら反撃しましょう。,전조를 살피고 코어가 열리면 반격하세요.
+Borrow RUSH from the socket to cross the closing gates.,Borrow RUSH from the socket to cross the closing gates.,从插槽借取 RUSH，冲过即将关闭的闸门。,從插槽借取 RUSH，衝過即將關閉的閘門。,ソケットから RUSH を取得し、閉まるゲートを抜けましょう。,소켓에서 RUSH를 가져와 닫히는 문을 통과하세요.
+Shift worlds. Exchange positions. Steal the rules.,Shift worlds. Exchange positions. Steal the rules.,切换世界，交换位置，夺走规则。,切換世界，交換位置，奪走規則。,世界を切り替え、位置を交換し、ルールを奪え。,세계를 전환하고 위치를 교환하며 규칙을 빼앗으세요.
+Equipment takes effect at combat start. Remove it before entry for a full refund.,Equipment takes effect at combat start. Remove it before entry for a full refund.,装备开战生效。入场前可全额退款更换。,裝備開戰生效。入場前可全額退款更換。,装備は戦闘開始で発動。出撃前なら全額返金で変更可能。,장비는 전투 시작 시 발동합니다. 입장 전에는 전액 환불하고 교체할 수 있습니다.
+RUSH exchanges positions. LIFT grounds the boss. AEGIS breaks its armor.,RUSH exchanges positions. LIFT grounds the boss. AEGIS breaks its armor.,RUSH 交换站位，LIFT 让首领落地，AEGIS 剥离装甲。,RUSH 交換位置，LIFT 使首領落地，AEGIS 剝離裝甲。,RUSH は位置交換、LIFT はボスを地上へ、AEGIS は装甲破壊。,"RUSH는 위치 교환, LIFT는 보스 착지, AEGIS는 장갑 파괴입니다."
+Phase I,Phase I,相位 I,相位 I,位相 I,위상 I
+Phase II,Phase II,相位 II,相位 II,位相 II,위상 II
+Shift operator,Shift operator,相移执行者,相移執行者,シフト実行者,시프트 실행자
+Entering sector,Entering sector,正在进入关卡,正在進入關卡,区画へ出撃中,구역 진입 중
+Exchange. Reposition. Transform.,Exchange. Reposition. Transform.,交换规则，换位反击，改变战局。,交換規則，換位反擊，改變戰局。,交換し、位置を変え、戦局を変える。,"규칙 교환, 위치 전환, 전투 변화."

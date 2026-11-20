@@ -23,6 +23,9 @@ var ridden := false
 var last_checkpoint := Vector2.ZERO
 var checkpoint_age := 0.0
 var region := 0
+var phase := 0
+var shift_cd := 0.0
+var phase_decks: Array[Rect2] = []
 
 const OFFER := {"lift": 2, "reflect": 3, "chase": 1, "live": 1}
 
@@ -36,6 +39,9 @@ func load_level(level: Array) -> void:
 		targets.append(Vector2(point[0], point[1]))
 		if point[1] < 488:
 			ledges.append(Rect2(point[0] - 100, point[1], 178, 14))
+	phase_decks.assign(ledges)
+	phase = 0
+	shift_cd = 0.0
 	if kind == "lift":
 		ledges.append(Rect2(385, 412, 156, 14))
 		ledges.append(Rect2(714, 319, 135, 14))
@@ -79,7 +85,10 @@ func target() -> Vector2:
 	return targets[cursor] if active() else Vector2.ZERO
 
 func surface(next: Vector2, from_y: float, base: float) -> float:
-	for ledge in ledges:
+	for i in ledges.size():
+		var ledge := ledges[i]
+		if kind == "phase" and i % 2 != phase:
+			continue
 		if next.x >= ledge.position.x and next.x <= ledge.end.x and from_y <= ledge.position.y + 0.5:
 			base = minf(base, ledge.position.y)
 	if ferry.has_area() and next.x >= ferry.position.x and next.x <= ferry.end.x and from_y <= ferry.position.y + 0.5:
@@ -105,6 +114,31 @@ func near(a: Vector2, b: Vector2, width: float, height := 46.0) -> bool:
 func steal(g: Node2D) -> bool:
 	if not active():
 		return false
+	if kind in ["phase", "blink"]:
+		if shift_cd > 0.0:
+			return false
+		if kind == "blink":
+			if not near(g.p, target(), 310.0, 192.0):
+				g._report("Anchor out of range", "Move inside the anchor ring before shifting.", 1.0)
+				return false
+			var previous: Vector2 = g.p
+			g.p = target()
+			g.v = Vector2.ZERO
+			echo = previous
+			g.wire_from = previous - Vector2(0, 22)
+			g.wire_to = g.p - Vector2(0, 22)
+			g.wire_color = Color("#90ddde")
+			g.wire_time = 0.5
+			step(g)
+		else:
+			phase = 1 - phase
+			g.shift_phase = phase
+			g._impact(g.p - Vector2(0, 22), Color("#90ddde") if phase == 0 else Color("#f2c389"))
+		shift_cd = 0.48
+		g.route_shifts += 1
+		g.phase_transition = 0.55
+		g.audio_rig.fire("steal")
+		return true
 	if kind == "swap" and near(g.p, target(), 102.0):
 		var offered: int = 1 + (cursor + variant) % 3
 		if offered == g.player_rule:
@@ -147,7 +181,11 @@ func strike(g: Node2D) -> void:
 	if kind in ["break", "belt", "timer"] and near(g.p, target(), 105.0, 75.0):
 		if kind != "timer" or cursor > 0 or timing > 0.0:
 			g._roll_drop(target() - Vector2(0, 20))
-			step(g)
+			combo += 1
+			g.audio_rig.fire("hit")
+			var required := 3 if kind == "break" else (2 if kind == "belt" else 1)
+			if combo >= required:
+				step(g)
 
 func use_at_gate(g: Node2D) -> bool:
 	if kind != "key" or not active() or not near(g.p, target(), 94.0, 72.0) or g.player_rule != required_rule:
@@ -168,10 +206,10 @@ func step(g: Node2D) -> void:
 	g.audio_rig.fire("objective")
 	_configure_gate()
 	if cursor == targets.size():
-		g._finish_arena()
+		g.finish_route()
 
 func hazard() -> Rect2:
-	if kind == "sensor":
+	if kind == "sensor" or (kind == "cargo" and region == 5):
 		var x := 550.0 + cos(clock * (1.32 + variant * 0.16)) * 304.0
 		return Rect2(x - 12.0, 447.0, 24.0, 53.0)
 	if not kind in ["break", "live", "belt", "cargo", "chase"]:
@@ -186,7 +224,7 @@ func hazard() -> Rect2:
 	return Rect2(373.0 + lane * 173.0, 447.0 if kind != "chase" else 462.0, width, 56.0)
 
 func hazard_live() -> bool:
-	return kind == "sensor" or fmod(clock, 1.8) >= hazard_ignition()
+	return kind == "sensor" or (kind == "cargo" and region == 5) or fmod(clock, 1.8) >= hazard_ignition()
 
 func hazard_ignition() -> float:
 	return 1.36 if kind == "break" else 1.18
@@ -230,10 +268,12 @@ func tick(g: Node2D, dt: float) -> void:
 	if not active():
 		return
 	clock += dt
+	shift_cd = maxf(0.0, shift_cd - dt)
 	timing = maxf(0.0, timing - dt)
 	checkpoint_age = maxf(0.0, checkpoint_age - dt)
 	var point := target()
 	if limit > 0.0 and clock >= limit:
+		g.last_failure = "Borrow RUSH from the socket to cross the closing gates."
 		g.mode = "lost"
 		g.audio_rig.fire("hurt")
 		return
@@ -279,6 +319,9 @@ func tick(g: Node2D, dt: float) -> void:
 				step(g)
 			if g.mode == "fight":
 				g._check_hurt(pulse, echo.x)
+	elif kind == "phase":
+		if phase == cursor % 2 and near(g.p, point, 44.0, 32.0):
+			step(g)
 	elif kind in ["cross", "chase", "lift", "live", "sensor", "ferry"] and near(g.p, point, 44.0, 32.0):
 		if kind == "ferry" and not ridden:
 			return

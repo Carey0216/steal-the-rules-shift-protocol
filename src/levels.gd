@@ -23,6 +23,10 @@ const LESSONS := [
 	["Sweep sensors", "Watch the beam move across the floor. Jump over it, or dodge through. Enter each station while the beam is clear."],
 	["Emergency holds", "Stay inside the beacon to charge it. Leave the red strike marker and return before the beacon empties."],
 	["Dodge capacitors", "Stand within the ring. When the marker flashes solid, dodge through the pulse to charge the capacitor."],
+	["Phase shift", "Press Shift to switch the active world phase. Match the beacon symbol. Only platforms in the active phase can hold you."],
+	["Position shift", "Move within the anchor ring and press Shift to trade places with it. The trail shows your old position. Chain anchors to reach the exit."],
+	["Perfect shift", "Dodge through a hit just before it reaches you. A perfect shift primes one counterstrike for 2 seconds. Strike to spend it."],
+	["Guardian intercept", "Some routes end in a guardian battle. Complete the checkpoints, then dodge its attack and steal its rule. Clear the guardian to finish the sector."],
 ]
 
 # The third and fourth columns tell the arena which objective and combat chassis to load.
@@ -34,8 +38,8 @@ const TABLE := [
 	["Catch the Lift", 0, "chase", 0, 2, 19.0, 1, [[460, 421], [752, 488], [1021, 414]]],
 	["Shaft Trial", 0, "lift", 1, 3, 20.0, 1, [[548, 356], [752, 282], [938, 337]]],
 	["Lattice", 0, "boss", 1, -1, 50.0, 0, []],
-	["Rebound Workshop", 1, "reflect", 2, 4, 22.0, 0, [[540, 488]]],
-	["The Rule Seat", 1, "swap", 2, 5, 20.0, 1, [[516, 418], [861, 488]]],
+	["Rebound Workshop", 1, "reflect", 2, 4, 27.0, 0, [[440, 488], [772, 422], [1004, 488]]],
+	["The Rule Seat", 1, "phase", 2, 20, 32.0, 1, [[417, 434], [602, 397], [789, 442], [1007, 488]]],
 	["Pulse Routing", 1, "reflect", 2, -1, 29.0, 1, [[427, 488], [824, 408]]],
 	["Pressure Divide", 1, "live", 2, 6, 18.0, 2, [[507, 488], [761, 416], [1021, 488]]],
 	["Recover the Cell", 1, "cargo", 2, 7, 29.0, 0, [[470, 488], [747, 423], [1019, 488]]],
@@ -44,9 +48,9 @@ const TABLE := [
 	["Against the Belt", 2, "belt", 3, -1, 26.0, 2, [[433, 488], [699, 407], [1011, 488]]],
 	["Press Key", 2, "timer", 3, 8, 22.0, 1, [[632, 398], [1000, 488]]],
 	["Hot Handoff", 2, "cargo", 3, -1, 34.0, 2, [[477, 488], [696, 401], [1000, 488]]],
-	["Slag Run", 2, "chase", 3, -1, 24.0, 3, [[433, 404], [707, 488], [1000, 419]]],
+	["Slag Run", 2, "blink", 3, 21, 34.0, 3, [[440, 404], [704, 457], [980, 419], [727, 339], [465, 488]]],
 	["Furnace", 2, "boss", 3, -1, 62.0, 0, []],
-	["Leave a Mark", 3, "echo", 4, 9, 23.0, 0, [[550, 488]]],
+	["Leave a Mark", 3, "echo", 4, 9, 28.0, 0, [[444, 488], [716, 415], [1002, 488]]],
 	["Glass Archive", 3, "echo", 4, -1, 31.0, 2, [[453, 488], [870, 406]]],
 	["Crossfire", 3, "echo", 4, -1, 34.0, 3, [[434, 488], [644, 402], [958, 488]]],
 	["Mirror", 3, "boss", 4, -1, 66.0, 0, []],
@@ -56,21 +60,21 @@ const TABLE := [
 	["Pump Choir", 4, "combo", 1, 15, 26.0, 0, [[473, 488], [795, 488]]],
 	["Caisson", 4, "boss", 0, -1, 48.0, 1, []],
 	["Two-bank Junction", 4, "key", 2, 16, 28.0, 0, [[526, 488], [929, 488]]],
-	["Silt Lift", 4, "ferry", 1, -1, 28.0, 2, [[457, 421], [757, 397], [976, 417]]],
-	["Undertow", 4, "hold", 3, 18, 25.0, 0, [[500, 488], [884, 413]]],
+	["Silt Lift", 4, "hold", 1, 18, 38.0, 2, [[457, 421], [757, 397], [976, 417]]],
+	["Undertow", 4, "boss", 3, -1, 62.0, 1, []],
 	["Watchkeeper", 5, "sensor", 4, 17, 24.0, 0, [[482, 488], [749, 415], [1020, 488]]],
 	["Hush Freight", 5, "cargo", 2, -1, 26.0, 1, [[482, 415], [713, 488], [1001, 405]]],
 	["Cold Lens", 5, "boss", 4, -1, 68.0, 2, []],
-	["Glass Dials", 5, "combo", 0, -1, 25.0, 2, [[458, 419], [685, 488], [901, 417]]],
+	["Glass Dials", 5, "blink", 0, -1, 39.0, 2, [[458, 419], [685, 488], [901, 417], [654, 345], [397, 488]]],
 	["Deadband", 5, "evade", 2, 19, 29.0, 0, [[503, 488], [841, 488]]],
-	["Quiet Hours", 5, "sensor", 3, -1, 28.0, 2, [[438, 427], [648, 488], [834, 423], [1018, 488]]],
+	["Quiet Hours", 5, "boss", 4, -1, 72.0, 2, []],
 	["Ballast Run", 6, "chase", 0, -1, 23.0, 4, [[410, 410], [621, 488], [824, 403], [1022, 488]]],
 	["Updraft Ferry", 6, "ferry", 1, -1, 30.0, 3, [[464, 419], [720, 392], [972, 415]]],
 	["Cloudbreak", 6, "boss", 1, -1, 55.0, 3, []],
 	["Storm Moorings", 6, "evade", 2, -1, 28.0, 2, [[484, 421], [728, 488], [965, 423]]],
 	["Float Relay", 6, "key", 3, -1, 29.0, 1, [[477, 488], [735, 419], [988, 488]]],
-	["Lightning Wells", 6, "hold", 3, -1, 34.0, 2, [[430, 418], [684, 488], [933, 418]]],
-	["Ghost Circuit", 7, "key", 4, -1, 33.0, 2, [[476, 415], [721, 488], [981, 411]]],
+	["Lightning Wells", 6, "boss", 1, -1, 67.0, 3, []],
+	["Ghost Circuit", 7, "phase", 4, -1, 42.0, 2, [[401, 432], [596, 381], [795, 428], [1018, 488], [728, 416]]],
 	["Triple Interlock", 7, "echo", 4, -1, 31.0, 4, [[430, 488], [665, 412], [940, 488]]],
 	["Backfeed", 7, "boss", 2, -1, 64.0, 3, []],
 	["Redline Protocol", 7, "combo", 3, -1, 28.0, 3, [[419, 421], [647, 488], [874, 415]]],
@@ -88,9 +92,18 @@ const GOALS := {
 	"ferry": "Ride the ferry and reach each high beacon.", "combo": "Chain three strikes to break each relay.",
 	"key": "Borrow the shown rule and activate the gate.", "sensor": "Cross the sensor beam and visit each station.",
 	"hold": "Charge each beacon while avoiding the strikes.", "evade": "Dodge a pulse inside each ring.",
+	"phase": "Shift the world phase to match each beacon.",
+	"blink": "Shift places with each anchor inside its range.",
 }
 
+static func has_guardian(index: int) -> bool:
+	return index in [1, 10, 13, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46]
+
 static func unlocked_lesson(id: int, progress: int) -> bool:
+	if id == 22:
+		return progress >= 2
+	if id == 23:
+		return progress >= 1
 	if id in [11, 12]:
 		return progress >= 1
 	if id == 13:
@@ -108,4 +121,12 @@ static func lessons_at(index: int) -> Array[int]:
 		result.append_array([11, 12])
 	if index == 2:
 		result.append(13)
+	if TABLE[index][2] == "boss" and 22 not in result:
+		result.append(22)
+	if has_guardian(index):
+		result.append(23)
+	var contextual := {"phase": 20, "blink": 21}
+	var kind: String = TABLE[index][2]
+	if contextual.has(kind) and contextual[kind] not in result:
+		result.append(contextual[kind])
 	return result
