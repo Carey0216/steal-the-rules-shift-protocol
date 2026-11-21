@@ -248,6 +248,15 @@ func _button(parent: Control, key: String, at: Rect2, callback: Callable, primar
 	var focus := _button_skin(Color.TRANSPARENT, PAPER, false, true)
 	focus.focus_only = true
 	button.add_theme_stylebox_override("focus", focus)
+	# Compact lesson selectors still need room for their number at every text scale.
+	if at.size.x < 60:
+		for state_name in ["normal", "hover", "pressed", "disabled", "focus"]:
+			var compact := button.get_theme_stylebox(state_name).duplicate()
+			compact.content_margin_left = 3.0
+			compact.content_margin_right = 3.0
+			compact.content_margin_top = 1.0
+			compact.content_margin_bottom = 1.0
+			button.add_theme_stylebox_override(state_name, compact)
 	button.pressed.connect(func():
 		game.audio_rig.fire("ui_confirm")
 		callback.call()
@@ -388,6 +397,7 @@ func _draw_page() -> void:
 	if game.mode != "title":
 		return
 	match page:
+		"protocol": _protocol()
 		"language": _language()
 		"settings": _settings()
 		"guide": _guide()
@@ -417,11 +427,12 @@ func _title_controls() -> void:
 	var level: Array = Levels.TABLE[frontier]
 	var in_campaign := cleared < Levels.TABLE.size()
 	var action := "Start operation" if cleared == 0 else "Continue operation"
-	var play := _button(ui, action if in_campaign else "Sector map", Rect2(64, 272, 264, 58), _prepare_from_lobby.bind(frontier) if in_campaign else _open_map, true)
+	var play := _button(ui, "Protocol run", Rect2(64, 272, 264, 52), _open.bind("protocol"), true)
+	_button(ui, action if in_campaign else "Sector map", Rect2(64, 336, 264, 45), _prepare_from_lobby.bind(frontier) if in_campaign else _open_map)
 	if in_campaign:
-		_button(ui, "Sector map", Rect2(64, 345, 264, 53), _open_map)
-	_button(ui, "Equipment shop", Rect2(64, 413, 264, 53), _open_shop.bind(-1))
-	_button(ui, "Field archive", Rect2(64, 481, 264, 53), _open_archive.bind(0))
+		_button(ui, "Sector map", Rect2(64, 393, 264, 45), _open_map)
+	_button(ui, "Equipment shop", Rect2(64, 450, 264, 45), _open_shop.bind(-1))
+	_button(ui, "Field archive", Rect2(64, 507, 264, 45), _open_archive.bind(0))
 	var dispatch := _panel(ui, Rect2(858, 227, 244, 309), Color("#0b202bea"), Color("#526c6e"))
 	_label(dispatch, "Next sector", Rect2(19, 13, 206, 31), 14, AMBER)
 	_label(dispatch, "%02d" % (frontier + 1), Rect2(19, 51, 206, 54), 40, GREEN, true)
@@ -443,6 +454,22 @@ func _title_controls() -> void:
 	var shop := _button(ui, "", Rect2(925, 25, 48, 44), _open_shop.bind(-1))
 	shop.tooltip_text = _t("Equipment shop")
 	shop.draw.connect(_currency_icon.bind(shop, true))
+	if game.save_recovered:
+		_label(ui, "Backup save restored", Rect2(858, 541, 244, 26), 13, AMBER)
+
+func _protocol() -> void:
+	var panel := _modal("Protocol run", Rect2(184, 112, 784, 424))
+	_label(panel, "Six bosses. One rule slot. Rewrite the system.", Rect2(30, 73, 724, 61), 27, PAPER, true, true)
+	_label(panel, "Dodge the marked attack. Approach the open core. SHIFT takes its rule and gives it yours. E uses your stolen rule.", Rect2(30, 145, 724, 92), 18, DIM, false, true)
+	_label(panel, "Each boss escalates through three protocols. Your rule carries forward; each clear repairs 3 hull. Retry the current boss freely.", Rect2(30, 245, 724, 73), 16, DIM, false, true)
+	var start := _button(panel, "Begin protocol", Rect2(30, 340, 352, 53), _launch_protocol, true)
+	_button(panel, "Field archive", Rect2(400, 340, 354, 53), _open_archive.bind(0))
+	start.grab_focus()
+
+func _launch_protocol() -> void:
+	_open("")
+	game._new_run()
+	game.engage_sector()
 
 func _open_map() -> void:
 	map_region = -1
@@ -1028,7 +1055,7 @@ func _pause() -> void:
 	if game.save_error:
 		_show_save_notice(panel, Rect2(29, 78, 376, 44))
 	else:
-		_label(panel, "Your cleared sectors are saved.", Rect2(29, 78, 376, 44), 15, DIM, false, true)
+		_label(panel, "Protocol run pauses here. Leaving ends this run." if game.protocol_run else "Your cleared sectors are saved.", Rect2(29, 78, 376, 44), 15, DIM, false, true)
 	var resume := _button(panel, "RESUME", Rect2(28, 137, 378, 55), _resume, true)
 	_button(panel, "Restart sector", Rect2(28, 210, 378, 49), game._retry)
 	if game.practice >= 0 and onboarding:
@@ -1065,6 +1092,13 @@ func _result() -> void:
 		text_line = _t("%s  /  %s hits  /  %s retries") % [game.timecode(score.get("seconds", 0.0)), score.get("hits", 0), score.get("retries", 0)]
 		action = "Sector map"
 		callback = game.return_to_lobby.bind("map")
+		if game.protocol_run:
+			action = "Next boss" if game.mode == "clear" else "Return to lobby"
+			callback = game.continue_after_clear if game.mode == "clear" else game.return_to_lobby
+			if game.mode == "win":
+				text_line = _t("System freed. You are no longer its exception.") + "\n" + _t("%s  /  %d transfers  /  %d retries") % [game.timecode(game.run_time), game.steals, game.run_retries]
+			else:
+				text_line += "\n" + _t("Your rule carries forward. Hull repaired +3.")
 	elif game.mode == "lost":
 		text_line = game.last_failure if not game.last_failure.is_empty() else ("Time ran out. Retry from the start of this sector." if timed_out else "Reboot from this sector with your entry loadout.")
 		action = "REBOOT"

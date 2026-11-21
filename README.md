@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.6.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.7.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Download Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Download Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#field-guide"><img alt="Field guide" src="https://img.shields.io/badge/Read-Field%20guide-795c35?style=for-the-badge"></a>
@@ -11,6 +11,10 @@
 **English** · [中文（简体）](docs/readme/zh-CN.md) · [中文（繁體）](docs/readme/zh-TW.md) · [日本語](docs/readme/ja.md) · [한국어](docs/readme/ko.md)
 
 A 2D boss rush about stealing the rules of a fight. Built with Godot and GDScript for GitHub Game Off 2026.
+
+**v1.7.0 release candidate:** choose **Protocol run** in the lobby for the complete six-boss experience, or play the persistent 48-sector operation. Every boss escalates at 67% and 34% health; Protocol III arms return sweeps, double shockwaves and wider pulse patterns. Shift trades both rules, so the ability you surrender determines the next threat. Protocol run repairs three hull after each clear, allows retries from the current boss and ends with your total time, transfers and retries. Leaving it ends that run; the campaign remains separately saved.
+
+Release materials: [itch.io copy](docs/ITCH.md), [AI disclosure](docs/AI-DISCLOSURE.md), [submission checklist](docs/SUBMISSION-CHECKLIST.md), [validation report](docs/VALIDATION-v1.7.0.md). Local builds are ready for review; v1.7.0 is not published or entered in the jam until the creator confirms publication.
 
 
 
@@ -81,6 +85,6 @@ Web HTML5 is a desktop browser build: serve index.html over HTTP, or upload the 
 
 ## Credits and license
 
-Created by Carey. Codex assisted with code, testing, documentation, generated character artwork and animation poses. No runtime AI is used. Original project files use MIT. Fonts retain their SIL OFL notices; Godot and dependencies retain their notices. Interface study references: Hell759735653’s Ember Veil and FunX’s Foundation UI. Their images are not distributed with the game.
+Created by Carey. Codex assisted with code, testing, documentation, generated character artwork, animation poses and the gate overlook background. No runtime AI is used. Original project files use MIT. Fonts retain their SIL OFL notices; Godot and dependencies retain their notices. Interface study references: Hell759735653’s Ember Veil and FunX’s Foundation UI. Their images are not distributed with the game.
 
 [Art and reference notes](assets/ART-NOTES.txt)

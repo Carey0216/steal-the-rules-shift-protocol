@@ -5,6 +5,7 @@ Install **Godot 4.7.2 (standard, not .NET)**, open `project.godot`, and run the 
 ```text
 godot --headless --path . --import
 godot --headless --path . --script tests/smoke.gd
+godot --headless --path . --script tests/release.gd
 ```
 
 On Windows, use the Godot console executable for command output. To build and package both targets:

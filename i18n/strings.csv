@@ -441,3 +441,19 @@ Phase II,Phase II,相位 II,相位 II,位相 II,위상 II
 Shift operator,Shift operator,相移执行者,相移執行者,シフト実行者,시프트 실행자
 Entering sector,Entering sector,正在进入关卡,正在進入關卡,区画へ出撃中,구역 진입 중
 Exchange. Reposition. Transform.,Exchange. Reposition. Transform.,交换规则，换位反击，改变战局。,交換規則，換位反擊，改變戰局。,交換し、位置を変え、戦局を変える。,"규칙 교환, 위치 전환, 전투 변화."
+Protocol run,Protocol run,协议挑战,協定挑戰,プロトコル挑戦,프로토콜 도전
+Six bosses. One rule slot. Rewrite the system.,Six bosses. One rule slot. Rewrite the system.,六位首领，一个规则槽。改写整个系统。,六位首領，一個規則槽。改寫整個系統。,6体のボス。1つのルール枠。システムを書き換えろ。,보스 여섯. 규칙 슬롯 하나. 시스템을 다시 쓰세요.
+Dodge the marked attack. Approach the open core. SHIFT takes its rule and gives it yours. E uses your stolen rule.,Dodge the marked attack. Approach the open core. SHIFT takes its rule and gives it yours. E uses your stolen rule.,闪避标记攻击，靠近暴露的核心。SHIFT 夺取敌方规则，同时交出你的规则。E 使用夺来的规则。,閃避標記攻擊，靠近暴露的核心。SHIFT 奪取敵方規則，同時交出你的規則。E 使用奪來的規則。,予告攻撃を避け、開いたコアへ。SHIFTでルールを交換。Eで奪ったルールを使う。,표시된 공격을 피하고 열린 코어에 접근하세요. SHIFT로 규칙을 교환하고 E로 빼앗은 규칙을 사용하세요.
+Each boss escalates through three protocols. Your rule carries forward; each clear repairs 3 hull. Retry the current boss freely.,Each boss escalates through three protocols. Your rule carries forward; each clear repairs 3 hull. Retry the current boss freely.,每位首领有三个战斗阶段。规则保留至下一战；每次胜利回复 3 点装甲。可随时重试当前首领。,每位首領有三個戰鬥階段。規則保留至下一戰；每次勝利回復 3 點裝甲。可隨時重試目前首領。,各ボスは3段階に変化。ルールは次戦へ持ち越し、勝利で装甲3回復。現在のボスから再挑戦できます。,보스마다 세 단계로 격화됩니다. 규칙은 이어지고 승리 시 장갑 3을 회복합니다. 현재 보스부터 다시 도전할 수 있습니다.
+Begin protocol,Begin protocol,开始挑战,開始挑戰,挑戦開始,도전 시작
+Next boss,Next boss,下一位首领,下一位首領,次のボス,다음 보스
+System freed. You are no longer its exception.,System freed. You are no longer its exception.,系统已解放。你不再是它的例外。,系統已解放。你不再是它的例外。,システムは解放された。君はもう、その例外ではない。,시스템이 해방되었습니다. 당신은 더 이상 예외가 아닙니다.
+%s  /  %d transfers  /  %d retries,%s  /  %d transfers  /  %d retries,%s  /  %d 次交换  /  %d 次重试,%s  /  %d 次交換  /  %d 次重試,%s  /  交換 %d  /  再挑戦 %d,%s  /  교환 %d회  /  재도전 %d회
+Your rule carries forward. Hull repaired +3.,Your rule carries forward. Hull repaired +3.,规则保留至下一战。装甲回复 +3。,規則保留至下一戰。裝甲回復 +3。,ルールを持ち越し。装甲 +3 回復。,규칙이 이어집니다. 장갑 +3 회복.
+Protocol run pauses here. Leaving ends this run.,Protocol run pauses here. Leaving ends this run.,挑战已暂停。返回大厅会结束本轮挑战。,挑戰已暫停。返回大廳會結束本輪挑戰。,挑戦を一時停止中。ロビーに戻ると今回の挑戦は終了します。,도전이 일시 정지되었습니다. 로비로 돌아가면 이번 도전이 끝납니다.
+Backup save restored,Backup save restored,已从备份恢复存档,已從備份恢復存檔,バックアップから復元しました,백업 저장을 복구했습니다
+PROTOCOL I,PROTOCOL I,协议 I,協定 I,プロトコル I,프로토콜 I
+PROTOCOL II,PROTOCOL II,协议 II,協定 II,プロトコル II,프로토콜 II
+PROTOCOL III,PROTOCOL III,协议 III,協定 III,プロトコル III,프로토콜 III
+Attack pattern accelerated,Attack pattern accelerated,攻击节奏加快,攻擊節奏加快,攻撃パターン加速,공격 패턴 가속
+Return attacks armed,Return attacks armed,强化追击已启动,強化追擊已啟動,強化追撃を起動,강화 후속 공격 가동

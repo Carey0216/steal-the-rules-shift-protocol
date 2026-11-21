@@ -110,10 +110,10 @@ func _route() -> void:
 		var future: Vector2 = route.targets[i]
 		_line(future + Vector2(0, -15), future, DIM, 2.0)
 	var pad: bool = g.last_device == "pad"
-	var strike := "X" if pad else "J"
-	var rule := "Y" if pad else "E"
-	var dodge := "B" if pad else "K"
-	var symbols := {"echo": "!", "reflect": rule, "swap": ("RB" if pad else "SHIFT"), "break": strike, "timer": strike, "belt": strike, "combo": strike, "hold": "", "evade": dodge}
+	var strike: String = g.key_label("strike")
+	var rule: String = g.key_label("rule")
+	var dodge: String = g.key_label("dodge")
+	var symbols := {"echo": "!", "reflect": rule, "swap": g.key_label("steal"), "break": strike, "timer": strike, "belt": strike, "combo": strike, "hold": "", "evade": dodge}
 	var target: Vector2 = route.target() - Vector2(0, 34)
 	if route.kind == "phase":
 		_marker(target, "I" if route.cursor % 2 == 0 else "II", GREEN if route.cursor % 2 == 0 else Color("#e7be85"))
@@ -588,6 +588,9 @@ func _hud() -> void:
 		_text(g.RULE_NAMES[g.boss_rule], 1081, 59, 24, tint, true, HORIZONTAL_ALIGNMENT_RIGHT, 224, 29)
 		_rect(374, 63, 405, 6, LINE)
 		_rect(374, 63, 405.0 * g.boss_hp / g.boss_max_hp, 6, accent)
+		for fraction in [0.34, 0.67]:
+			_rect(374 + fraction * 405, 61, 2, 10, INK)
+		_text(["PROTOCOL I", "PROTOCOL II", "PROTOCOL III"][g.boss_phase - 1], 576, 83, 11, RED if g.boss_phase == 3 else DIM, false, HORIZONTAL_ALIGNMENT_CENTER)
 
 	var slot_color: Color = g.RULE_COLORS[g.player_rule]
 	if not route_run or g.player_rule != g.Rule.EMPTY:

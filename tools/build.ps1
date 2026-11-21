@@ -9,9 +9,11 @@ $projectPath = Split-Path $PSScriptRoot -Parent
 
 function Invoke-Engine {
     param([string[]] $EngineArgs)
-    & $enginePath --headless --path $projectPath @EngineArgs
-    if ($LASTEXITCODE -ne 0) {
-        throw "Godot exited with code $LASTEXITCODE."
+    $engineOutput = & $enginePath --headless --path $projectPath @EngineArgs 2>&1
+    $engineExit = $LASTEXITCODE
+    $engineOutput | ForEach-Object { Write-Output $_ }
+    if ($engineExit -ne 0 -or ($engineOutput -match 'SCRIPT ERROR:|^ERROR:')) {
+        throw "Godot check failed (exit $engineExit). Review the errors above."
     }
 }
 
@@ -42,6 +44,7 @@ try {
     New-Item -ItemType File -Path 'builds/.gdignore' -Force | Out-Null
     Invoke-Engine -EngineArgs @('--import')
     Invoke-Engine -EngineArgs @('--script', 'tests/smoke.gd')
+    Invoke-Engine -EngineArgs @('--script', 'tests/release.gd')
     Invoke-Engine -EngineArgs @('--export-release', 'Web', "$stage/web/index.html")
     Invoke-Engine -EngineArgs @('--export-release', 'Windows', "$stage/windows/runtime/ShiftProtocolGame.exe")
     $csc = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
@@ -51,7 +54,7 @@ try {
     & $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$launcherOut" $launcherSource
     if ($LASTEXITCODE -ne 0) { throw 'Could not compile the Windows launcher.' }
 
-    $notices = @('LICENSE','docs/GODOT_LICENSE.txt','docs/GODOT_COPYRIGHT.txt','assets/ART-NOTES.txt')
+    $notices = @('LICENSE','docs/GODOT_LICENSE.txt','docs/GODOT_COPYRIGHT.txt','assets/ART-NOTES.txt','docs/AI-DISCLOSURE.md')
     $notices += @(Get-ChildItem -Path 'assets/OFL-*.txt' -File | Select-Object -ExpandProperty FullName)
     foreach ($target in @('web','windows')) {
         $noticePath = "$stage/$target/notices"
@@ -59,13 +62,15 @@ try {
         Copy-Item -LiteralPath $notices -Destination $noticePath -Force
     }
     Copy-Item -LiteralPath 'docs/PLAY-ZH.md' -Destination "$stage/windows/PLAY-ZH.md"
+    Copy-Item -LiteralPath 'docs/PLAY-EN.md' -Destination "$stage/windows/README.md"
+    Copy-Item -LiteralPath 'docs/CAMPAIGN-48-ZH.md' -Destination "$stage/windows/CAMPAIGN-48-ZH.md"
 
     $webFiles = @('index.html','index.js','index.pck','index.wasm','notices')
     foreach ($optional in @('index.icon.png','index.apple-touch-icon.png','index.png','index.audio.worklet.js','index.audio.position.worklet.js')) {
         if (Test-Path -LiteralPath "$stage/web/$optional") { $webFiles += $optional }
     }
     $webPaths = @($webFiles | ForEach-Object { "$stage/web/$_" })
-    $winPaths = @('ShiftProtocol.exe','runtime','PLAY-ZH.md','notices' | ForEach-Object { "$stage/windows/$_" })
+    $winPaths = @('ShiftProtocol.exe','runtime','README.md','PLAY-ZH.md','CAMPAIGN-48-ZH.md','notices' | ForEach-Object { "$stage/windows/$_" })
     Compress-Archive -LiteralPath $webPaths -DestinationPath "$stage/shift-protocol-web.zip" -CompressionLevel Optimal
     Compress-Archive -LiteralPath $winPaths -DestinationPath "$stage/shift-protocol-windows-x64.zip" -CompressionLevel Optimal
     $backedUp = @()

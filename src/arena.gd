@@ -10,6 +10,7 @@ const Levels = preload("res://src/levels.gd")
 const Gear = preload("res://src/gear.gd")
 const Route = preload("res://src/route.gd")
 const Controls = preload("res://src/controls.gd")
+const SaveStore = preload("res://src/save_store.gd")
 const SAVE = "user://shift_protocol.cfg"
 const SIZE = Vector2(1152, 648)
 const LEFT = 68.0
@@ -162,23 +163,29 @@ var phase_transition := 0.0
 var route_shifts := 0
 var context_practice := -1
 var deploy_time := 0.0
+var protocol_run := false
+var boss_phase := 1
+var run_retries := 0
+var run_perfect := 0
+var save_recovered := false
 
 func _ready() -> void:
 	Locale.install()
 	Engine.physics_ticks_per_second = 120
-	_bind(&"left", [], [])
-	_bind(&"right", [], [])
+	_bind(&"left", [], [JOY_BUTTON_DPAD_LEFT])
+	_bind(&"right", [], [JOY_BUTTON_DPAD_RIGHT])
 	_bind(&"jump", [], [JOY_BUTTON_A])
 	_bind(&"strike", [], [JOY_BUTTON_X])
 	_bind(&"rule", [], [JOY_BUTTON_Y])
 	_bind(&"dodge", [], [JOY_BUTTON_B])
 	_bind(&"steal", [], [JOY_BUTTON_RIGHT_SHOULDER])
-	_bind(&"confirm", [KEY_ENTER], [])
+	_bind(&"confirm", [KEY_ENTER], [JOY_BUTTON_A])
 	_bind(&"pause", [], [JOY_BUTTON_START])
 	_bind(&"retry", [], [JOY_BUTTON_BACK])
 	_bind(&"full", [KEY_F11], [])
-	if not save_path.is_empty() and config.load(save_path) != OK:
-		config.load(save_path + ".backup")
+	var profile := SaveStore.load_profile(save_path)
+	config = profile.config
+	save_recovered = profile.recovered
 	controls.install(config)
 	campaign.load_from(config, Levels.TABLE.size())
 	get_tree().auto_accept_quit = false
@@ -235,6 +242,14 @@ func _bind(action: StringName, keys: Array, buttons: Array) -> void:
 		InputMap.action_add_event(action, event)
 
 func _input(event: InputEvent) -> void:
+	# Some Windows accessibility/virtual keyboards report a Pause scan code
+	# for every injected key. Reparse its logical key without adding bindings.
+	if OS.get_name() == "Windows" and event is InputEventKey and event.physical_keycode == KEY_PAUSE and event.keycode != KEY_PAUSE and event.keycode != 0:
+		var corrected := event.duplicate() as InputEventKey
+		corrected.physical_keycode = event.keycode
+		Input.parse_input_event(corrected)
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventJoypadButton and event.pressed:
 		last_device = "pad"
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -301,11 +316,14 @@ func _save() -> Error:
 	var result := config.save(temporary)
 	if result != OK:
 		return result
-	if FileAccess.file_exists(save_path):
+	if FileAccess.file_exists(save_path) and not save_recovered:
 		result = DirAccess.copy_absolute(save_path, save_path + ".backup")
 		if result != OK:
 			return result
-	return DirAccess.rename_absolute(temporary, save_path)
+	result = DirAccess.rename_absolute(temporary, save_path)
+	if result == OK:
+		save_recovered = false
+	return result
 
 func save_and_quit() -> void:
 	if _save() != OK:
@@ -317,6 +335,7 @@ func save_and_quit() -> void:
 		get_tree().quit()
 
 func return_to_lobby(next_page := "") -> void:
+	protocol_run = false
 	if context_practice >= 0:
 		next_page = "new_lesson"
 		title_menu.active_lesson = context_practice
@@ -339,6 +358,7 @@ func return_from_practice() -> void:
 func begin_sector(index: int) -> bool:
 	if not campaign.selectable(index, Levels.TABLE.size()):
 		return false
+	protocol_run = false
 	starter.assign(campaign.reserved)
 	campaign.reserved.clear()
 	if _save() != OK:
@@ -532,6 +552,9 @@ func _physics_process(dt: float) -> void:
 	queue_redraw()
 
 func _new_run() -> void:
+	protocol_run = true
+	run_retries = 0
+	run_perfect = 0
 	mission_sector = false
 	replay = false
 	practice = -1
@@ -567,6 +590,8 @@ func _retry() -> void:
 		title_menu._retry_from_results()
 		return
 	sector_retries += 1
+	if protocol_run:
+		run_retries += 1
 	if practice >= 0:
 		begin_practice(practice, practice_return)
 		return
@@ -580,6 +605,7 @@ func _retry() -> void:
 	audio_rig.fire("start")
 
 func _load_arena() -> void:
+	boss_phase = 1
 	checkpoint = {"rule": player_rule, "hp": hp, "time": run_time, "steals": steals, "hits": hits_taken}
 	boss_max_hp = roundi(float(ENCOUNTERS[stage].hp) * 1.35)
 	boss_hp = boss_max_hp
@@ -660,6 +686,7 @@ func _load_arena() -> void:
 	mode = "brief"
 
 func begin_practice(lesson: int, return_page := "guide") -> void:
+	protocol_run = false
 	stage = 0
 	hp = MAX_HP
 	player_rule = Rule.EMPTY
@@ -671,6 +698,7 @@ func begin_practice(lesson: int, return_page := "guide") -> void:
 	practice_return = return_page
 
 func begin_context_practice(id: int) -> void:
+	protocol_run = false
 	var training := {20: 7, 21: 16, 23: 1}
 	if id == 22:
 		begin_practice(2, "new_lesson")
@@ -1012,6 +1040,13 @@ func _strike() -> void:
 	if ahead < -53.0 or ahead > reach or p.y > b.y + 33.0 or p.y < b.y - 138.0:
 		return
 	var damage := 3 if state in ["exposed", "reboot"] else 1
+	if boss_rule == Rule.AEGIS and state in ["windup", "active"] and lift <= 0.0:
+		audio_rig.fire("deny")
+		_burst(core_pos(), RULE_COLORS[Rule.AEGIS], 8, 120.0)
+		return
+	# A shielded or locked core cannot consume a primed counterstrike.
+	if not boss_locks.is_empty() or (mission_sector and stage == 2 and capacitor_power <= 0.0 and not state in ["reboot", "exposed"]):
+		return
 	if counter_time > 0.0:
 		damage += 4
 		counter_time = 0.0
@@ -1019,11 +1054,6 @@ func _strike() -> void:
 	if followup_time > 0.0:
 		damage += 2
 		followup_time = 0.0
-	if boss_rule == Rule.AEGIS and state in ["windup", "active"]:
-		if lift <= 0.0:
-			audio_rig.fire("deny")
-			_burst(core_pos(), RULE_COLORS[Rule.AEGIS], 8, 120.0)
-			return
 	if lift > 0.0:
 		damage += 4
 		lift = 0.0
@@ -1155,6 +1185,8 @@ func _finish_arena() -> void:
 	sector_result = {"seconds": sector_time, "hits": hits_taken - int(checkpoint.hits), "retries": sector_retries}
 	sector_result.perfect = perfect_dodges
 	sector_result.shifts = steals - int(checkpoint.steals) + route_shifts
+	if protocol_run:
+		run_perfect += perfect_dodges
 	if mission_sector:
 		var fast: bool = sector_time <= Levels.TABLE[sector_index][5]
 		var clean: bool = sector_result.hits <= (1 if Levels.TABLE[sector_index][2] == "boss" else 0)
@@ -1248,12 +1280,21 @@ func _tick_boss(dt: float) -> void:
 
 func _windup() -> void:
 	zones.clear()
-	overclock_attack = overclock_pending or (mission_sector and sector_index >= 24 and sector_time > 14.0 and boss_hp < boss_max_hp * 0.62)
+	if practice < 0:
+		var next_phase := 3 if boss_hp <= boss_max_hp * 0.34 else (2 if boss_hp <= boss_max_hp * 0.67 else 1)
+		if next_phase > boss_phase:
+			boss_phase = next_phase
+			phase_transition = 0.8
+			_report("PROTOCOL III" if boss_phase == 3 else "PROTOCOL II", "Return attacks armed" if boss_phase == 3 else "Attack pattern accelerated", 1.8)
+			audio_rig.fire("objective")
+	overclock_attack = overclock_pending or boss_phase == 3 or (mission_sector and sector_index >= 24 and sector_time > 14.0 and boss_hp < boss_max_hp * 0.62)
 	overclock_pending = false
 	rail_return = false
 	target_x = clampf(p.x, LEFT + 86, RIGHT - 86)
 	b_facing = 1.0 if p.x >= b.x else -1.0
 	var t := maxf(0.51, 0.73 - stage * 0.05) + (0.18 if assist else 0.0)
+	if boss_phase >= 2:
+		t = maxf(0.51, t - 0.04)
 	match boss_rule:
 		Rule.RUSH:
 			move_name = "RAIL CUT"

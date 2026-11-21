@@ -59,3 +59,22 @@ src/equipment_icons.gd:
   Original vector equipment symbols, including the three new behavior items.
 src/arena_art.gd:
   Original procedural bosses, region scenery, hazards and real-state effects.
+
+assets/gate-overlook.webp
+  Original environment generated with OpenAI's built-in image tool during v1.4.
+  Provenance recovered from development chat on 2026-11-21.
+  Original generation id: exec-d0fcd3c9-34be-4fe6-8795-a72e316c5339
+  Original image size 1672 x 941; converted to WebP quality 91, method 6.
+  Prompt:
+  Wide landscape 16:9 premium hand-painted atmospheric 2D action game key art
+  for original SHIFT PROTOCOL industrial science-fiction. First-person overlook
+  of an immense abandoned industrial research facility suspended inside a deep
+  stormy mountain ravine at blue hour. Dominant monumental circular breach gate
+  on the right third, weathered ceramic and brushed titanium, a small yellow-white
+  power slit across its center, suspended walkways and strong depth, a small
+  silhouetted mechanic in the near-right foreground, nothing derived from any
+  franchise. Moody ink navy and blue slate, muted copper, soft gilded cream key
+  light, filmic natural haze, graphic clear silhouettes, fine environment painting.
+  Left 45 percent open, very dark near-black navy with subtle distant geometry
+  and soft mist for title negative space. No writing, typography, watermark,
+  logos, UI, borders or text. Full bleed cinematic composition.
