@@ -19,5 +19,3 @@
 **Upload settings:** HTML project; 1152 × 648 embed; fullscreen enabled; Web ZIP marked “played in browser”; Windows ZIP marked Windows download. Single-thread WebGL 2 build. Keyboard/controller, desktop browsers. No mobile/touch claim. Free to play for jam judging. Mark generative AI usage in the itch.io metadata and include the public source URL.
 
 **Source:** https://github.com/Carey0216/steal-the-rules-shift-protocol
-
-**Status:** v1.7.0 is a locally prepared candidate. Do not claim it has been published or entered in the jam until both steps are confirmed on their respective services.

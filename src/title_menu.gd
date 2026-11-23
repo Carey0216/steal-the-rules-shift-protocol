@@ -63,6 +63,8 @@ var active_lesson := -1
 var money_clicks := 0
 var money_deadline := 0
 var money_authorized := false
+var money_note := ""
+var money_entry: LineEdit
 var map_region := -1
 var map_focus := -1
 var last_view := ""
@@ -180,24 +182,28 @@ func _style(fill: Color, border: Color, width := 1) -> StyleBoxFlat:
 	return box
 
 func _place(node: Control, parent: Control, at: Rect2) -> void:
-	parent.add_child(node)
 	node.position = at.position
 	node.size = at.size
+	parent.add_child(node)
+	# A wrapped Label first measures against its width, then its height.
+	# Reapply the box after insertion so the initial zero-width measurement
+	# cannot leave a tall, one-character-per-line minimum in the layout.
+	node.size = at.size
+	node.set_meta("layout_rect", at)
 
 func _label(parent: Control, key: String, at: Rect2, size: int, shade := PAPER, large := false, wrap := false) -> Label:
 	var label := Label.new()
 	label.text = _t(key)
 	var font := Locale.face(Locale.current(), large)
 	var scaled_size := _text_size(size)
-	label.add_theme_font_override("font", font)
-	if wrap and at.size.x > 0.0 and at.size.y > 0.0:
-		while scaled_size > 12 and font.get_multiline_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, at.size.x, scaled_size).y > at.size.y:
+	if not wrap:
+		while scaled_size > 12 and font.get_height(scaled_size) > at.size.y:
 			scaled_size -= 1
+	label.add_theme_font_override("font", font)
 	if not wrap and at.size.x > 0:
-		var width := font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, scaled_size).x
-		if width > at.size.x:
-			scaled_size = maxi(size, floori(scaled_size * at.size.x / width))
 		label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.tooltip_text = label.text
 	label.add_theme_font_size_override("font_size", scaled_size)
 	label.add_theme_color_override("font_color", shade)
 	if wrap:
@@ -208,6 +214,16 @@ func _label(parent: Control, key: String, at: Rect2, size: int, shade := PAPER, 
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_place(label, parent, at)
 	return label
+
+func _scroll_copy(parent: Control, text: String, at: Rect2, size: int) -> void:
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	_place(scroll, parent, at)
+	var copy := _label(scroll, text, Rect2(0, 0, at.size.x - 18, 1), size, PAPER, false, true)
+	copy.custom_minimum_size.x = at.size.x - 18
+	copy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	copy.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 
 func _panel(parent: Control, at: Rect2, fill: Color, border := LINE) -> Panel:
 	var panel := Panel.new()
@@ -226,9 +242,15 @@ func _button(parent: Control, key: String, at: Rect2, callback: Callable, primar
 	button.add_theme_font_override("font", Locale.face(Locale.current()))
 	var font := button.get_theme_font("font")
 	var size := _text_size(16)
+	while size > 12 and font.get_height(size) + 6.0 > at.size.y:
+		size -= 1
 	var text_width := font.get_string_size(button.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
-	if text_width > at.size.x - 24.0:
-		size = maxi(14, floori(size * (at.size.x - 24.0) / text_width))
+	var text_room := at.size.x - (49.0 if primary else 38.0)
+	if at.size.x < 60:
+		text_room = at.size.x - 8.0
+	if text_width > text_room:
+		size = maxi(14, floori(size * text_room / text_width))
+	button.tooltip_text = button.text
 	button.add_theme_font_size_override("font_size", size)
 	var text_color := INK if primary else (DANGER if danger else PAPER)
 	button.add_theme_color_override("font_color", text_color)
@@ -273,6 +295,8 @@ func _button_skin(fill: Color, border: Color, primary := false, lit := false) ->
 	skin.lit = lit
 	skin.content_margin_left = 15
 	skin.content_margin_right = 26 if primary else 15
+	skin.content_margin_top = 3
+	skin.content_margin_bottom = 3
 	return skin
 
 func _option(parent: Control, items: Array, chosen: int, at: Rect2, callback: Callable) -> OptionButton:
@@ -315,8 +339,12 @@ func _modal(title: String, at: Rect2) -> Panel:
 	_place(dim, ui, Rect2(0, 0, 1152, 648))
 	var panel := _panel(ui, at, PANEL, LINE)
 	panel.add_theme_stylebox_override("panel", _button_skin(PANEL, LINE))
-	_label(panel, title, Rect2(28, 19, at.size.x - 104, 52), 33, AMBER, true)
-	_panel(panel, Rect2(28, 72, at.size.x - 56, 1), LINE, LINE)
+	if not title.is_empty():
+		_label(panel, title, Rect2(28, 19, at.size.x - 104, 52), 33, AMBER, true)
+		_panel(panel, Rect2(28, 72, at.size.x - 56, 1), LINE, LINE)
+	if game.mode == "title" and page != "language" and not title.is_empty():
+		var close := _button(panel, "×", Rect2(at.size.x - 61, 23, 33, 33), back)
+		close.tooltip_text = _t("Back")
 	if opening_page and not game.reduced_motion and not game.save_path.is_empty():
 		dim.modulate.a = 0.0
 		panel.modulate.a = 0.0
@@ -379,7 +407,7 @@ func _draw_page() -> void:
 	var view: String = game.mode + ":" + page
 	var focused := get_viewport().gui_get_focus_owner()
 	if focused != null and focused is Button and is_ancestor_of(focused):
-		focus_memory[last_view] = focused.text
+		focus_memory[last_view] = _focus_key(focused)
 	opening_page = view != last_view
 	last_view = view
 	display_picker = null
@@ -412,14 +440,23 @@ func _draw_page() -> void:
 	if page != "money" and focus_memory.has(view):
 		_restore_focus.call_deferred(ui, focus_memory[view])
 
-func _restore_focus(parent: Node, text: String) -> void:
+func _focus_key(button: Control) -> String:
+	var point := Vector2.ZERO
+	var cursor: Node = button
+	while cursor != null and cursor != ui:
+		if cursor.has_meta("layout_rect"):
+			point += (cursor.get_meta("layout_rect") as Rect2).position
+		cursor = cursor.get_parent()
+	return str(point)
+
+func _restore_focus(parent: Node, key: String) -> void:
 	if not is_instance_valid(parent):
 		return
 	for child in parent.get_children():
-		if child is Button and child.text == text and not child.disabled and not text.is_empty():
+		if child is Button and _focus_key(child) == key and not child.disabled:
 			child.grab_focus()
 			return
-		_restore_focus(child, text)
+		_restore_focus(child, key)
 
 func _title_controls() -> void:
 	var cleared: int = game.campaign.records.size()
@@ -427,12 +464,12 @@ func _title_controls() -> void:
 	var level: Array = Levels.TABLE[frontier]
 	var in_campaign := cleared < Levels.TABLE.size()
 	var action := "Start operation" if cleared == 0 else "Continue operation"
-	var play := _button(ui, "Protocol run", Rect2(64, 272, 264, 52), _open.bind("protocol"), true)
-	_button(ui, action if in_campaign else "Sector map", Rect2(64, 336, 264, 45), _prepare_from_lobby.bind(frontier) if in_campaign else _open_map)
+	var play := _button(ui, "Protocol run", Rect2(64, 272, 264, 48), _open.bind("protocol"), true)
+	_button(ui, action if in_campaign else "Sector map", Rect2(64, 330, 264, 48), _prepare_from_lobby.bind(frontier) if in_campaign else _open_map)
 	if in_campaign:
-		_button(ui, "Sector map", Rect2(64, 393, 264, 45), _open_map)
-	_button(ui, "Equipment shop", Rect2(64, 450, 264, 45), _open_shop.bind(-1))
-	_button(ui, "Field archive", Rect2(64, 507, 264, 45), _open_archive.bind(0))
+		_button(ui, "Sector map", Rect2(64, 388, 264, 48), _open_map)
+	_button(ui, "Equipment shop", Rect2(64, 446 if in_campaign else 388, 264, 48), _open_shop.bind(-1))
+	_button(ui, "Field archive", Rect2(64, 504 if in_campaign else 446, 264, 48), _open_archive.bind(0))
 	var dispatch := _panel(ui, Rect2(858, 227, 244, 309), Color("#0b202bea"), Color("#526c6e"))
 	_label(dispatch, "Next sector", Rect2(19, 13, 206, 31), 14, AMBER)
 	_label(dispatch, "%02d" % (frontier + 1), Rect2(19, 51, 206, 54), 40, GREEN, true)
@@ -459,7 +496,7 @@ func _title_controls() -> void:
 
 func _protocol() -> void:
 	var panel := _modal("Protocol run", Rect2(184, 112, 784, 424))
-	_label(panel, "Six bosses. One rule slot. Rewrite the system.", Rect2(30, 73, 724, 61), 27, PAPER, true, true)
+	_label(panel, "Six bosses. One rule slot.", Rect2(30, 73, 724, 61), 27, PAPER, true)
 	_label(panel, "Dodge the marked attack. Approach the open core. SHIFT takes its rule and gives it yours. E uses your stolen rule.", Rect2(30, 145, 724, 92), 18, DIM, false, true)
 	_label(panel, "Each boss escalates through three protocols. Your rule carries forward; each clear repairs 3 hull. Retry the current boss freely.", Rect2(30, 245, 724, 73), 16, DIM, false, true)
 	var start := _button(panel, "Begin protocol", Rect2(30, 340, 352, 53), _launch_protocol, true)
@@ -514,31 +551,58 @@ func _wallet_pressed() -> void:
 		money_deadline = now + 2400
 	if money_clicks == 5:
 		money_clicks = 0
-		money_authorized = false
-		_open.call_deferred("money")
+		_open_money.call_deferred()
+
+func _open_money() -> void:
+	money_authorized = false
+	money_note = ""
+	_open("money")
 
 func _money() -> void:
-	var panel := _modal("", Rect2(341, 245, 470, 138))
+	var panel := _modal("Enter new coin amount" if money_authorized else "", Rect2(306, 200, 540, 248) if money_authorized else Rect2(306, 241, 540, 166))
 	var entry := LineEdit.new()
+	money_entry = entry
 	entry.max_length = 9
 	entry.secret = not money_authorized
-	_place(entry, panel, Rect2(22, 39, 303, 49))
-	var submit := func(value: String):
-		if not money_authorized:
-			if value == "MONEY":
-				money_authorized = true
-				_draw_page.call_deferred()
-		elif value.is_valid_int() and int(value) >= 0 and int(value) <= Gear.MAX_COINS:
-			var previous: int = game.campaign.coins
-			game.campaign.coins = int(value)
-			if game._save() == OK:
-				money_authorized = false
-				_open.call_deferred("")
-			else:
-				game.campaign.coins = previous
-	entry.text_submitted.connect(submit)
-	_button(panel, "Confirm", Rect2(340, 39, 108, 49), func(): submit.call(entry.text), true)
+	entry.add_theme_font_override("font", Locale.face(Locale.current()))
+	entry.add_theme_font_size_override("font_size", _text_size(19))
+	entry.add_theme_stylebox_override("normal", _style(INK, LINE))
+	entry.add_theme_stylebox_override("focus", _style(INK, GREEN, 2))
+	entry.placeholder_text = "0 – 999999999" if money_authorized else ""
+	entry.text = str(game.campaign.coins) if money_authorized else ""
+	_place(entry, panel, Rect2(28, 96 if money_authorized else 28, 484, 46))
+	if not money_note.is_empty():
+		_label(panel, money_note, Rect2(28, 148 if money_authorized else 78, 484, 32), 14, DANGER, false, true)
+	entry.text_submitted.connect(_submit_money)
+	_button(panel, "Cancel", Rect2(28, 188 if money_authorized else 112, 228, 40), back)
+	_button(panel, "Confirm", Rect2(280, 188 if money_authorized else 112, 232, 40), func(): _submit_money(entry.text), true)
 	entry.grab_focus()
+	if money_authorized:
+		entry.select_all()
+
+func _submit_money(value: String) -> void:
+	value = value.strip_edges()
+	if not money_authorized:
+		if value == "MONEY":
+			money_authorized = true
+			money_note = ""
+		else:
+			money_note = "Invalid command."
+		_draw_page.call_deferred()
+		return
+	if not value.is_valid_int() or int(value) < 0 or int(value) > Gear.MAX_COINS:
+		money_note = "Choose a whole number from 0 to 999999999."
+		_draw_page.call_deferred()
+		return
+	var previous: int = game.campaign.coins
+	game.campaign.coins = int(value)
+	if game._save() == OK:
+		game.save_error = false
+		_open.call_deferred("")
+	else:
+		game.campaign.coins = previous
+		money_note = "Could not save. Your balance has not changed."
+		_draw_page.call_deferred()
 
 func _draw_gear(gear: Button) -> void:
 	var center := gear.size * 0.5
@@ -552,6 +616,8 @@ func _draw_gear(gear: Button) -> void:
 func _open(next: String) -> void:
 	if next != "money":
 		money_clicks = 0
+		money_authorized = false
+		money_note = ""
 	var previous := page
 	page = next
 	if game.save_path.is_empty() or game.reduced_motion or next == previous or game.mode != "title":
@@ -765,7 +831,7 @@ func _map() -> void:
 	_label(detail, status, Rect2(19, 14, 232, 38), 14, tint if map_focus <= cleared else DIM)
 	_label(detail, selected_level[0], Rect2(19, 53, 238, 97), 28, PAPER, true, true)
 	_panel(detail, Rect2(19, 154, 238, 1), LINE, LINE)
-	_label(detail, Levels.GOALS[selected_level[2]], Rect2(19, 168, 238, 116), 17, PAPER, false, true)
+	_label(detail, Levels.GOALS[selected_level[2]], Rect2(19, 168, 238, 133), 17, PAPER, false, true)
 	if map_focus > cleared:
 		_label(detail, _t("Clear sector %02d to advance.") % (cleared + 1), Rect2(19, 314, 238, 75), 14, DIM, false, true)
 	else:
@@ -813,7 +879,7 @@ func _mission() -> void:
 	_back_arrow(screen, Rect2(48, 35, 44, 43), back, "Back")
 	_label(screen, "%02d  /  %s" % [sector_pending + 1, _t(Levels.REGIONS[level[1]])], Rect2(48, 128, 659, 33), 17, tint)
 	_label(screen, level[0], Rect2(48, 166, 659, 86), 50, PAPER, true)
-	_label(screen, Levels.GOALS[level[2]], Rect2(48, 251, 647, 65), 19, PAPER, false, true)
+	_label(screen, Levels.GOALS[level[2]], Rect2(48, 251, 647, 72), 19, PAPER, false, true)
 	_mission_diagram(screen, level, tint)
 	_label(screen, "Bonus star targets", Rect2(48, 555, 223, 49), 14, DIM)
 	_label(screen, "%s    /    %s" % [_t("Time ≤ %ds") % int(level[5]), _t("Hits ≤ %d") % (1 if level[2] == "boss" else 0)], Rect2(278, 555, 421, 49), 17, tint)
@@ -830,9 +896,9 @@ func _mission() -> void:
 		_gear_badge(loadout, Rect2(22, y, 35, 35), id, true)
 		_label(loadout, Gear.ITEMS[id][0], Rect2(69, y, 284, 36), 15)
 	if reserved.is_empty():
-		_label(loadout, "Equipment is optional.", Rect2(22, 140, 331, 64), 16, DIM, false, true)
-	_label(loadout, "Equipment timers start when the fight begins.", Rect2(22, 276, 331, 48), 13, DIM, false, true)
-	_button(loadout, "Equipment shop", Rect2(22, 325, 331, 45), _open_shop.bind(sector_pending))
+		_label(loadout, "Equipment is optional.", Rect2(22, 140, 331, 72), 16, DIM, false, true)
+	_label(loadout, "Equipment timers start when the fight begins.", Rect2(22, 276, 331, 56), 13, DIM, false, true)
+	_button(loadout, "Equipment shop", Rect2(22, 337, 331, 40), _open_shop.bind(sector_pending))
 	_show_save_notice(screen, Rect2(48, 514, 659, 32))
 	_panel(screen, Rect2(48, 547, 1056, 1), LINE, LINE)
 	var deploy := _button(screen, "Start sector", Rect2(729, 565, 375, 50), _start_selected, true)
@@ -882,19 +948,19 @@ func _shop() -> void:
 		var item: Array = Gear.ITEMS[id]
 		var slot := i % 4
 		var selected: bool = id in reserved
-		var card := _panel(screen, Rect2(48 + (slot % 2) * 386, 135 + (slot / 2) * 202, 368, 184), Color("#17333e"), AMBER if selected else LINE)
+		var card := _panel(screen, Rect2(48 + (slot % 2) * 386, 135 + (slot / 2) * 206, 368, 194), Color("#17333e"), AMBER if selected else LINE)
 		_panel(card, Rect2(0, 0, 368, 3), AMBER if selected else GREEN.darkened(0.4), LINE)
 		_gear_badge(card, Rect2(16, 22, 58, 58), id)
 		_label(card, item[0], Rect2(91, 15, 258, 44), 24, PAPER, true)
-		_label(card, item[1], Rect2(91, 62, 258, 45), 14, DIM, false, true)
-		_label(card, _t("Effect lasts %d seconds") % int(item[2]), Rect2(16, 104, 333, 29), 13, GREEN)
-		var button := _button(card, (_t("Remove · %d coins") % int(item[3])) if selected else (_t("Buy · %d coins") % int(item[3])), Rect2(16, 135, 333, 35), _refund.bind(id) if selected else _buy.bind(id), not selected)
+		_label(card, item[1], Rect2(91, 62, 258, 58), 14, DIM, false, true)
+		_label(card, _t("Effect lasts %d seconds") % int(item[2]), Rect2(16, 121, 333, 24), 13, GREEN)
+		var button := _button(card, (_t("Remove · %d coins") % int(item[3])) if selected else (_t("Buy · %d coins") % int(item[3])), Rect2(16, 147, 333, 36), _refund.bind(id) if selected else _buy.bind(id), not selected)
 		button.disabled = not selected and (reserved.size() >= Gear.MAX_LOADOUT or item[3] > game.campaign.coins)
 		if button.disabled:
 			button.text = _t("Loadout full") if reserved.size() >= Gear.MAX_LOADOUT else (_t("%d coins short") % (item[3] - game.campaign.coins))
 		if purchased_id == id and selected:
 			_animate_purchase(card)
-	var loadout := _panel(screen, Rect2(842, 135, 262, 386), Color("#0d2530"), Color("#637b76"))
+	var loadout := _panel(screen, Rect2(842, 135, 262, 400), Color("#0d2530"), Color("#637b76"))
 	_label(loadout, "Starting loadout", Rect2(18, 13, 227, 45), 22, AMBER, true)
 	for i in Gear.MAX_LOADOUT:
 		var y := 70.0 + i * 80.0
@@ -908,7 +974,7 @@ func _shop() -> void:
 			var empty := _panel(loadout, Rect2(17, y, 228, 67), Color("#10212b"), LINE.darkened(0.2))
 			_label(empty, "%02d" % (i + 1), Rect2(14, 8, 44, 48), 22, DIM, true)
 			_label(empty, "Empty slot", Rect2(67, 8, 149, 48), 15, DIM)
-	_label(loadout, "Cancel freely before deployment. Full refund.", Rect2(18, 318, 227, 57), 14, DIM, false, true)
+	_label(loadout, "Cancel freely before deployment. Full refund.", Rect2(18, 331, 227, 57), 14, DIM, false, true)
 	_panel(screen, Rect2(48, 547, 1056, 1), LINE, LINE)
 	_back_arrow(screen, Rect2(48, 568, 44, 46), _shop_page.bind(-1), "Previous").disabled = gear_page == 0
 	_back_arrow(screen, Rect2(159, 568, 44, 46), _shop_page.bind(1), "Next", true).disabled = gear_page >= pages - 1
@@ -1214,6 +1280,7 @@ func _guide() -> void:
 		var x := 913.0 + index * 39.0
 		var tab := _button(screen, "%d" % (index + 1), Rect2(x, 67, 35, 26), _choose_demo.bind(index), false, index == chapter)
 		tab.add_theme_font_size_override("font_size", 13)
+		tab.size = Vector2(35, 26)
 		tab.tooltip_text = _t(DEMOS[index][1])
 		tab.disabled = onboarding and index > chapter and not lesson_watched.has(index - 1)
 	_button(screen, "Try it", Rect2(780, 490, 324, 45), _try_lesson)
@@ -1241,7 +1308,7 @@ func _guide_screen(heading: String, title: String, instructions: String, keys: A
 	_place(preview, screen, GUIDE_FRAME)
 	_panel(screen, Rect2(780, 135, 324, 3), tone, tone)
 	_label(screen, title, Rect2(780, 153, 324, 91), 34, PAPER, true, true)
-	_label(screen, instructions, Rect2(780, 251, 324, 179), 17, PAPER, false, true)
+	_scroll_copy(screen, instructions, Rect2(780, 251, 324, 179), 17)
 	if not keys.is_empty():
 		_draw_keycaps(screen, keys, 440)
 	_panel(screen, Rect2(48, 553, 1056, 1), LINE, LINE)
@@ -1318,11 +1385,12 @@ func _next_lesson() -> void:
 		_finish_guide()
 
 func _finish_guide() -> void:
+	var was_onboarding := onboarding
 	onboarding = false
 	game.guide_seen = true
 	game._save()
 	chapter = 0
-	_open("")
+	_open("" if was_onboarding else "archive")
 
 func _toggle_demo() -> void:
 	if not is_playing and demo_time >= demo_duration():

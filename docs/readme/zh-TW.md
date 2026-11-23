@@ -1,89 +1,65 @@
-<p align="center"><img src="../../assets/icon.svg" width="112" height="112" alt="SHIFT PROTOCOL 標誌"></p>
-<h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
+# STEAL THE RULES: SHIFT PROTOCOL
 
-<p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本與更新日誌" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.6.0-398274?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下載 Windows x64 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89-Windows%20x64-3b5d88?style=for-the-badge"></a>
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下載 Web HTML5 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89-Web%20HTML5-825874?style=for-the-badge"></a>
-  <a href="#行動指南"><img alt="行動指南" src="https://img.shields.io/badge/%E6%8C%87%E5%8D%97-%E7%B9%81%E9%AB%94%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
-</p>
+[English](../../README.md) · [简体中文](zh-CN.md) · [繁體中文](zh-TW.md) · [日本語](ja.md) · [한국어](ko.md)
 
-[English](../../README.md) · [中文（简体）](../../docs/readme/zh-CN.md) · **中文（繁體）** · [日本語](../../docs/readme/ja.md) · [한국어](../../docs/readme/ko.md)
+一款以規則交換為核心的 2D 動作遊戲。按下 SHIFT，奪取首領的能力，同時把自己的規則交給它。
 
-一款靠偷取規則改變戰局的 2D Boss Rush。為 GitHub Game Off 2026 使用 Godot 與 GDScript 製作。
+[下載 Windows 版](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip) · [下載網頁版](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip) · [v1.7.0](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/tag/v1.7.0)
 
+## 開始遊戲
 
+Windows 版解壓後執行 **ShiftProtocol.exe**，保留旁邊的 `runtime` 資料夾。網頁版可上傳 itch.io，或透過 HTTP 服務開啟 `index.html`，使用桌面瀏覽器遊玩。
 
+## 兩種玩法
 
-**v1.7.0 發行候選版：** 在大廳選擇「協定挑戰」，體驗六首領完整流程、三階段變化、規則繼承與裝甲修復；可重試目前首領。保留 48 關戰役與既有存檔，改善極限閃避、存檔恢復與改鍵提示。本版本尚未公開或提交參賽。
+**協定挑戰**：連續迎戰六位首領。過關後繼承規則、修復最多三點裝甲，失敗可從目前首領重試。首領在 67% 與 34% 血量切換戰鬥階段。
 
-## 遊戲特色
+**行動戰役**：八個區域、48 關，進度自動儲存。包含相位平台、錨點換位、移動渡台、貨物接力及守衛截擊。
 
-| | |
-| --- | --- |
-| 48 關 / 八個區域 | 19 種路線機制、14 個 Boss 關卡，以及 13 條終點有守衛截擊的路線。每個區域都以 Boss 戰收尾。 |
-| Shift 的三種意義 | 與敵人交換規則、與錨點交換位置，以及切換世界相位，讓另一組平台實體化。 |
-| 極限閃避 | 攻擊命中前閃避穿過，可強化下一次攻擊，傷害 +4，2 秒內有效。普通閃避仍保留原有保護。 |
-| 可撤銷的出戰配置 | 23 種短時裝備，出戰前最多買三種。點擊已購槽位或撤銷按鈕即可全額退回金幣，再換購。減益僅在對抗中掉落。 |
-| 指南與設定 | 29 段實機示範及練習，支援重設按鍵、獨立調整總音量/音樂/音效與震動畫面強度。左下角常駐顯示動作及按鍵。 |
+觀察攻擊預警，閃避或跳出危險區，再靠近暴露的核心。交換前會預告雙方收到的規則。按 **SHIFT** 交換，按 **E** 使用：RUSH 交換站位並向前衝斬；LIFT 讓首領落地、讓自己升空；AEGIS 剝離裝甲，並能接下近處的一擊反彈傷害。
 
-![繼續下一關，或開啟地圖、商店、檔案與設定。](../lobby-zh-TW.png)
+## 操作
 
-繼續下一關，或開啟地圖、商店、檔案與設定。
-
-![先選區域，再選關卡，出戰前查看目標。](../map-zh-TW.png)
-
-先選區域，再選關卡，出戰前查看目標。
-
-![每件裝備會標明有效時間，點右側已購槽位即可退款。](../equipment-zh-TW.png)
-
-每件裝備會標明有效時間，點右側已購槽位即可退款。
-
-![世界相移教學：左側播放實機示範，右側列出步驟與按鍵。](../guide-zh-TW.png)
-
-世界相移教學：左側播放實機示範，右側列出步驟與按鍵。
-
-## 操作方式
-
-| 操作 | 預設鍵盤按鍵 | 手把 |
+| 操作 | 鍵盤 | 手柄 |
 | --- | --- | --- |
-| 選單確認 | Enter | A |
-| 向左移動 | A | ← Stick |
-| 向右移動 | D | Stick → |
+| 向左／向右 | A / D | Stick / D-pad |
 | 跳躍 | Space | A |
-| 揮刀（可按住） | J | X |
+| 揮刀，可按住連續攻擊 | J | X |
 | 閃避 | K | B |
-| 相移 / 交換 | Shift | RB |
-| 使用目前能力 | E | Y |
+| 交換規則 | Shift | RB |
+| 使用能力 | E | Y |
 | 暫停 | Esc | Start |
 | 重試 | R | Back |
+| 確認戰鬥簡報 | Enter | A |
 
-## Shift 如何改變戰局
+可重設鍵盤操作，調整字體大小、輔助模式、減少動態效果、分項音量和畫面震動。行動檔案提供實戰示範及練習。
 
-奪取 **RUSH** 時會與 Boss 交換位置，並自動轉向敵人；奪取 **LIFT** 使 Boss 落地，懸陣機的甲板也會坍塌；奪取 **AEGIS** 剝離裝甲，產生短暫增傷窗口。Boss 會接過你的舊規則，改變下一招。交換前請確認雙方圖示。
+## MONEY：實驗性金幣修改
 
-## 行動指南
+方便直接嘗試不同裝備。
 
-1. 解壓縮 Windows 整包，執行 **ShiftProtocol.exe**，保留 runtime 資料夾。首次預設全螢幕。選好語言，依序看五課，或按「親手練習」試做。
+1. 在大廳，**2.4 秒內連續點擊金幣餘額五次**。
+2. 輸入 **MONEY** 並確認。
+3. 出現金幣數量提示後，輸入 **0～999999999** 的整數，再次確認。
 
-2. 觀察紅色蓄力預警。閃避或離開危險區後，靠近開啟的核心並按 **Shift** 交換。**E** 使用能力，閃避條充滿後才能再次閃避。
+只會修改存檔金幣，不會解鎖關卡或改變星級。遊戲內保留隱藏入口。
 
-3. 攻擊即將碰到你時按 **K** 穿過，觸發極限閃避。金色環與音效代表反擊就緒；2 秒內下一次揮刀命中會消耗一次強化。
+## 遊戲畫面
 
-4. 相位關查看 **I / II**，按 Shift 啟用對應平台。錨點關先進入大圓環，再按 Shift 交換位置。新機制會自動示範，之後可在 **？** 回看。
+![lobby](../lobby-zh-TW.png)
 
-5. 部分路線需要在完成檢查點後擊敗守衛。重玩亦按每顆星 1000 金幣發獎。商店已購槽位在出戰前可全額撤銷再換購，購買裝備持續 7–9 秒，開戰才計時。
+![map](../map-zh-TW.png)
 
-6. 齒輪開啟設定。每個動作只有一個按鍵，選已佔用的鍵會互換綁定，左下角提示同步更新。可分別調整總音量、音樂、音效與震動畫面。Esc 暫停，「儲存並離開」保留本機進度。
+![equipment](../equipment-zh-TW.png)
 
-## 執行與建置
+![guide](../guide-zh-TW.png)
 
-網頁版適用於桌面瀏覽器。透過 HTTP 開啟 index.html，或將 Web ZIP 上傳至 itch.io。原始碼使用標準版 Godot 4.7.2，建置說明包含匯出與測試步驟。
+## 從原始碼執行
 
-[下載帶標籤版本](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [建置說明](../BUILD.md)
+以 **Godot 4.7.2 標準版**開啟 `project.godot`，按 F5 執行。匯出說明見 [BUILD.md](../BUILD.md)。
 
 ## 製作與授權
 
-Carey 製作。Codex 協助程式、測試、文件，以及角色原畫和動作姿態生成。遊戲執行時不使用 AI。原創專案檔案採 MIT，字型保留 SIL OFL，Godot 及其相依套件保留各自授權。介面研究參考 Hell759735653《燼域》和 FunX《Foundation-基地-Game UI》，未將其圖片打包。
+Carey 製作。Codex 協助程式、設計、程序繪圖與音訊、翻譯和文件；角色原畫、動作圖集和背景使用 OpenAI 圖像生成。執行時不使用 AI。[AI 使用說明](../AI-DISCLOSURE.md) · [素材記錄](../../assets/ART-NOTES.txt)
 
-[美術與參考說明](../../assets/ART-NOTES.txt)
+原創專案檔案採用 [MIT](../../LICENSE)，字型與 Godot 保留各自授權。

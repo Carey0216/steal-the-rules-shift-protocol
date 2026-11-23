@@ -24,6 +24,7 @@ func _run() -> void:
 	_test_profiles()
 	_test_blocked_counter()
 	_test_protocol_menu()
+	_test_money()
 	for seed_value in [17, 94, 2026]:
 		for assisted in [false, true]:
 			g.assist = assisted
@@ -94,6 +95,29 @@ func _test_profiles() -> void:
 	for suffix in ["", ".backup", ".next"]:
 		if FileAccess.file_exists(path + suffix):
 			DirAccess.remove_absolute(path + suffix)
+
+func _test_money() -> void:
+	g.return_to_lobby()
+	var coins: int = g.campaign.coins
+	var records: Array = g.campaign.records.duplicate(true)
+	g.title_menu._open_money()
+	g.title_menu._submit_money("wrong")
+	_check(not g.title_menu.money_authorized and g.campaign.coins == coins, "An incorrect MONEY command cannot edit coins.")
+	g.title_menu._submit_money("MONEY")
+	_check(g.title_menu.money_authorized, "MONEY opens the amount step.")
+	for invalid in ["", "-1", "1.5", "9999999999", "hello"]:
+		g.title_menu._submit_money(invalid)
+		_check(g.campaign.coins == coins, "Invalid amounts leave coins unchanged.")
+	g.title_menu._submit_money("123456")
+	_check(g.campaign.coins == 123456 and g.campaign.records == records, "MONEY edits only the coin balance.")
+	g.title_menu._open_money()
+	g.title_menu._submit_money("MONEY")
+	g.save_path = "user://missing-release-test-directory/profile.cfg"
+	g.title_menu._submit_money("999")
+	_check(g.campaign.coins == 123456 and not g.title_menu.money_note.is_empty(), "MONEY restores the old balance when saving fails.")
+	g.save_path = ""
+	g.campaign.coins = coins
+	g.return_to_lobby()
 
 func _test_blocked_counter() -> void:
 	g._new_run()

@@ -457,3 +457,8 @@ PROTOCOL II,PROTOCOL II,协议 II,協定 II,プロトコル II,프로토콜 II
 PROTOCOL III,PROTOCOL III,协议 III,協定 III,プロトコル III,프로토콜 III
 Attack pattern accelerated,Attack pattern accelerated,攻击节奏加快,攻擊節奏加快,攻撃パターン加速,공격 패턴 가속
 Return attacks armed,Return attacks armed,强化追击已启动,強化追擊已啟動,強化追撃を起動,강화 후속 공격 가동
+Six bosses. One rule slot.,Six bosses. One rule slot.,六位首领，一个规则槽。,六位首領，一個規則槽。,6体のボス、1つのルール枠。,"보스 여섯, 규칙 슬롯 하나."
+Enter new coin amount,Enter new coin amount,请输入修改金币数,請輸入修改金幣數,変更後のコイン数を入力,변경할 코인 수를 입력하세요
+Invalid command.,Invalid command.,指令不正确。,指令不正確。,コマンドが違います。,올바른 명령어가 아닙니다.
+Choose a whole number from 0 to 999999999.,Choose a whole number from 0 to 999999999.,请输入 0 到 999999999 之间的整数。,請輸入 0 到 999999999 之間的整數。,0～999999999の整数を入力してください。,0부터 999999999 사이의 정수를 입력하세요.
+Could not save. Your balance has not changed.,Could not save. Your balance has not changed.,保存失败，金币数量未改变。,儲存失敗，金幣數量未變更。,保存できませんでした。コイン数は変更されていません。,저장하지 못했습니다. 코인 수는 변경되지 않았습니다.

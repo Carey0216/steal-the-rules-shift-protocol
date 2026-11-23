@@ -28,4 +28,6 @@ Use the question mark for gameplay recordings and drills. Bought campaign gear c
 
 Created by Carey with substantial AI assistance. See **notices/AI-DISCLOSURE.md**, asset notes, MIT, font and Godot notices. No runtime AI. No external telemetry or online leaderboard.
 
-This is a locally prepared release candidate. Online publication and jam submission are separate creator-confirmed steps.
+## MONEY — experimental coin editor
+
+In the lobby, click the coin balance five times within 2.4 seconds. Enter MONEY and confirm, then enter an integer from 0 to 999999999. This changes saved coins only, not sector unlocks or stars.

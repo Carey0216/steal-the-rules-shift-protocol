@@ -8,7 +8,7 @@ var disabled := false
 var focus_only := false
 
 func _get_minimum_size() -> Vector2:
-	return Vector2(16, 16)
+	return Vector2(maxf(content_margin_left, 0) + maxf(content_margin_right, 0), maxf(content_margin_top, 0) + maxf(content_margin_bottom, 0))
 
 func _draw(item: RID, at: Rect2) -> void:
 	var r := at.grow(-0.5)
