@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.7.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="Versions and release notes" src="https://img.shields.io/badge/Versions-v1.1.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Download Windows x64 ZIP" src="https://img.shields.io/badge/Download-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Download Web HTML5 ZIP" src="https://img.shields.io/badge/Download-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#field-guide"><img alt="Field guide" src="https://img.shields.io/badge/Read-Field%20guide-795c35?style=for-the-badge"></a>
@@ -89,15 +89,3 @@ For trying different equipment without replaying sectors for coins.
 3. When the amount prompt appears, enter an integer from **0 to 999999999** and confirm.
 
 This sets the saved coin balance. It does not unlock sectors or change stars. The entry stays hidden in the game.
-
-## Play and build
-
-Web HTML5 is a desktop browser build: serve index.html over HTTP, or upload the Web ZIP to itch.io. Source builds use standard Godot 4.7.2. See the build instructions for exports.
-
-[Download a tagged release](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [Build instructions](docs/BUILD.md)
-
-## Credits and license
-
-Created by Carey. Codex assisted with code, testing, documentation, generated character artwork, animation poses and the gate background. No runtime AI is used. Original project files use MIT. Fonts retain their SIL OFL notices; Godot and dependencies retain their notices. Interface study references: Hell759735653’s Ember Veil and FunX’s Foundation UI. Their images are not distributed with the game.
-
-[Art and reference notes](assets/ART-NOTES.txt)

@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="バージョンと更新履歴" src="https://img.shields.io/badge/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3-v1.7.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="バージョンと更新履歴" src="https://img.shields.io/badge/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3-v1.1.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP をダウンロード" src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP をダウンロード" src="https://img.shields.io/badge/%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#攻略ガイド"><img alt="攻略ガイド" src="https://img.shields.io/badge/%E3%82%AC%E3%82%A4%E3%83%89-%E6%97%A5%E6%9C%AC%E8%AA%9E-795c35?style=for-the-badge"></a>
@@ -89,15 +89,3 @@
 3. 金額入力画面で**0～999999999**の整数を入力し、確定します。
 
 保存済みのコイン残高だけを変更します。区画や星は変わりません。
-
-## 起動とビルド
-
-Web 版はデスクトップブラウザー用です。HTTP で index.html を開くか、Web ZIP を itch.io にアップロードしてください。ソースは標準版 Godot 4.7.2 を使用。ビルド手順にエクスポートとテストを記載しています。
-
-[タグ付きバージョンを取得](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [ビルド手順](../BUILD.md)
-
-## クレジットとライセンス
-
-Carey 制作。Codex はコード、テスト、文書、キャラクターイラストと動作ポーズの生成を補助しました。実行中の AI は使用しません。独自ファイルは MIT、フォントは SIL OFL、Godot と依存ライブラリは各ライセンスです。UI研究参考は Hell759735653 の Ember Veil と FunX の Foundation UI。参考作品の画像は同梱していません。
-
-[アートと参考資料](../../assets/ART-NOTES.txt)

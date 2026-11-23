@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/%EB%B2%84%EC%A0%84-v1.7.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="버전 및 업데이트 기록" src="https://img.shields.io/badge/%EB%B2%84%EC%A0%84-v1.1.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="Windows x64 ZIP 다운로드" src="https://img.shields.io/badge/%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="Web HTML5 ZIP 다운로드" src="https://img.shields.io/badge/%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#플레이-가이드"><img alt="플레이 가이드" src="https://img.shields.io/badge/%EA%B0%80%EC%9D%B4%EB%93%9C-%ED%95%9C%EA%B5%AD%EC%96%B4-795c35?style=for-the-badge"></a>
@@ -89,15 +89,3 @@
 3. 금액 입력 화면에서 **0～999999999** 사이의 정수를 입력하고 확인합니다.
 
 저장된 코인 잔액만 변경하며 구역 해금이나 별 기록은 바뀌지 않습니다.
-
-## 실행과 빌드
-
-Web 버전은 데스크톱 브라우저용입니다. HTTP로 index.html을 열거나 Web ZIP을 itch.io에 올리세요. 소스는 일반 Godot 4.7.2를 사용합니다. 빌드 안내에 내보내기와 테스트가 있습니다.
-
-[태그 버전 다운로드](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [빌드 안내](../BUILD.md)
-
-## 제작 및 라이선스
-
-Carey 제작. Codex가 코드, 테스트, 문서, 캐릭터 원화와 동작 포즈 생성을 지원했습니다. 실행 중 AI를 사용하지 않습니다. 원본 파일은 MIT, 글꼴은 SIL OFL, Godot와 의존성은 각 라이선스를 따릅니다. UI 연구 참고는 Hell759735653의 Ember Veil과 FunX의 Foundation UI입니다. 참고 작품 이미지는 배포하지 않습니다.
-
-[미술 및 참고 자료](../../assets/ART-NOTES.txt)

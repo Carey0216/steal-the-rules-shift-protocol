@@ -10,12 +10,10 @@
 
 **Learning:** Five initial lessons, 24 mechanic recordings and hands-on drills. New mechanics introduce themselves before entry. Menus and guides support English, 简体中文, 繁體中文, 日本語 and 한국어.
 
-**Credits and AI disclosure:** Carey. Made in Godot for GitHub Game Off 2026. Substantial AI assistance: Codex for design, programming, procedural bosses/scenery/audio, tests, balancing, translations and documentation. Original operative illustration, eight-pose sprite sheet and gate overlook background were generated with OpenAI's image tool. No runtime AI. Original project files are MIT, with separate font and Godot notices. See [full disclosure](AI-DISCLOSURE.md).
-
 **Tags:** boss-rush, action, 2d, sci-fi, singleplayer, game-off-2026
 
 **Screenshots, in order:** [Rule exchange](transfer.png) · [Lattice deck breach](breach.png) · [Protocol overview](protocol.png) · [Lobby](lobby.png) · [Map](map.png).
 
-**Upload settings:** HTML project; 1152 × 648 embed; fullscreen enabled; Web ZIP marked “played in browser”; Windows ZIP marked Windows download. Single-thread WebGL 2 build. Keyboard/controller, desktop browsers. No mobile/touch claim. Free to play for jam judging. Mark generative AI usage in the itch.io metadata and include the public source URL.
+**Upload settings:** HTML project; 1152 × 648 embed; fullscreen enabled; Web ZIP marked “played in browser”; Windows ZIP marked Windows download. Single-thread WebGL 2 build. Keyboard/controller, desktop browsers. No mobile/touch claim. Free to play for jam judging.
 
 **Source:** https://github.com/Carey0216/steal-the-rules-shift-protocol

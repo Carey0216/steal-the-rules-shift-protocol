@@ -1,4 +1,4 @@
-# STEAL THE RULES: SHIFT PROTOCOL — v1.7.0
+# STEAL THE RULES: SHIFT PROTOCOL — v1.1.0
 
 Extract the complete ZIP, then open **ShiftProtocol.exe**. Keep the runtime folder next to it. Windows x64; no installation or online account needed. Use Settings or F11 to switch fullscreen.
 
@@ -25,8 +25,6 @@ Protocol run carries your rule and repairs up to 3 hull after each victory. Retr
 Settings offer keyboard remapping, larger text, assist mode, reduced motion, independent master/music/effects levels and shake strength. Assist gives longer reaction and defensive windows. Every action has one configurable keyboard key; assigning an occupied key swaps bindings. Losing focus pauses combat.
 
 Use the question mark for gameplay recordings and drills. Bought campaign gear can be removed for a full refund before entry. Effects begin in combat and expire. Penalty gear only drops in combat.
-
-Created by Carey with substantial AI assistance. See **notices/AI-DISCLOSURE.md**, asset notes, MIT, font and Godot notices. No runtime AI. No external telemetry or online leaderboard.
 
 ## MONEY — experimental coin editor
 

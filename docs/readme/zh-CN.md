@@ -2,7 +2,7 @@
 <h1 align="center">STEAL THE RULES: SHIFT PROTOCOL</h1>
 
 <p align="center">
-  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.7.0-398274?style=for-the-badge"></a>
+  <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases"><img alt="版本与更新日志" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-v1.1.0-398274?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-windows-x64.zip"><img alt="下载 Windows x64 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Windows%20x64-3b5d88?style=for-the-badge"></a>
   <a href="https://github.com/Carey0216/steal-the-rules-shift-protocol/releases/latest/download/shift-protocol-web.zip"><img alt="下载 Web HTML5 ZIP" src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Web%20HTML5-825874?style=for-the-badge"></a>
   <a href="#行动指南"><img alt="行动指南" src="https://img.shields.io/badge/%E6%8C%87%E5%8D%97-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-795c35?style=for-the-badge"></a>
@@ -89,15 +89,3 @@
 3. 出现「请输入修改金币数」后，输入 **0～999999999** 之间的整数，再次确认。
 
 修改的是存档中的金币余额，不会解锁关卡或改变星级。游戏内保留隐藏入口。
-
-## 运行与构建
-
-网页版适用于桌面浏览器。通过 HTTP 服务打开 index.html，或将 Web ZIP 上传到 itch.io。源码使用标准版 Godot 4.7.2；构建说明包含导出步骤。
-
-[下载带标签的版本](https://github.com/Carey0216/steal-the-rules-shift-protocol/releases) · [构建说明](../BUILD.md)
-
-## 制作与许可
-
-Carey 制作。Codex 协助代码、测试、文档，以及角色原画、动作姿态和大厅背景的生成。游戏运行时不使用 AI。原创项目文件采用 MIT，字体保留 SIL OFL，Godot 及其依赖保留各自许可。界面研究参考 Hell759735653 的《烬域》和 FunX 的《Foundation-基地-Game UI》，项目未打包它们的图片。
-
-[美术与参考说明](../../assets/ART-NOTES.txt)
