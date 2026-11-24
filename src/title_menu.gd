@@ -81,6 +81,9 @@ var binding_note := ""
 var focus_memory := {}
 var purchased_id := -1
 var page_animation: Tween
+var skip_button: Button
+var skip_dialog: ConfirmationDialog
+var skip_resume_playback := false
 
 func _ready() -> void:
 	layer = 4
@@ -398,6 +401,7 @@ func _text_action(parent: Control, text: String, at: Rect2, action: Callable, en
 	return button
 
 func _draw_page() -> void:
+	_close_skip_dialog(false)
 	set_process(false)
 	if is_instance_valid(page_animation):
 		page_animation.kill()
@@ -1313,8 +1317,87 @@ func _guide_screen(heading: String, title: String, instructions: String, keys: A
 		_draw_keycaps(screen, keys, 440)
 	_panel(screen, Rect2(48, 553, 1056, 1), LINE, LINE)
 	demo_toggle = _button(screen, "Pause demo", Rect2(48, 572, 186, 48), _toggle_demo)
-	_label(screen, "Gameplay recording", Rect2(253, 572, 340, 48), 14, DIM)
+	_label(screen, "Gameplay recording", Rect2(253, 572, 310, 48), 14, DIM)
+	skip_button = _button(screen, "Skip", Rect2(582, 572, 174, 48), _request_skip)
 	return screen
+
+func _request_skip() -> void:
+	if game.mode != "title" or page not in ["guide", "new_lesson"] or is_instance_valid(skip_dialog):
+		return
+	var more_lessons: bool = chapter < DEMOS.size() - 1 if page == "guide" else sector_pending >= 0 and not lesson_pending.is_empty()
+	if not more_lessons:
+		_skip_lessons(false)
+		return
+	skip_resume_playback = is_playing
+	set_process(false)
+	skip_dialog = ConfirmationDialog.new()
+	skip_dialog.title = _t("Skip lessons?")
+	skip_dialog.dialog_text = _t("Skip this lesson or all remaining lessons in this sequence? You can replay them in the Field archive.")
+	skip_dialog.dialog_autowrap = true
+	skip_dialog.ok_button_text = _t("Skip current")
+	skip_dialog.cancel_button_text = _t("Keep watching")
+	skip_dialog.exclusive = true
+	skip_dialog.theme = Theme.new()
+	skip_dialog.theme.default_font = Locale.face(Locale.current())
+	skip_dialog.theme.default_font_size = _text_size(16)
+	skip_dialog.theme.set_stylebox("panel", "AcceptDialog", _style(PANEL, GREEN, 2))
+	for state in ["normal", "hover", "pressed", "focus"]:
+		skip_dialog.theme.set_stylebox(state, "Button", _style(INK if state == "normal" else PANEL.lightened(0.12), LINE if state == "normal" else GREEN))
+	for color_name in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		skip_dialog.theme.set_color(color_name, "Button", PAPER)
+	skip_dialog.get_label().add_theme_color_override("font_color", PAPER)
+	var all_button := skip_dialog.add_button(_t("Skip all this time"), true, "all")
+	all_button.pressed.connect(_skip_lessons.bind(true))
+	skip_dialog.confirmed.connect(_skip_lessons.bind(false))
+	skip_dialog.canceled.connect(_close_skip_dialog.bind(true))
+	add_child(skip_dialog)
+	skip_dialog.popup_centered(Vector2i(690, 240))
+	# Cancellation is the default for keyboard/controller confirmation.
+	skip_dialog.get_cancel_button().grab_focus()
+
+func _close_skip_dialog(resume: bool) -> void:
+	if not is_instance_valid(skip_dialog):
+		return
+	var dialog := skip_dialog
+	skip_dialog = null
+	dialog.hide()
+	dialog.queue_free()
+	if resume:
+		set_process(skip_resume_playback and is_playing)
+		if is_instance_valid(skip_button):
+			skip_button.grab_focus()
+	skip_resume_playback = false
+
+func _skip_lessons(all_remaining: bool) -> void:
+	if game.mode != "title" or page not in ["guide", "new_lesson"]:
+		return
+	_close_skip_dialog(false)
+	is_playing = false
+	set_process(false)
+	practice_demo_time = -1.0
+	if page == "new_lesson":
+		if sector_pending < 0:
+			_open("archive")
+		else:
+			# Skipping applies to this deployment, not the saved watched list.
+			if all_remaining:
+				lesson_pending.clear()
+			_next_context_lesson()
+		return
+	# Unlock the next basic lesson without waiting for this recording.
+	lesson_watched[chapter] = true
+	if not all_remaining and chapter < DEMOS.size() - 1:
+		_choose_demo(chapter + 1)
+	elif onboarding:
+		onboarding = false
+		game.guide_seen = true
+		chapter = 0
+		game._save()
+		lesson_pending.clear()
+		sector_pending = mini(game.campaign.records.size(), Levels.TABLE.size() - 1)
+		_deploy_pending()
+	else:
+		_finish_guide()
 
 func _draw_keycaps(parent: Control, keys: Array, y: float) -> void:
 	var x := 780.0
@@ -1451,6 +1534,9 @@ func play_arena_reveal() -> void:
 	screen.add_child(transition)
 
 func back() -> void:
+	if is_instance_valid(skip_dialog):
+		_close_skip_dialog(true)
+		return
 	binding_index = -1
 	game._save()
 	if page == "language":
