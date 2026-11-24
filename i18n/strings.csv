@@ -462,3 +462,9 @@ Enter new coin amount,Enter new coin amount,请输入修改金币数,請輸入�
 Invalid command.,Invalid command.,指令不正确。,指令不正確。,コマンドが違います。,올바른 명령어가 아닙니다.
 Choose a whole number from 0 to 999999999.,Choose a whole number from 0 to 999999999.,请输入 0 到 999999999 之间的整数。,請輸入 0 到 999999999 之間的整數。,0～999999999の整数を入力してください。,0부터 999999999 사이의 정수를 입력하세요.
 Could not save. Your balance has not changed.,Could not save. Your balance has not changed.,保存失败，金币数量未改变。,儲存失敗，金幣數量未變更。,保存できませんでした。コイン数は変更されていません。,저장하지 못했습니다. 코인 수는 변경되지 않았습니다.
+Skip,Skip,跳过,跳過,スキップ,건너뛰기
+Skip lessons?,Skip lessons?,跳过引导？,跳過引導？,ガイドをスキップしますか？,안내를 건너뛸까요?
+Skip current,Skip current,仅跳过当前,僅跳過目前,現在のガイドのみ,현재 안내만
+Skip all this time,Skip all this time,跳过本次全部,跳過本次全部,今回の残りすべて,이번 안내 모두
+Keep watching,Keep watching,继续观看,繼續觀看,視聴を続ける,계속 보기
+Skip this lesson or all remaining lessons in this sequence? You can replay them in the Field archive.,Skip this lesson or all remaining lessons in this sequence? You can replay them in the Field archive.,仅跳过当前引导，还是跳过本次剩余的全部引导？之后可在行动档案中重新观看。,僅跳過目前引導，還是跳過本次剩餘的全部引導？之後可在行動檔案中重新觀看。,現在のガイドだけ、または今回の残りすべてをスキップできます。あとでフィールドアーカイブから見直せます。,현재 안내만 또는 이번에 남은 안내를 모두 건너뛸 수 있습니다. 나중에 현장 기록에서 다시 볼 수 있습니다。
