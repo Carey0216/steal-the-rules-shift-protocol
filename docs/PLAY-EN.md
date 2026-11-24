@@ -4,6 +4,8 @@ Extract the complete ZIP, then open **ShiftProtocol.exe**. Keep the runtime fold
 
 Choose a language, follow the five short lessons and try their drills. In the lobby choose **Protocol run** for the complete six-boss experience, or **Start/Continue operation** for the saved 48-sector campaign.
 
+Every lesson has **Skip**, available immediately. When more lessons follow, choose **Skip current** or **Skip all this time**. **Keep watching** resumes the same clip. Skipping the first-time guide starts gameplay directly. Campaign skips apply to this deployment only; lessons remain available in the Field archive.
+
 | Action | Key | Controller |
 | --- | --- | --- |
 | Move | A / D | Stick or D-pad |

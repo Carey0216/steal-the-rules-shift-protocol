@@ -8,7 +8,9 @@
 
 **Controls:** A left · D right · Space jump · J strike · K dodge · Shift exchange · E ability · Esc pause · R retry. Each action has one configurable key. Controller supported. Settings include assist mode, reduced motion, separate audio levels and screen shake.
 
-**Learning:** Five initial lessons, 24 mechanic recordings and hands-on drills. New mechanics introduce themselves before entry. Menus and guides support English, 简体中文, 繁體中文, 日本語 and 한국어.
+**Learning:** Five initial lessons, 24 mechanic recordings and hands-on drills. Every lesson has an immediately available **Skip** button. If more clips follow, choose **Skip current** or **Skip all this time**; **Keep watching** resumes the same clip. Skipping the first-time guide begins gameplay directly. Campaign skips apply to this deployment only, and recordings remain available in the Field archive. Menus and guides support English, 简体中文, 繁體中文, 日本語 and 한국어.
+
+**v1.1.0 update:** Optional tutorials with current/all skip choices, five-language skip controls, a smaller verified browser download and retry on interrupted loading. Windows and HTML5 builds contain the same gameplay update.
 
 **Tags:** boss-rush, action, 2d, sci-fi, singleplayer, game-off-2026
 
