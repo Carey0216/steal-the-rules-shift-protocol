@@ -68,7 +68,7 @@ Bosses change phase at **67%** and **34%** health. Later phases add return charg
 
 ## Field guide
 
-1. Extract the Windows ZIP and launch **ShiftProtocol.exe**, leaving its runtime folder in place. First launch is fullscreen. Choose your language, watch the five basic lessons and use **Try it** to practice.
+1. Extract the Windows ZIP and launch **ShiftProtocol.exe**, leaving its runtime folder in place. First launch is fullscreen. Choose your language, watch the five basic lessons and use **Try it** to practice. **Skip** is available immediately: choose the current lesson or all remaining lessons when a sequence follows. Skipping the first-time guide starts a playable sector. Campaign skips affect this deployment only; clips remain in the Field archive.
 
 2. Watch the red windup. Dodge or leave its marked zone, approach the opened core, then press **Shift**. Press **E** to use the stolen rule. The bar shows when dodge is ready.
 
