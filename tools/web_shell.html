@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>$GODOT_PROJECT_NAME</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090d10;color:#eef4f2;font-family:system-ui,sans-serif}
+#canvas{display:block;width:100%;height:100%;outline:none}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#090d10}
+.panel{width:min(380px,80vw);text-align:center}
+h1{font-size:26px;letter-spacing:.06em;margin:0 0 8px}p{font-size:14px;color:#a5b1bc;line-height:1.6}
+progress{display:block;width:100%;height:5px;margin:24px 0 16px;accent-color:#80fbd2}
+#detail{min-height:22px;font-variant-numeric:tabular-nums}
+button,a{font:inherit;color:#80fbd2}button{border:1px solid #80fbd2;background:transparent;padding:10px 22px;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid #eef4f2;outline-offset:4px}
+[hidden]{display:none!important}
+</style>
+$GODOT_HEAD_INCLUDE
+</head>
+<body>
+<canvas id="canvas" tabindex="0">Your browser does not support this game.</canvas>
+<div id="loading"><div class="panel">
+<h1>STEAL THE RULES</h1><p>SHIFT PROTOCOL</p>
+<progress id="progress" aria-label="Loading game"></progress>
+<p id="detail" role="status" aria-live="polite">Loading game…</p>
+<button id="retry" hidden>Try again</button>
+<p id="fallback" hidden><a href="https://carey0216.itch.io/steal-the-rules-shift-protocol#download" target="_blank" rel="noopener">Download the Windows edition</a></p>
+</div></div>
+<noscript>Enable JavaScript to play.</noscript>
+<script src="$GODOT_URL"></script>
+<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const SHIFT_PACK_SHA256 = '$SHIFT_PACK_SHA256';
+const SHIFT_WEB_PARTS = $SHIFT_WEB_PARTS;
+(async function () {
+    const chinese = navigator.language.toLowerCase().startsWith('zh');
+    const text = (en, zh) => chinese ? zh : en;
+    const overlay = document.getElementById('loading');
+    const progress = document.getElementById('progress');
+    const detail = document.getElementById('detail');
+    const retry = document.getElementById('retry');
+    let failed = false;
+    let lastActivity = Date.now();
+    let runtimeErrors = [];
+    const downloaded = new Map();
+    const totalBytes = Object.values(GODOT_CONFIG.fileSizes).reduce((a, b) => a + b, 0);
+    function updateProgress() {
+        lastActivity = Date.now();
+        progress.max = totalBytes;
+        progress.value = Array.from(downloaded.values()).reduce((a, b) => a + b, 0);
+        detail.textContent = text('Loading ', '正在加载 ') + Math.min(100, Math.floor(progress.value / totalBytes * 100)) + '%';
+    }
+    function failure(error) {
+        if (failed) return;
+        failed = true;
+        console.error(error);
+        overlay.hidden = false;
+        detail.textContent = text('Could not start the game. Please try again.', '游戏未能启动，请重试。');
+        progress.hidden = true;
+        retry.hidden = false;
+        document.getElementById('fallback').hidden = false;
+    }
+    retry.textContent = text('Try again', '重新加载');
+    retry.onclick = () => window.location.reload();
+    const watchdog = setInterval(() => {
+        if (Date.now() - lastActivity > 45000) failure(new Error('Loading stalled.'));
+    }, 5000);
+    try {
+        const missing = Engine.getMissingFeatures({threads: $GODOT_THREADS_ENABLED});
+        if (missing.length) throw new Error(missing.join('\n'));
+        const packName = GODOT_CONFIG.executable + '.pck';
+        const engine = new Engine(Object.assign({}, GODOT_CONFIG, {
+            onPrintError(message) { runtimeErrors.push(String(message)); console.error(message); },
+            onExit(code) { if (code !== 0) failure(new Error(runtimeErrors.join('\n') || 'Game exited: ' + code)); }
+        }));
+        const hashOf = async bytes => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), n => n.toString(16).padStart(2, '0')).join('');
+        // Short, independently verified requests survive CDN connections closing mid-download.
+        async function loadPart(part) {
+            for (let attempt = 0; attempt < 4; attempt++) {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 25000);
+                try {
+                    const response = await fetch(part.file, {signal: controller.signal});
+                    if (!response.ok) throw new Error('Resource download failed: ' + response.status);
+                    const bytes = new Uint8Array(await response.arrayBuffer());
+                    if (bytes.length !== part.size || await hashOf(bytes) !== part.sha256) throw new Error('Incomplete or corrupt resource: ' + part.file);
+                    downloaded.set(part.file, part.size);
+                    updateProgress();
+                    return bytes;
+                } catch (error) {
+                    if (attempt === 3 || failed) throw error;
+                    lastActivity = Date.now();
+                    detail.textContent = text('Connection interrupted. Retrying…', '连接中断，正在重试…');
+                    await new Promise(resolve => setTimeout(resolve, 600 * (attempt + 1)));
+                } finally { clearTimeout(timeout); }
+            }
+        }
+        const jobs = [];
+        for (const kind of ['pck', 'wasm']) SHIFT_WEB_PARTS[kind].forEach((part, index) => jobs.push({kind, index, part}));
+        const buffers = {pck: [], wasm: []};
+        let cursor = 0;
+        async function worker() {
+            while (cursor < jobs.length && !failed) {
+                const job = jobs[cursor++];
+                buffers[job.kind][job.index] = await loadPart(job.part);
+            }
+        }
+        await Promise.all(Array.from({length: 3}, worker));
+        if (failed) return;
+        function assemble(kind) {
+            const length = GODOT_CONFIG.fileSizes[GODOT_CONFIG.executable + '.' + kind];
+            const bytes = new Uint8Array(length);
+            let offset = 0;
+            for (const chunk of buffers[kind]) { bytes.set(chunk, offset); offset += chunk.length; }
+            if (offset !== length) throw new Error('Incomplete resource: ' + kind);
+            buffers[kind] = [];
+            return bytes;
+        }
+        const pack = assemble('pck');
+        if (new DataView(pack.buffer).getUint32(0, true) !== 0x43504447 || await hashOf(pack) !== SHIFT_PACK_SHA256) throw new Error('Invalid resource pack.');
+        const wasm = assemble('wasm');
+        detail.textContent = text('Starting game…', '正在启动游戏…');
+        // Feed the verified engine bytes to Godot's standard loader without another large request.
+        const nativeFetch = window.fetch;
+        const wasmUrl = new URL(GODOT_CONFIG.executable + '.wasm', document.baseURI).href;
+        window.fetch = (input, options) => new URL(typeof input === 'string' ? input : input.url, document.baseURI).href === wasmUrl
+            ? Promise.resolve(new Response(wasm, {headers: {'Content-Type': 'application/wasm'}})) : nativeFetch(input, options);
+        try { await engine.init(GODOT_CONFIG.executable); } finally { window.fetch = nativeFetch; }
+        await engine.preloadFile(pack.buffer, '/' + packName);
+        await engine.start({args: ['--main-pack', '/' + packName].concat(GODOT_CONFIG.args || [])});
+        if (!failed) { overlay.hidden = true; document.getElementById('canvas').focus(); }
+    } catch (error) { failure(error); }
+    finally { clearInterval(watchdog); }
+}());
+</script>
+</body>
+</html>

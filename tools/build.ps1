@@ -45,7 +45,29 @@ try {
     Invoke-Engine -EngineArgs @('--import')
     Invoke-Engine -EngineArgs @('--script', 'tests/smoke.gd')
     Invoke-Engine -EngineArgs @('--script', 'tests/release.gd')
+    Invoke-Engine -EngineArgs @('--script', 'tests/guide_skip.gd')
     Invoke-Engine -EngineArgs @('--export-release', 'Web', "$stage/web/index.html")
+    $webHtml = Join-Path $stage 'web/index.html'
+    $packHash = (Get-FileHash -LiteralPath "$stage/web/index.pck" -Algorithm SHA256).Hash.ToLowerInvariant()
+    $webParts = @{}
+    New-Item -ItemType Directory -Path "$stage/web/parts" -Force | Out-Null
+    foreach ($kind in @('pck','wasm')) {
+        $payload = [IO.File]::ReadAllBytes("$stage/web/index.$kind")
+        $parts = @()
+        for ($offset = 0; $offset -lt $payload.Length; $offset += 1MB) {
+            $count = [Math]::Min(1MB, $payload.Length - $offset)
+            $chunk = [byte[]]::new($count)
+            [Array]::Copy($payload, $offset, $chunk, 0, $count)
+            $name = 'parts/{0}-{1:d3}.{0}' -f $kind, [int]($offset / 1MB)
+            [IO.File]::WriteAllBytes("$stage/web/$name", $chunk)
+            $hash = (Get-FileHash -LiteralPath "$stage/web/$name" -Algorithm SHA256).Hash.ToLowerInvariant()
+            $parts += @{file=$name; size=$count; sha256=$hash}
+        }
+        $webParts[$kind] = $parts
+    }
+    $partManifest = $webParts | ConvertTo-Json -Depth 5 -Compress
+    $shell = [IO.File]::ReadAllText($webHtml).Replace('$SHIFT_PACK_SHA256', $packHash).Replace('$SHIFT_WEB_PARTS', $partManifest)
+    [IO.File]::WriteAllText($webHtml, $shell, [Text.UTF8Encoding]::new($false))
     Invoke-Engine -EngineArgs @('--export-release', 'Windows', "$stage/windows/runtime/ShiftProtocolGame.exe")
     $csc = Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
     if (-not (Test-Path -LiteralPath $csc -PathType Leaf)) { throw 'The Windows launcher requires the .NET Framework C# compiler.' }
@@ -65,13 +87,27 @@ try {
     Copy-Item -LiteralPath 'docs/PLAY-EN.md' -Destination "$stage/windows/README.md"
     Copy-Item -LiteralPath 'docs/CAMPAIGN-48-ZH.md' -Destination "$stage/windows/CAMPAIGN-48-ZH.md"
 
-    $webFiles = @('index.html','index.js','index.pck','index.wasm','notices')
+    $webFiles = @('index.html','index.js','parts','notices')
     foreach ($optional in @('index.icon.png','index.apple-touch-icon.png','index.png','index.audio.worklet.js','index.audio.position.worklet.js')) {
         if (Test-Path -LiteralPath "$stage/web/$optional") { $webFiles += $optional }
     }
     $webPaths = @($webFiles | ForEach-Object { "$stage/web/$_" })
     $winPaths = @('ShiftProtocol.exe','runtime','README.md','PLAY-ZH.md','CAMPAIGN-48-ZH.md','notices' | ForEach-Object { "$stage/windows/$_" })
     Compress-Archive -LiteralPath $webPaths -DestinationPath "$stage/shift-protocol-web.zip" -CompressionLevel Optimal
+    # itch.io recognizes gzip data under its original filename and serves the encoding header.
+    # Keep the unpacked build untouched so it also works on ordinary local HTTP servers.
+    Add-Type -AssemblyName System.IO.Compression
+    $webZip = [IO.Compression.ZipFile]::Open("$stage/shift-protocol-web.zip", [IO.Compression.ZipArchiveMode]::Update)
+    try {
+        foreach ($part in $webParts['wasm']) {
+            $webZip.GetEntry($part.file).Delete()
+            $wasmEntry = $webZip.CreateEntry($part.file, [IO.Compression.CompressionLevel]::NoCompression)
+            $entryStream = $wasmEntry.Open()
+            $gzip = [IO.Compression.GZipStream]::new($entryStream, [IO.Compression.CompressionLevel]::Optimal, $false)
+            $wasmSource = [IO.File]::OpenRead("$stage/web/$($part.file)")
+            try { $wasmSource.CopyTo($gzip) } finally { $wasmSource.Dispose(); $gzip.Dispose() }
+        }
+    } finally { $webZip.Dispose() }
     Compress-Archive -LiteralPath $winPaths -DestinationPath "$stage/shift-protocol-windows-x64.zip" -CompressionLevel Optimal
     $backedUp = @()
     $published = @()
